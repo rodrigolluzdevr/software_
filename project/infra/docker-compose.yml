@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    env_file: .env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+  
+  backend:
+    build: ../backend
+    env_file: .env
+    ports:
+      - "4000:4000"
+    volumes:
+      - ../backend:/app  # Mapeia o código local para o container
+      - /app/node_modules  # Evita sobrescrever node_modules
+    depends_on:
+      - postgres
+
+  frontend:
+    build: ../frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ../frontend:/app  # Mapeia o código local para o container
+      - /app/node_modules  # Evita sobrescrever node_modules
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
