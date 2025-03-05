@@ -3,6 +3,7 @@ import { PrismaService } from './database/prisma.service';
 import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
 import * as dotenv from 'dotenv'; // Importando dotenv
+import { DashboardController } from './modules/dashboard/dashboard.controller';
 
 // Carregar variáveis do .env
 dotenv.config();
@@ -12,6 +13,7 @@ dotenv.config();
     UserModule,
     AuthModule,
   ],
+  controllers: [DashboardController],
   providers: [PrismaService],
 })
 export class AppModule {

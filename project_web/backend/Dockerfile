@@ -2,6 +2,8 @@ FROM node:18-alpine
 
 WORKDIR /app  
 
+COPY prisma ./
+
 RUN npm install -g @nestjs/cli
 
 COPY package*.json ./  

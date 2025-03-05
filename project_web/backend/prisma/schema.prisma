@@ -8,10 +8,19 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  ADMIN
+  SECRETARIO
+  COORDENADOR
+  DIRETOR
+  PROFESSOR
+  USER
+}
+
 model User {
-  id       Int    @id @default(autoincrement())
-  name     String
-  email    String @unique
-  password String
-  role     String @default("USER")
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(USER) // Permissão do usuário (usando enum)
 }

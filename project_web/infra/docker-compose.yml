@@ -7,26 +7,34 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
-  
+      - "5432:5432"  # Porta padrão para acesso interno
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   backend:
     build: ../backend
     env_file: .env
     ports:
       - "4000:4000"
+      - "5555:5555"  # Expondo a porta do Prisma Studio
+
     volumes:
-      - ../backend:/app  # Mapeia o código local para o container
-      # Removemos a linha de mapeamento de node_modules para evitar sobrescrever
+      - ../backend:/app
+      - /app/node_modules  # Evita sobrescrever os módulos dentro do container
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy  # Aguarda o banco estar pronto antes de iniciar
 
   frontend:
     build: ../frontend
     ports:
       - "3000:3000"
     volumes:
-      - ../frontend:/app  # Mapeia o código local para o container
-      - /app/node_modules  # Evita sobrescrever node_modules
+      - ../frontend:/app
+      - /app/node_modules
     depends_on:
       - backend
 
