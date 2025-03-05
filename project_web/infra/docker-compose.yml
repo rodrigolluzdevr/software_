@@ -16,7 +16,7 @@ services:
       - "4000:4000"
     volumes:
       - ../backend:/app  # Mapeia o código local para o container
-      - /app/node_modules  # Evita sobrescrever node_modules
+      # Removemos a linha de mapeamento de node_modules para evitar sobrescrever
     depends_on:
       - postgres
 
