@@ -1,3 +1,4 @@
+// Login.tsx
 import { useState } from "react";
 import { useRouter } from "next/router";
 import { jwtDecode } from "jwt-decode";
@@ -35,13 +36,14 @@ export default function Login() {
         throw new Error("Token inválido ou ausente na resposta");
       }
 
-      localStorage.setItem("token", token); // Armazena o token JWT
-
-      // Decodifica o token para obter o role do usuário
+      // Armazena o token e o role no sessionStorage
+      sessionStorage.setItem("token", token); // Usando sessionStorage
       const decodedToken = jwtDecode(token) as { role: string };
-      console.log("Token decodificado:", decodedToken); // Log do token decodificado
-
       const userRole = decodedToken.role;
+      sessionStorage.setItem("role", userRole); // Armazena o role
+
+      // Disparar evento storage para atualizar o withAuth (nova adição)
+      window.dispatchEvent(new Event("storage"));
 
       // Redireciona com base no role
       switch (userRole) {
