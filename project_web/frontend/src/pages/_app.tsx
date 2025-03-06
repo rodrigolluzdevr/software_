@@ -2,26 +2,40 @@ import "@/styles/globals.css";
 import { AppProps } from "next/app";
 import { useEffect, useState } from "react";
 import AuthLayout from "../layouts/AuthLayout";
-import { useRouter } from "next/router"; // Importa o useRouter para obter a rota
+import { useRouter } from "next/router";
 import React from "react";
 
 export default function App({ Component, pageProps }: AppProps) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const router = useRouter(); // Usa o router para pegar a URL atual
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (token) {
-      setIsAuthenticated(true);
-    }
+    setIsAuthenticated(!!token); // Define como true se houver token, senão false
   }, []);
 
-  // Verifica se a página é de login ou home
-  const isLoginPage = router.pathname === "/login";
-  const isHomePage = router.pathname === "/";
+  // Redirecionamento imediato se o usuário não estiver autenticado
+  useEffect(() => {
+    if (isAuthenticated === false) {
+      const allowedRoutes = ["/login/Login", "/"];
+      if (!allowedRoutes.includes(router.pathname)) {
+        alert("Você precisa estar logado para acessar esta página.");
+        router.replace("/login/Login"); // Redireciona sem histórico, impedindo voltar para a página anterior
+      }
+    }
+  }, [isAuthenticated, router.pathname]);
 
-  // Condicionalmente aplica o layout de autenticação
-  const Layout = isLoginPage || isHomePage ? React.Fragment : AuthLayout;
+  // Se ainda estiver verificando autenticação, não renderiza nada
+  if (isAuthenticated === null) {
+    return null;
+  }
+
+  // Se o usuário não estiver autenticado e estiver em uma página proibida, retorna null até ser redirecionado
+  if (isAuthenticated === false && !["/login/Login", "/"].includes(router.pathname)) {
+    return null;
+  }
+
+  const Layout = ["/login/Login", "/"].includes(router.pathname) ? React.Fragment : AuthLayout;
 
   return (
     <Layout>

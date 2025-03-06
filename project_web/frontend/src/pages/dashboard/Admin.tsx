@@ -1,5 +1,3 @@
-import withAuth from "../../components/withAuth";
-
 function Admin() {
   return (
     <div>
@@ -8,5 +6,3 @@ function Admin() {
     </div>
   );
 }
-
-export default withAuth(Admin, ["ADMIN"]);
