@@ -6,7 +6,7 @@ const LogoutButton = () => {
   const router = useRouter();
 
   const handleLogout = () => {
-    localStorage.removeItem("token"); // Remove o token de localStorage
+    sessionStorage.removeItem("token"); // Remove o token do sessionStorage
     router.replace("/login/Login"); // Redireciona para a página de login
   };
 
