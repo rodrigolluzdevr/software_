@@ -10,17 +10,27 @@ export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    setIsAuthenticated(!!token); // Define como true se houver token, senão false
+    // Função para verificar autenticação
+    const checkAuth = () => {
+      const token = localStorage.getItem("token");
+      setIsAuthenticated(!!token); // Atualiza o estado corretamente
+    };
+
+    checkAuth(); // Executa ao montar
+
+    // Event Listener para atualizar autenticação caso o token mude
+    window.addEventListener("storage", checkAuth);
+    return () => window.removeEventListener("storage", checkAuth);
   }, []);
 
-  // Redirecionamento imediato se o usuário não estiver autenticado
   useEffect(() => {
     if (isAuthenticated === false) {
       const allowedRoutes = ["/login/Login", "/"];
       if (!allowedRoutes.includes(router.pathname)) {
-        alert("Você precisa estar logado para acessar esta página.");
-        router.replace("/login/Login"); // Redireciona sem histórico, impedindo voltar para a página anterior
+        setTimeout(() => {
+          alert("Você precisa estar logado para acessar esta página.");
+          router.replace("/login/Login");
+        }, 0);
       }
     }
   }, [isAuthenticated, router.pathname]);

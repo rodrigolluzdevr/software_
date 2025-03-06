@@ -1,8 +1,10 @@
-export default function Coordenador(){
-    return (
-        <div>
-            <h1>Painel do Coordenador</h1>
-            <p>Bem vindo, Coordenador!</p>
-        </div>
-    )
+import LogoutButton from "@/components/logoutButton/Logout.Button";
+
+export default function Coordenador() {
+  return (
+    <div>
+      <h1>Bem-vindo ao Painel do Coordenador</h1>
+      <LogoutButton /> {/* Adiciona o botão de logout */}
+    </div>
+  );
 }
