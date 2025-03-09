@@ -17,10 +17,139 @@ enum Role {
   USER
 }
 
-model User {
+model Organization {
   id        Int      @id @default(autoincrement())
   name      String
-  email     String   @unique
-  password  String
-  role      Role     @default(USER) // Permissão do usuário (usando enum)
+  type      String   @db.VarChar(50)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  regions   Region[]
+  users     User[]
+}
+
+model Region {
+  id             Int          @id @default(autoincrement())
+  name           String
+  type           String       @db.VarChar(50)
+  organizationID Int
+  organization   Organization @relation(fields: [organizationID], references: [id])
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  schools        School[]
+  users          User[]
+}
+
+model School {
+  id        Int      @id @default(autoincrement())
+  name      String
+  type      String   @db.VarChar(50)
+  regionID  Int
+  region    Region   @relation(fields: [regionID], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  classes   Class[]
+  users     User[]
+}
+
+model Class {
+  id          Int          @id @default(autoincrement())
+  name        String
+  schoolId    Int
+  school      School       @relation(fields: [schoolId], references: [id])
+  year        Int
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  users       User[]
+  grades      Grade[]
+  attendances Attendance[]
+}
+
+model User {
+  id                  Int                  @id @default(autoincrement())
+  name                String
+  cpf                 String               @unique @db.VarChar(14)
+  email               String               @unique
+  password            String
+  role                Role                 @default(USER)
+  address             String
+  cep                 String               @db.VarChar(9)
+  numberAdress        String               @db.VarChar(10)
+  organizationId      Int?                 // Tornado opcional
+  organization        Organization?        @relation(fields: [organizationId], references: [id]) // Tornado opcional
+  regionId            Int?
+  region              Region?              @relation(fields: [regionId], references: [id])
+  schoolId            Int?
+  school              School?              @relation(fields: [schoolId], references: [id])
+  classId             Int?
+  class               Class?               @relation(fields: [classId], references: [id])
+  isActive            Boolean              @default(true)
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  registrationNumber  String?              @db.VarChar(20)
+  birthDate           DateTime?
+  specialization      String?              @db.VarChar(100)
+  hireDate            DateTime?
+  grades              Grade[]
+  studentObservations StudentObservation[]
+  teacherObservations TeacherObservation[]
+  attendances         Attendance[]
+}
+
+model Grade {
+  id              Int      @id @default(autoincrement())
+  name            String
+  studentId       Int
+  student         User     @relation(fields: [studentId], references: [id])
+  classId         Int
+  class           Class    @relation(fields: [classId], references: [id])
+  monthlyGrade1   Float?
+  monthlyGrade2   Float?
+  monthlyGrade3   Float?
+  monthlyGrade4   Float?
+  monthlyGrade5   Float?
+  monthlyGrade6   Float?
+  monthlyGrade7   Float?
+  monthlyGrade8   Float?
+  bimonthlyGrade1 Float?
+  bimonthlyGrade2 Float?
+  bimonthlyGrade3 Float?
+  bimonthlyGrade4 Float?
+  semesterGrade1  Float?
+  semesterGrade2  Float?
+  annualGrade     Float?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model StudentObservation {
+  id          Int      @id @default(autoincrement())
+  studentId   Int
+  student     User     @relation(fields: [studentId], references: [id])
+  observation String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model TeacherObservation {
+  id          Int      @id @default(autoincrement())
+  teacherId   Int
+  teacher     User     @relation(fields: [teacherId], references: [id])
+  observation String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Attendance {
+  id             Int      @id @default(autoincrement())
+  studentId      Int
+  student        User     @relation(fields: [studentId], references: [id])
+  classId        Int
+  class          Class    @relation(fields: [classId], references: [id])
+  period         String   @db.VarChar(7)
+  attendanceDays Int[]
+  absenceDays    Int[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([studentId, classId, period])
 }
