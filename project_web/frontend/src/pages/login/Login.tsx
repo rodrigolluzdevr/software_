@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import { jwtDecode } from "jwt-decode";
 
 export default function Login() {
-  const [email, setEmail] = useState("");
+  const [cpf, setCpf] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
@@ -17,7 +17,7 @@ export default function Login() {
       const response = await fetch("http://localhost:4000/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ cpf, password }),
       });
 
       if (!response.ok) {
@@ -76,17 +76,17 @@ export default function Login() {
   return (
     <form onSubmit={handleSubmit}>
       <input
-        type="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        placeholder="Email"
+        type="cpf"
+        value={cpf}
+        onChange={(e) => setCpf(e.target.value)}
+        placeholder="Digete o Cpf"
         required
       />
       <input
         type="password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
-        placeholder="Senha"
+        placeholder="Digite a Senha"
         required
       />
       <button type="submit">Entrar</button>

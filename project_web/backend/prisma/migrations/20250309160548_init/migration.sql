@@ -59,7 +59,7 @@ CREATE TABLE "User" (
     "address" TEXT NOT NULL,
     "cep" VARCHAR(9) NOT NULL,
     "numberAdress" VARCHAR(10) NOT NULL,
-    "organizationId" INTEGER NOT NULL,
+    "organizationId" INTEGER,
     "regionId" INTEGER,
     "schoolId" INTEGER,
     "classId" INTEGER,
@@ -156,7 +156,7 @@ ALTER TABLE "School" ADD CONSTRAINT "School_regionID_fkey" FOREIGN KEY ("regionI
 ALTER TABLE "Class" ADD CONSTRAINT "Class_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "User" ADD CONSTRAINT "User_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "User" ADD CONSTRAINT "User_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "User" ADD CONSTRAINT "User_regionId_fkey" FOREIGN KEY ("regionId") REFERENCES "Region"("id") ON DELETE SET NULL ON UPDATE CASCADE;

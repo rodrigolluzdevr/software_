@@ -11,6 +11,7 @@ export class AuthService {
     private jwtService: JwtService, // Injeção do JwtService
   ) {}
 
+  
   async createUser(userData: {
     cpf: string;
     password: string;
@@ -22,10 +23,11 @@ export class AuthService {
     numberAdress: string;
     organizationId: number;
   }) {
+    const hashPassword = await bcrypt.hash(userData.password, 10)
     return this.prisma.user.create({
       data: {
         cpf: userData.cpf,
-        password: userData.password,
+        password: hashPassword,
         name: userData.name,
         role: userData.role,
         email: userData.email,
