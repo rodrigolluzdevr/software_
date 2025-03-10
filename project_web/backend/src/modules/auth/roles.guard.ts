@@ -8,14 +8,14 @@ export class RolesGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const requiredRoles = this.reflector.get<string[]>('roles', context.getHandler());
     if (!requiredRoles) {
-      return true; // Se não houver roles definidas, permite o acesso
+      return true;
     }
 
     const request = context.switchToHttp().getRequest();
-    const user = request.user; // Payload do token JWT
+    const user = request.user;
 
     if (!requiredRoles.includes(user.role)) {
-      throw new ForbiddenException('Acesso negado: permissão insuficiente');
+      throw new ForbiddenException('Denied access: Insufficient permission');
     }
 
     return true;

@@ -1,5 +1,9 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/database/prisma.service'; // Importando o PrismaService
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { Role } from '@prisma/client';
@@ -7,11 +11,10 @@ import { Role } from '@prisma/client';
 @Injectable()
 export class AuthService {
   constructor(
-    private prisma: PrismaService, // Injeção do PrismaService
-    private jwtService: JwtService, // Injeção do JwtService
+    private prisma: PrismaService,
+    private jwtService: JwtService,
   ) {}
 
-  
   async createUser(userData: {
     cpf: string;
     password: string;
@@ -23,7 +26,7 @@ export class AuthService {
     numberAdress: string;
     organizationId: number;
   }) {
-    const hashPassword = await bcrypt.hash(userData.password, 10)
+    const hashPassword = await bcrypt.hash(userData.password, 10);
     return this.prisma.user.create({
       data: {
         cpf: userData.cpf,
@@ -35,7 +38,7 @@ export class AuthService {
         cep: userData.cep,
         numberAdress: userData.numberAdress,
         organization: {
-          connect: { id: userData.organizationId }, // Conecta à organização existente
+          connect: { id: userData.organizationId },
         },
       },
     });
@@ -49,21 +52,26 @@ export class AuthService {
         cpf: true,
         password: true,
         role: true,
+        organizationId: true,
       },
     });
-
-    if (!user) throw new Error('Usuário não encontrado');
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
 
     const validPassword = await bcrypt.compare(password, user.password);
-    if (!validPassword) throw new Error('Senha inválida');
+    if (!validPassword) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
 
     const payload = {
-      sub: user.id, // ID do usuário
+      sub: user.id,
       cpf: user.cpf,
-      role: user.role, // Role do usuário
+      role: user.role,
+      organizationId: user.organizationId,
     };
+    const token = this.jwtService.sign(payload);
 
-    const token = this.jwtService.sign(payload); // Gera o token JWT
-    return { token }; // Retorna o token como uma string no campo "token"
+    return { token };
   }
 }
