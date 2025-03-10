@@ -10,6 +10,12 @@ export class UserService {
     return this.prisma.user.findMany();
   }
 
+  async getAllUsersByOrganization(organizationId: number): Promise<User[]> {
+    return this.prisma.user.findMany({
+      where: { organizationId },
+    });
+  }
+
   async createUser(userData: Prisma.UserUncheckedCreateInput) {
     return this.prisma.user.create({
       data: userData,

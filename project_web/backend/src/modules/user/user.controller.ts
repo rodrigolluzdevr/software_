@@ -1,14 +1,19 @@
-import { Controller, Get, Post, Body } from '@nestjs/common';
+import { Controller, Get, Post, Body, Req, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import type { Role } from '@prisma/client';
+import { Request } from 'express';
+import { RolesGuard } from '../auth/roles.guard';
+import { getOrganizationIdFromRequest } from 'src/utils/organization.util';
 
 @Controller('users')
+@UseGuards(RolesGuard)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get()
-  async getAllUsers() {
-    return this.userService.getAllUsers();
+  async getAllUsers(@Req() req: Request) {
+    const organizationId = getOrganizationIdFromRequest(req);
+    return this.userService.getAllUsersByOrganization(organizationId);
   }
 
   @Post()

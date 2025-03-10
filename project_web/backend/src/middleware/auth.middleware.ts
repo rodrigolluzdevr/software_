@@ -18,10 +18,13 @@ export class AuthMiddleware implements NestMiddleware {
 
     try {
       // Verifica e decodifica o token com a chave secreta
-      const decoded = jwt.verify(token, jwtSecret);
+      const decoded = jwt.verify(token, jwtSecret) as any;
 
       // Adiciona a propriedade 'user' ao req (agora tipada corretamente)
       req.user = decoded;
+
+      // Adiciona a organização do usuário ao req
+      req.organizationId = decoded.organizationId;
 
       next();
     } catch (err) {
