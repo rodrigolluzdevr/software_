@@ -9,9 +9,9 @@ dotenv.config();
 
 @Module({
   imports: [
-    UserModule,  // Módulo para gerenciar usuários
-    AuthModule,  // Módulo para gerenciar autenticação
+    UserModule,
+    AuthModule,
   ],
-  providers: [PrismaService],  // Serviço para conectar ao banco de dados
+  providers: [PrismaService],
 })
 export class AppModule {}

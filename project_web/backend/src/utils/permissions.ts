@@ -1,6 +1,5 @@
 import { permissions } from "./permissions/index";
 
-
 export function canCreate(userRole: string, entity: string): boolean {
   return permissions[userRole]?.create?.includes(entity) || false;
 }

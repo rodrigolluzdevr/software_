@@ -16,9 +16,28 @@ export class UserService {
     });
   }
 
-  async createUser(userData: Prisma.UserUncheckedCreateInput) {
+  async createUser(userData: Prisma.UserUncheckedCreateInput): Promise<User> {
     return this.prisma.user.create({
       data: userData,
+    });
+  }
+
+  async getUserById(id: number): Promise<User | null> { // Permitir retorno null
+    return this.prisma.user.findUnique({
+      where: { id },
+    });
+  }
+
+  async updateUser(id: number, userData: Prisma.UserUpdateInput): Promise<User> {
+    return this.prisma.user.update({
+      where: { id },
+      data: userData,
+    });
+  }
+
+  async deleteUser(id: number): Promise<User> {
+    return this.prisma.user.delete({
+      where: { id },
     });
   }
 }

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, Req, UseGuards, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { UserService } from './user.service';
 import type { Role } from '@prisma/client';
 import { Request } from 'express';
@@ -30,7 +30,53 @@ export class UserController {
       numberAdress: string;
       organizationId: number;
     },
+    @Req() req: Request
   ) {
+    const userRole = req.user.role;
+    if (userRole !== 'ADMIN' && userData.organizationId !== getOrganizationIdFromRequest(req)) {
+      throw new ForbiddenException('Você não tem permissão para criar usuários fora da sua organização');
+    }
     return this.userService.createUser(userData);
+  }
+
+  @Patch(':id')
+  async updateUser(
+    @Param('id') id: string,
+    @Body()
+    userData: {
+      cpf?: string;
+      password?: string;
+      name?: string;
+      role?: Role;
+      email?: string;
+      address?: string;
+      cep?: string;
+      numberAdress?: string;
+      organizationId?: number;
+    },
+    @Req() req: Request
+  ) {
+    const userRole = req.user.role;
+    const user = await this.userService.getUserById(Number(id));
+    if (!user) {
+      throw new NotFoundException('Usuário não encontrado');
+    }
+    if (userRole !== 'ADMIN' && user.organizationId !== getOrganizationIdFromRequest(req)) {
+      throw new ForbiddenException('Você não tem permissão para atualizar usuários fora da sua organização');
+    }
+    return this.userService.updateUser(Number(id), userData);
+  }
+
+  @Delete(':id')
+  async deleteUser(@Param('id') id: string, @Req() req: Request) {
+    const userRole = req.user.role;
+    const user = await this.userService.getUserById(Number(id));
+    if (!user) {
+      throw new NotFoundException('Usuário não encontrado');
+    }
+    if (userRole !== 'ADMIN' && user.organizationId !== getOrganizationIdFromRequest(req)) {
+      throw new ForbiddenException('Você não tem permissão para deletar usuários fora da sua organização');
+    }
+    return this.userService.deleteUser(Number(id));
   }
 }
