@@ -10,45 +10,20 @@ export class DashboardController {
     return `Bem-vindo ao painel do ${role.toLowerCase()} da organização ${organizationId}`;
   }
 
-  @Get('admin')
-  @SetMetadata('roles', ['ADMIN'])
-  adminDashboard(@Req() req: Request) {
-    const organizationId = req.user.organizationId;
-    return { message: this.getDashboardMessage('administrador', organizationId) };
-  }
+  @Get()
+  async getDashboard(@Req() req: Request) {
+    const { role, organizationId } = req.user;
 
-  @Get('professor')
-  @SetMetadata('roles', ['PROFESSOR'])
-  professorDashboard(@Req() req: Request) {
-    const organizationId = req.user.organizationId;
-    return { message: this.getDashboardMessage('professor', organizationId) };
-  }
+    const dashboards = {
+      ADMIN: { message: this.getDashboardMessage('administrador', organizationId) },
+      PROFESSOR: { message: this.getDashboardMessage('professor', organizationId) },
+      SECRETARIO: { message: this.getDashboardMessage('secretário', organizationId) },
+      COORDENADOR: { message: this.getDashboardMessage('coordenador', organizationId) },
+      DIRETOR: { message: this.getDashboardMessage('diretor', organizationId) },
+      USER: { message: this.getDashboardMessage('usuário', organizationId) },
+    };
 
-  @Get('secretario')
-  @SetMetadata('roles', ['SECRETARIO'])
-  secretarioDashboard(@Req() req: Request) {
-    const organizationId = req.user.organizationId;
-    return { message: this.getDashboardMessage('secretário', organizationId) };
-  }
-
-  @Get('coordenador')
-  @SetMetadata('roles', ['COORDENADOR'])
-  coordenadorDashboard(@Req() req: Request) {
-    const organizationId = req.user.organizationId;
-    return { message: this.getDashboardMessage('coordenador', organizationId) };
-  }
-
-  @Get('diretor')
-  @SetMetadata('roles', ['DIRETOR'])
-  diretorDashboard(@Req() req: Request) {
-    const organizationId = req.user.organizationId;
-    return { message: this.getDashboardMessage('diretor', organizationId) };
-  }
-
-  @Get('user')
-  @SetMetadata('roles', ['USER'])
-  userDashboard(@Req() req: Request) {
-    const organizationId = req.user.organizationId;
-    return { message: this.getDashboardMessage('usuário', organizationId) };
+    // Retorna as informações específicas para a Role
+    return dashboards[role] || { message: 'Role não reconhecida' };
   }
 }

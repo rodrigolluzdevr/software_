@@ -7,7 +7,7 @@ const LogoutButton = () => {
 
   const handleLogout = () => {
     sessionStorage.removeItem("token"); // Remove o token do sessionStorage
-    router.replace("/login/Login"); // Redireciona para a página de login
+    router.replace("/login"); // Redireciona para a página de login
   };
 
   return <button onClick={handleLogout}>Logout</button>;

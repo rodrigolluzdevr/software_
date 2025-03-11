@@ -12,62 +12,38 @@ export default function Login() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-
+  
     try {
       const response = await fetch("http://localhost:4000/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ cpf, password }),
       });
-
+  
       if (!response.ok) {
         throw new Error("Login falhou, verifique suas credenciais");
       }
-
+  
       const data = await response.json();
       console.log("Resposta da API:", data); // Log da resposta completa
-
-      // Acessa o token dentro do objeto aninhado
+  
+      // Obtém o token corretamente
       const token = data.token?.token;
-
-      // Verifica se o token está presente e é uma string
       if (!token || typeof token !== "string") {
-        console.error("Token inválido ou ausente na resposta:", data); // Log de erro
+        console.error("Token inválido ou ausente na resposta:", data);
         throw new Error("Token inválido ou ausente na resposta");
       }
-
+  
       // Armazena o token e o role no sessionStorage
-      sessionStorage.setItem("token", token); // Usando sessionStorage
+      sessionStorage.setItem("token", token);
       const decodedToken = jwtDecode(token) as { role: string };
-      const userRole = decodedToken.role;
-      sessionStorage.setItem("role", userRole); // Armazena o role
-
-      // Disparar evento storage para atualizar o withAuth (nova adição)
+      sessionStorage.setItem("role", decodedToken.role);
+  
+      // Disparar evento storage para atualizar o withAuth
       window.dispatchEvent(new Event("storage"));
-
-      // Redireciona com base no role
-      switch (userRole) {
-        case "ADMIN":
-          router.push("/dashboard/Admin");
-          break;
-        case "PROFESSOR":
-          router.push("/dashboard/Professor");
-          break;
-        case "SECRETARIO":
-          router.push("/dashboard/Secretario");
-          break;
-        case "COORDENADOR":
-          router.push("/dashboard/Coordenador");
-          break;
-        case "DIRETOR":
-          router.push("/dashboard/Diretor");
-          break;
-        case "USER":
-          router.push("/dashboard/User");
-          break;
-        default:
-          router.push("/"); // Redireciona para a página inicial
-      }
+  
+      // 🚀 Redireciona todos os usuários para /dashboard
+      router.push("/dashboard");
     } catch (err: any) {
       setError(err.message);
     }
