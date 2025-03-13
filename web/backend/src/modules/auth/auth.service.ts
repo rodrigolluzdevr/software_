@@ -56,12 +56,12 @@ export class AuthService {
       },
     });
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException('Usuário não encontrado, verifique suas credenciais.');
     }
 
     const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException('Credenciais inválidas, entre em contato com o admnistrador.');
     }
 
     const payload = {

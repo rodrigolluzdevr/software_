@@ -17,11 +17,13 @@ export default function Login() {
     e.preventDefault();
     setError("");
 
+    const formattedCpf = cpf.replace(/\D/g, ""); // Remove non-digits
+
     try {
       const response = await fetch("http://localhost:4000/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cpf, password }),
+        body: JSON.stringify({ cpf: formattedCpf, password }),
       });
 
       if (!response.ok) {
@@ -45,8 +47,8 @@ export default function Login() {
 
       router.push("/dashboard");
     } catch (err: any) {
-      setError(err.message);
-    }
+        setError(err.message);
+      }
   };
 
   return (

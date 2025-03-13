@@ -11,25 +11,34 @@ interface LoginFormProps {
   onSubmit: (e: React.FormEvent) => void;
 }
 
-const LoginForm: React.FC<LoginFormProps> = ({ cpf, password, error, onCpfChange, onPasswordChange, onSubmit }) => (
-  <form className="text-start" onSubmit={onSubmit}>
-    <div className="grid grid-cols-1">
-      <InputField
-        id="LoginCpf"
-        type="text"
-        label="CPF:"
-        placeholder="Digite o CPF"
-        value={cpf}
-        onChange={onCpfChange}
-      />
-      <InputField
-        id="LoginPassword"
-        type="password"
-        label="Password:"
-        placeholder="Digite a Senha"
-        value={password}
-        onChange={onPasswordChange}
-      />
+const LoginForm: React.FC<LoginFormProps> = ({ cpf, password, error, onCpfChange, onPasswordChange, onSubmit }) => {
+  return (
+    <form className="text-start" onSubmit={onSubmit}>
+      <div className="grid grid-cols-1">
+        <InputField
+          id="LoginCpf"
+          type="text"
+          label="CPF:"
+          placeholder="Digite o CPF"
+          value={cpf}
+          onChange={(e) => {
+            let value = e.target.value;
+            value = value.replace(/\D/g, "");
+            if (value.length > 3) value = value.slice(0, 3) + '.' + value.slice(3);
+            if (value.length > 7) value = value.slice(0, 7) + '.' + value.slice(7);
+            if (value.length > 11) value = value.slice(0, 11) + '-' + value.slice(11, 13);
+            onCpfChange({ ...e, target: { ...e.target, value } });
+          }}
+        />
+        <InputField
+          id="LoginPassword"
+          type="password"
+          label="Password:"
+          placeholder="Digite a Senha"
+          value={password}
+          onChange={onPasswordChange}
+        />
+      </div>
       <div className="mb-4">
         <input
           type="submit"
@@ -38,8 +47,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ cpf, password, error, onCpfChange
         />
       </div>
       {error && <ErrorMessage message={error} />}
-    </div>
-  </form>
-);
+    </form>
+  );
+};
 
 export default LoginForm;
