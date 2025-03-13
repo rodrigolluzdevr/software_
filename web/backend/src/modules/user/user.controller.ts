@@ -1,4 +1,16 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, Req, UseGuards, ForbiddenException, NotFoundException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Body,
+  Param,
+  Req,
+  UseGuards,
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import type { Role } from '@prisma/client';
 import { Request } from 'express';
@@ -30,13 +42,27 @@ export class UserController {
       numberAdress: string;
       organizationId: number;
     },
-    @Req() req: Request
+    @Req() req: Request,
   ) {
     const userRole = req.user.role;
-    if (userRole !== 'ADMIN' && userData.organizationId !== getOrganizationIdFromRequest(req)) {
-      throw new ForbiddenException('Você não tem permissão para criar usuários fora da sua organização');
+    if (
+      userRole !== 'ADMIN' &&
+      userData.organizationId !== getOrganizationIdFromRequest(req)
+    ) {
+      throw new ForbiddenException(
+        'Você não tem permissão para criar usuários fora da sua organização',
+      );
     }
     return this.userService.createUser(userData);
+  }
+
+  @Get(':id')
+  async getUserById(@Param('id') id: string, @Req() req: Request) {
+    const user = await this.userService.getUserById(Number(id));
+    if (!user) {
+      throw new NotFoundException('Usuário não encontrado');
+    }
+    return user;
   }
 
   @Patch(':id')
@@ -54,15 +80,20 @@ export class UserController {
       numberAdress?: string;
       organizationId?: number;
     },
-    @Req() req: Request
+    @Req() req: Request,
   ) {
     const userRole = req.user.role;
     const user = await this.userService.getUserById(Number(id));
     if (!user) {
       throw new NotFoundException('Usuário não encontrado');
     }
-    if (userRole !== 'ADMIN' && user.organizationId !== getOrganizationIdFromRequest(req)) {
-      throw new ForbiddenException('Você não tem permissão para atualizar usuários fora da sua organização');
+    if (
+      userRole !== 'ADMIN' &&
+      user.organizationId !== getOrganizationIdFromRequest(req)
+    ) {
+      throw new ForbiddenException(
+        'Você não tem permissão para atualizar usuários fora da sua organização',
+      );
     }
     return this.userService.updateUser(Number(id), userData);
   }
@@ -74,8 +105,13 @@ export class UserController {
     if (!user) {
       throw new NotFoundException('Usuário não encontrado');
     }
-    if (userRole !== 'ADMIN' && user.organizationId !== getOrganizationIdFromRequest(req)) {
-      throw new ForbiddenException('Você não tem permissão para deletar usuários fora da sua organização');
+    if (
+      userRole !== 'ADMIN' &&
+      user.organizationId !== getOrganizationIdFromRequest(req)
+    ) {
+      throw new ForbiddenException(
+        'Você não tem permissão para deletar usuários fora da sua organização',
+      );
     }
     return this.userService.deleteUser(Number(id));
   }

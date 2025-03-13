@@ -5,26 +5,49 @@ import { AiOutlineSetting } from "react-icons/ai";
 import router from "next/router";
 import { BiSolidUser } from "react-icons/bi";
 import { BsLightningChargeFill } from "react-icons/bs";
+import { fetchUser } from "@/services/authService";
 
 interface HeaderProps {
   setToggle: React.Dispatch<React.SetStateAction<boolean>>;
   toggle: boolean;
 }
 
+interface User {
+  id: number;
+  name: string;
+  cpf?: string;
+  email?: string;
+  // Adicione outras propriedades necessárias
+}
+
 const Header: React.FC<HeaderProps> = ({ setToggle, toggle }) => {
-  const [user, setUser] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [dropdownVisible, setDropdownVisible] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setUser(false);
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node)
+      ) {
+        setDropdownVisible(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
+  }, []);
+
+  useEffect(() => {
+    async function getUser() {
+      const userData = await fetchUser();
+      if (userData) {
+        setUser(userData);
+      }
+    }
+    getUser();
   }, []);
 
   const toggleSidebar = () => setToggle(!toggle);
@@ -50,7 +73,7 @@ const Header: React.FC<HeaderProps> = ({ setToggle, toggle }) => {
         <ul className="list-none mb-0 space-x-1 relative">
           <li className="dropdown inline-block relative">
             <button
-              onClick={() => setUser(!user)}
+              onClick={() => setDropdownVisible(!dropdownVisible)}
               className="dropdown-toggle items-center"
               type="button"
             >
@@ -58,10 +81,10 @@ const Header: React.FC<HeaderProps> = ({ setToggle, toggle }) => {
                 <BiSolidUser className="size-6 hover:text-indigo-600" />
               </span>
               <span className="font-semibold text-[14x] ms-2 sm:inline-block hidden items-center py-2 px-4 hover:text-indigo-600">
-                Rodrigo Sousa Luz
+                {user ? user.name : "Usuário"}
               </span>
             </button>
-            {user && (
+            {dropdownVisible && (
               <div
                 className="dropdown-menu absolute end-0 m-0 mt-4 z-10 w-52 rounded-md overflow-hidden bg-white shadow-sm"
                 ref={dropdownRef}
