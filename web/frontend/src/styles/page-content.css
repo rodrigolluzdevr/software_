@@ -1,0 +1,50 @@
+@import "tailwindcss";
+
+.page-content {
+  @apply inline-block w-full ps-0 overflow-x-hidden duration-500;
+
+  .top-header {
+    @apply fixed top-0 inset-x-0 z-999 max-h-[70px] duration-500;
+
+    .header-bar {
+      @apply relative justify-between items-center p-6 bg-white h-[70px] shadow-sm;
+
+      @media (max-width: 425px) {
+        @apply py-6 px-3;
+      }
+    }
+  }
+
+  .layout-specing {
+    min-height: calc(100vh - 66px) !important;
+    @apply !relative !pt-[94px] !px-3 !pb-6;
+
+    @media (max-width: 425px) {
+      @apply !px-0;
+    }
+  }
+}
+
+.page-wrapper.toggled {
+  @media screen and (min-width: 1025px) {
+    .page-content {
+      @apply ps-[300px];
+    }
+  }
+
+  .top-header {
+    @apply start-[301px];
+
+    @media (max-width: 1024px) {
+      @apply start-0;
+    }
+  }
+
+  .sidebar-wrapper {
+    @apply start-0;
+
+    @media (max-width: 1024px) {
+      @apply -start-[300px];
+    }
+  }
+}
