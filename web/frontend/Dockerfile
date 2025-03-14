@@ -3,6 +3,7 @@ WORKDIR /app
 COPY package*.json ./  
 RUN npm install  
 COPY . .  
+VOLUME ["/app/.next/cache"]  
 CMD ["npm", "run", "dev"]  
 EXPOSE 3000
 ##
