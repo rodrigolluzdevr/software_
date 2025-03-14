@@ -3,7 +3,7 @@ import Link from "next/link";
 import { IoMdLogOut } from "react-icons/io";
 import { AiOutlineSetting } from "react-icons/ai";
 import router from "next/router";
-import { BiSolidUser } from "react-icons/bi";
+import { BiSolidUser, BiSolidUserCircle } from "react-icons/bi";
 import { BsLightningChargeFill } from "react-icons/bs";
 import { fetchUser } from "@/services/authService";
 
@@ -78,9 +78,9 @@ const Header: React.FC<HeaderProps> = ({ setToggle, toggle }) => {
               type="button"
             >
               <span className="size-8 inline-flex items-center justify-center tracking-wide align-middle duration-500 text-[20px] text-center bg-white border border-white text-slate-900 rounded-full">
-                <BiSolidUser className="size-6 hover:text-indigo-600" />
+                <BiSolidUserCircle className="size-8 hover:text-indigo-600" />
               </span>
-              <span className="font-semibold text-[14x] ms-2 sm:inline-block hidden items-center py-2 px-4 hover:text-indigo-600">
+              <span className="font-bold text-[14px] sm:inline-block hidden items-center py-2 px-4 hover:text-indigo-600">
                 {user ? user.name : "Usuário"}
               </span>
             </button>

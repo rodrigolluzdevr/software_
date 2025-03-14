@@ -5,7 +5,7 @@
 }
 
 .sidebar-wrapper {
-  @apply fixed top-0 -start-[300px] z-999 shadow-sm bg-black duration-500 w-[300px] h-screen max-h-screen;
+  @apply fixed top-0 -start-[300px] z-999 shadow-sm bg-white duration-500 w-[300px] h-screen max-h-screen;
 
   @media (max-width: 1024px) {
     @apply start-0;
@@ -52,13 +52,13 @@
 
     .header-menu {
       span {
-        @apply font-bold text-sm pt-[15px] pb-[5px] px-5 inline-block;
+        @apply text-xs pt-[15px] pb-[5px] px-5 inline-block;
       }
     }
 
     li {
       a {
-        @apply relative flex items-center w-full decoration-0 py-2 pe-6 ps-5 duration-500;
+        @apply relative flex items-center w-full decoration-0 py-4 pe-6 ps-5 duration-500;
 
         &:focus {
           outline: none !important;
@@ -77,14 +77,14 @@
         }
 
         i {
-          @apply !size-8 !bg-gray-100 dark:!bg-slate-800 !flex !items-center !justify-center !text-base !text-center !rounded-full !duration-500;
+          @apply !size-8 !bg-gray-100 !flex !items-center !justify-center !text-base !text-center !rounded-full !duration-500;
         }
       }
 
       &:hover,
       &.active {
         i {
-          @apply bg-gray-100 dark:bg-slate-700;
+          @apply bg-gray-100;
         }
       }
     }
@@ -93,12 +93,7 @@
       @apply ms-0;
 
       > a {
-        @apply after:absolute after:top-[17px] after:end-[15px] after:duration-500 after:text-slate-900 dark:after:text-white/50 after:text-sm;
-
-        &:after {
-          content: "\F0142" !important;
-          font-family: "Material Design Icons";
-        }
+        @apply after:absolute after:top-[17px] after:end-[15px] after:duration-500 after:text-slate-900 after:text-sm;
       }
 
       &.active {
@@ -110,7 +105,7 @@
       &:hover,
       &.active {
         > a:after {
-          @apply text-indigo-600 dark:text-white;
+          @apply text-indigo-600;
         }
       }
 
@@ -124,12 +119,7 @@
             @apply ps-[25px] text-sm ms-0;
 
             a {
-              @apply before:text-slate-900 dark:before:text-white before:me-1 before:text-base before:duration-500;
-
-              &:before {
-                content: "\F09DF" !important;
-                font-family: "Material Design Icons";
-              }
+              @apply before:text-indigo-600 before:me-1 before:text-base before:duration-500;
 
               .badge,
               .label {
@@ -160,93 +150,10 @@
       }
     }
   }
-
-  &.sidebar-dark {
-    @apply bg-slate-900;
-  }
-
-  &.sidebar-colored {
-    @apply bg-indigo-600;
-  }
-
-  &.sidebar-colored,
-  &.sidebar-dark {
-    .sidebar-brand > a,
-    .sidebar-menu li a {
-      @apply text-white/50;
-    }
-
-    .sidebar-menu li:hover > a,
-    .sidebar-menu li.active > a,
-    .sidebar-menu li:active > a,
-    .sidebar-menu li:active > a:before,
-    .sidebar-menu li:hover > a:before,
-    .sidebar-menu li.active > a:before,
-    .sidebar-menu .sidebar-dropdown.active > a,
-    .sidebar-brand > a:hover {
-      @apply !text-white;
-    }
-
-    .sidebar-menu {
-      li {
-        a {
-          i {
-            @apply !bg-gray-50/5;
-          }
-        }
-
-        &:hover,
-        &.active {
-          i {
-            @apply !bg-gray-50/10;
-          }
-        }
-      }
-
-      .sidebar-dropdown {
-        > a {
-          @apply after:text-white/10;
-        }
-
-        &:hover,
-        &.active {
-          > a {
-            @apply after:text-white;
-          }
-        }
-
-        .sidebar-submenu {
-          ul {
-            li {
-              a {
-                @apply before:text-white/5;
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-
-  .sidebar-brand > a,
-  .sidebar-menu li a {
-    @apply text-slate-900 dark:text-white/50 font-semibold;
-  }
-
-  .sidebar-menu li:hover > a,
-  .sidebar-menu li.active > a,
-  .sidebar-menu li:active > a,
-  .sidebar-menu li:active > a:before,
-  .sidebar-menu li:hover > a:before,
-  .sidebar-menu li.active > a:before,
-  .sidebar-menu .sidebar-dropdown.active > a,
-  .sidebar-brand > a:hover {
-    @apply !text-indigo-600 dark:!text-white;
-  }
 }
 
 .sidebar-footer {
-  @apply absolute w-full bottom-0 start-0 end-0 py-3 ps-6 pe-5 shadow-sm dark:shadow-gray-700 h-[51px];
+  @apply absolute w-full bottom-0 start-0 end-0 py-3 ps-6 pe-5 shadow-sm h-[51px];
 
   @media (max-width: 425px) {
     @apply !py-2 !px-3;
@@ -306,7 +213,7 @@
       &.active,
       &:hover {
         .navbar-link {
-          @apply !text-indigo-600 dark:!text-white;
+          @apply !text-indigo-600;
         }
       }
     }

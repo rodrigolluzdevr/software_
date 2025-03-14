@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import withAuth from "../utils/withAuth"; // Protege a página
-import LogoutButton from "@/components/logoutButton/Logout.Button";
 import Wrapper from "@/components/wrapper/Wrapper";
 
 const Dashboard = () => {
@@ -120,4 +119,4 @@ const Dashboard = () => {
   );
 };
 
-export default withAuth(Dashboard); // Protege a rota
+export default Dashboard; // Protege a rota >> withAuth(Dashboard)

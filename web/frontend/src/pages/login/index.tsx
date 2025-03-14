@@ -47,30 +47,20 @@ export default function Login() {
 
       router.push("/dashboard");
     } catch (err: any) {
-        setError(err.message);
-      }
+      setError(err.message);
+    }
   };
 
   return (
     <div>
       <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-blue-700/[0.8]"></div>
+        <div className="absolute inset-0 bg-white"></div>
         <div className="container-fluid relative">
           <div className="md:flex items-center">
             <div className="xl:w-[30%] lg:w-1/3 md:w-1/2">
               <div className="relative md:flex flex-col md:min-h-screen justify-center bg-white shadow-sm md:px-10 py-10 px-4 z-1">
                 <div className="text-center">
-                  <Link href="/">
-                    <Image
-                      src="/images/logo-icon-64.png"
-                      width={72}
-                      height={64}
-                      placeholder="blur"
-                      blurDataURL="/images/logo-icon.png"
-                      className="mx-auto"
-                      alt=""
-                    />
-                  </Link>
+                  <Link href="/">LOGO</Link>
                 </div>
                 <div className="title-heading text-center md:my-auto my-20">
                   <LoginForm

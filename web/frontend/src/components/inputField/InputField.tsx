@@ -17,7 +17,7 @@ const InputField: React.FC<InputFieldProps> = ({ id, type, label, placeholder, v
     <input
       id={id}
       type={type}
-      className="form-input mt-3 w-full py-2 px-3 h-10 bg-transparent rounded outline-none border border-gray-200 focus:border-indigo-600 focus:ring-0"
+      className="form-input mt-3 w-full py-2 px-3 h-10 bg-transparent rounded outline-none border border-gray-200 focus:border-black focus:ring-0"
       placeholder={placeholder}
       value={value}
       onChange={onChange}
