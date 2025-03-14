@@ -144,7 +144,7 @@ const Sidebar: React.FC = () => {
                 {
                   path: '/users/student',
                   label: 'Estudantes',
-                  roles: ['SECRETARIO', 'COORDENADOR', 'DIRETOR'],
+                  roles: ['SECRETARIO', 'COORDENADOR', 'DIRETOR', 'PROFESSOR'],
                 },
               ])}
             </li>
