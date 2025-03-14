@@ -1,20 +1,20 @@
-import React from "react";
-import Link from "next/link";
+import React from 'react';
+import Link from 'next/link';
 
 const Footer: React.FC = () => (
-  <div className="text-center">
-    <p className="mb-0 text-slate-400">
+  <footer className="text-center">
+    <div className="mb-0 text-black font-light text-xs">
       © {new Date().getFullYear()} SIGedu. desenvolvido por
       <Link
         href="https://github.com/rodrigolluzdevr"
         target="_blank"
         className="text-reset font-bold mx-1"
       >
-        devr sistemas e tecnologia
+        devr sistemas e tecnologia.
       </Link>
-      . Todos os direitos reservados.
-    </p>
-  </div>
+    </div>
+    <div className='text-black font-light text-xs'>todos os direitos reservados.</div>
+  </footer>
 );
 
 export default Footer;

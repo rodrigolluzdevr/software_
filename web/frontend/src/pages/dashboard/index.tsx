@@ -119,4 +119,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard; // Protege a rota >> withAuth(Dashboard)
+export default withAuth(Dashboard); // Protege a rota >> 

@@ -1,37 +1,60 @@
-import React, { useState, useEffect } from "react";
-import Link from "next/link";
-import Image from "next/image";
-import { usePathname } from "next/navigation";
-import SimpleBarReact from "simplebar-react";
-import "simplebar-react/dist/simplebar.min.css";
-import { PiBrowsersBold } from "react-icons/pi";
-import { BiSolidUserAccount } from "react-icons/bi";
+import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { usePathname } from 'next/navigation';
+import SimpleBarReact from 'simplebar-react';
+import 'simplebar-react/dist/simplebar.min.css';
+import { PiAirplayFill } from 'react-icons/pi';
+import { BiSolidUserAccount } from 'react-icons/bi';
+
+interface LinkItem {
+  path: string;
+  label: string;
+  roles?: string[];
+}
 
 const Sidebar: React.FC = () => {
-  const [menu, setMenu] = useState<string>("");
+  const [activeMenu, setActiveMenu] = useState('');
   const [subMenus, setSubMenus] = useState<{ [key: string]: boolean }>({});
-  const pathname = usePathname();
+  const [role, setRole] = useState<string | null>(null);
+  const currentPath = usePathname();
 
   useEffect(() => {
-    setMenu(pathname);
-    setSubMenus((prev) => ({ ...prev, [pathname]: true }));
+    setActiveMenu(currentPath);
+    setSubMenus((prev) => ({ ...prev, [currentPath]: true }));
     window.scrollTo(0, 0);
-  }, [pathname]);
+  }, [currentPath]);
+
+  useEffect(() => {
+    const storedRole = sessionStorage.getItem('role');
+    if (storedRole) {
+      setRole(storedRole);
+    }
+  }, []);
 
   const handleMenuClick = (menuName: string) => {
     setSubMenus((prev) => ({ ...prev, [menuName]: !prev[menuName] }));
   };
 
-  const isActive = (path: string) => menu === path;
+  const isActive = (path: string) => activeMenu === path;
 
-  const renderSubMenu = (menuName: string, links: { path: string; label: string }[]) => (
-    <div className={`sidebar-submenu ${subMenus[menuName] ? "block" : "hidden"}`}>
+  const renderSubMenu = (menuName: string, links: LinkItem[]) => (
+    <div
+      className={`sidebar-submenu ${subMenus[menuName] ? 'block' : 'hidden'}`}
+    >
       <ul>
-        {links.map((link) => (
-          <li key={link.path} className={`text-sm text-black hover:text-indigo-600 ${isActive(link.path) ? "active" : ""}`}>
-            <Link href={link.path}>{link.label}</Link>
-          </li>
-        ))}
+        {links
+          .filter((link) => !link.roles || (role && link.roles.includes(role)))
+          .map((link) => (
+            <li
+              key={link.path}
+              className={`text-sm text-black flex items-center hover:text-indigo-600 ${
+                isActive(link.path) ? 'active' : ''
+              }`}
+            >
+              <Link href={link.path}>{link.label}</Link>
+            </li>
+          ))}
       </ul>
     </div>
   );
@@ -39,43 +62,90 @@ const Sidebar: React.FC = () => {
   return (
     <nav className="sidebar-wrapper">
       <div className="sidebar-content">
-        <div className="sidebar-brand">
-          <Link href="/">
-            <Image
-              src="/images/logo-light.png"
-              placeholder="blur"
-              blurDataURL="/images/logo-light.png"
-              width={138}
-              height={24}
-              alt="Logo"
-            />
-          </Link>
-        </div>
-        <SimpleBarReact style={{ height: "calc(100% - 70px)" }}>
+        <div className="sidebar-brand">LOGO</div>
+        <SimpleBarReact style={{ height: 'calc(100% - 70px)' }}>
           <ul className="sidebar-menu">
-            <li className={`sidebar-dropdown text-black hover:text-indigo-600 ${["", "/", "/index-crypto", "/index-ecommerce"].includes(menu) ? "active" : ""}`}>
-              <Link href="#" onClick={() => handleMenuClick("dashboard-item")}>
-                <PiBrowsersBold className="icon mr-4" />
+            <li
+              className={`sidebar-dropdown text-black hover:text-indigo-600 ${
+                ['', '/dashboard', '/region', '/school', '/class'].includes(
+                  activeMenu,
+                )
+                  ? 'active'
+                  : ''
+              }`}
+            >
+              <Link href="#" onClick={() => handleMenuClick('dashboard-item')}>
+                <PiAirplayFill className="icon mr-4" />
                 Painel Administrativo
               </Link>
-              {renderSubMenu("dashboard-item", [
-                { path: "/dashboard", label: "Dashboard do usuário" },
-                { path: "/index-crypto", label: "Relatórios" },
-                { path: "/index-ecommerce", label: "Relatórios" },
+              {renderSubMenu('dashboard-item', [
+                { path: '/dashboard', label: 'Dashboard do usuário' },
+                {
+                  path: '/region',
+                  label: 'Regiões',
+                  roles: ['SECRETARIO', 'COORDENADOR'],
+                },
+                {
+                  path: '/school',
+                  label: 'Escolas',
+                  roles: ['SECRETARIO', 'COORDENADOR', 'DIRETOR', 'PROFESSOR'],
+                },
+                {
+                  path: '/class',
+                  label: 'Turmas',
+                  roles: [
+                    'SECRETARIO',
+                    'COORDENADOR',
+                    'DIRETOR',
+                    'PROFESSOR',
+                    'USER',
+                  ],
+                },
               ])}
             </li>
-
-            <li className={`sidebar-dropdown text-black hover:text-indigo-600 ${["/dashboard", "/users/coordinator", "/users/director", "/users/teacher", "/users/student"].includes(menu) ? "active" : ""}`}>
-              <Link href="#" onClick={() => handleMenuClick("/index-item")}>
+            <li
+              className={`sidebar-dropdown text-black hover:text-indigo-600 ${
+                [
+                  '/dashboard',
+                  '/users/coordinator',
+                  '/users/director',
+                  '/users/teacher',
+                  '/users/student',
+                ].includes(activeMenu)
+                  ? 'active'
+                  : ''
+              }`}
+            >
+              <Link href="#" onClick={() => handleMenuClick('/users-item')}>
                 <BiSolidUserAccount className="icon mr-4" />
                 Usuários
               </Link>
-              {renderSubMenu("/index-item", [
-                { path: "/dashboard/secretary", label: "Secretário de Educação" },
-                { path: "/users/coordinator", label: "Coordenadores" },
-                { path: "/users/director", label: "Diretores" },
-                { path: "/users/teacher", label: "Professores" },
-                { path: "/users/student", label: "Estudantes" },
+              {renderSubMenu('/users-item', [
+                {
+                  path: '/users/secretary',
+                  label: 'Secretário de Educação',
+                  roles: ['ADMIN'],
+                },
+                {
+                  path: '/users/coordinator',
+                  label: 'Coordenadores',
+                  roles: ['SECRETARIO'],
+                },
+                {
+                  path: '/users/director',
+                  label: 'Diretores',
+                  roles: ['SECRETARIO', 'COORDENADOR'],
+                },
+                {
+                  path: '/users/teacher',
+                  label: 'Professores',
+                  roles: ['SECRETARIO', 'COORDENADOR', 'DIRETOR'],
+                },
+                {
+                  path: '/users/student',
+                  label: 'Estudantes',
+                  roles: ['SECRETARIO', 'COORDENADOR', 'DIRETOR'],
+                },
               ])}
             </li>
           </ul>

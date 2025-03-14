@@ -58,9 +58,9 @@ export default function Login() {
         <div className="container-fluid relative">
           <div className="md:flex items-center">
             <div className="xl:w-[30%] lg:w-1/3 md:w-1/2">
-              <div className="relative md:flex flex-col md:min-h-screen justify-center bg-white shadow-sm md:px-10 py-10 px-4 z-1">
-                <div className="text-center">
-                  <Link href="/">LOGO</Link>
+              <div className="relative md:flex flex-col md:min-h-screen justify-center bg-white shadow-sm md:px-10 py-4 px-4 z-1">
+                <div className="flex justify-center mt-20 mb-4">
+                  <Image src="/material.jpg" alt="Logo" width={140} height={140} />
                 </div>
                 <div className="title-heading text-center md:my-auto my-20">
                   <LoginForm
