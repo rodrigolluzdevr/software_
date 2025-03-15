@@ -122,28 +122,28 @@ const Sidebar: React.FC = () => {
               </Link>
               {renderSubMenu('/users-item', [
                 {
-                  path: '/users/secretary',
+                  path: '/users/secretaries',
                   label: 'Secretário de Educação',
                   roles: ['ADMIN'],
                 },
                 {
-                  path: '/users/coordinator',
+                  path: '/users/coordinators',
                   label: 'Coordenadores',
                   roles: ['SECRETARIO'],
                 },
                 {
-                  path: '/users/director',
+                  path: '/users/directors',
                   label: 'Diretores',
                   roles: ['SECRETARIO', 'COORDENADOR'],
                 },
                 {
-                  path: '/users/teacher',
+                  path: '/users/teachers',
                   label: 'Professores',
                   roles: ['SECRETARIO', 'COORDENADOR', 'DIRETOR'],
                 },
                 {
-                  path: '/users/student',
-                  label: 'Estudantes',
+                  path: '/users/students',
+                  label: 'Alunos',
                   roles: ['SECRETARIO', 'COORDENADOR', 'DIRETOR', 'PROFESSOR'],
                 },
               ])}
