@@ -15,13 +15,29 @@ interface LinkItem {
 
 const Sidebar: React.FC = () => {
   const [activeMenu, setActiveMenu] = useState('');
-  const [subMenus, setSubMenus] = useState<{ [key: string]: boolean }>({});
+  // Initialize subMenus with all menus open by default
+  const [subMenus, setSubMenus] = useState<{ [key: string]: boolean }>({
+    'dashboard-item': true,
+    '/users-item': true
+  });
   const [role, setRole] = useState<string | null>(null);
   const currentPath = usePathname();
 
+  // Define which paths belong to which submenu
+  const pathToSubmenuMap: { [key: string]: string } = {
+    '/dashboard': 'dashboard-item',
+    '/region': 'dashboard-item',
+    '/school': 'dashboard-item',
+    '/class': 'dashboard-item',
+    '/users/secretaries': '/users-item',
+    '/users/coordinators': '/users-item',
+    '/users/directors': '/users-item',
+    '/users/teachers': '/users-item',
+    '/users/students': '/users-item',
+  };
+
   useEffect(() => {
     setActiveMenu(currentPath);
-    setSubMenus((prev) => ({ ...prev, [currentPath]: true }));
     window.scrollTo(0, 0);
   }, [currentPath]);
 
@@ -37,6 +53,16 @@ const Sidebar: React.FC = () => {
   };
 
   const isActive = (path: string) => activeMenu === path;
+  
+  // Check if user has access to any item in the submenu
+  const hasAccessToAnyItem = (links: LinkItem[]): boolean => {
+    return links.some(link => 
+      !link.roles || 
+      link.roles.length === 0 || 
+      !role || 
+      link.roles.includes(role)
+    );
+  };
 
   const renderSubMenu = (menuName: string, links: LinkItem[]) => (
     <div
@@ -44,20 +70,87 @@ const Sidebar: React.FC = () => {
     >
       <ul>
         {links
-          .filter((link) => !link.roles || (role && link.roles.includes(role)))
+          .filter(
+            (link) =>
+              !link.roles ||
+              link.roles.length === 0 ||
+              !role ||
+              link.roles.includes(role),
+          )
           .map((link) => (
             <li
               key={link.path}
-              className={`text-sm text-black flex items-center hover:text-blue-500 ${
+              className={`text-sm flex items-center ${
                 isActive(link.path) ? 'active' : ''
               }`}
             >
-              <Link href={link.path}>{link.label}</Link>
+              <Link
+                href={link.path}
+                className={`text-black hover:text-blue-500 ${
+                  isActive(link.path) ? 'text-blue-500' : ''
+                }`}
+              >
+                {link.label}
+              </Link>
             </li>
           ))}
       </ul>
     </div>
   );
+
+  // Define menu items for reuse
+  const adminPanelItems: LinkItem[] = [
+    { path: '/dashboard', label: 'Dashboard do usuário' },
+    {
+      path: '/region',
+      label: 'Regiões',
+      roles: ['SECRETARIO', 'COORDENADOR'],
+    },
+    {
+      path: '/school',
+      label: 'Escolas',
+      roles: ['SECRETARIO', 'COORDENADOR', 'DIRETOR', 'PROFESSOR'],
+    },
+    {
+      path: '/class',
+      label: 'Turmas',
+      roles: [
+        'SECRETARIO',
+        'COORDENADOR',
+        'DIRETOR',
+        'PROFESSOR',
+        'USER',
+      ],
+    },
+  ];
+
+  const userPanelItems: LinkItem[] = [
+    {
+      path: '/users/secretaries',
+      label: 'Secretário de Educação',
+      roles: ['ADMIN'],
+    },
+    {
+      path: '/users/coordinators',
+      label: 'Coordenadores',
+      roles: ['SECRETARIO'],
+    },
+    {
+      path: '/users/directors',
+      label: 'Diretores',
+      roles: ['SECRETARIO', 'COORDENADOR'],
+    },
+    {
+      path: '/users/teachers',
+      label: 'Professores',
+      roles: ['SECRETARIO', 'COORDENADOR', 'DIRETOR'],
+    },
+    {
+      path: '/users/students',
+      label: 'Alunos',
+      roles: ['SECRETARIO', 'COORDENADOR', 'DIRETOR', 'PROFESSOR'],
+    },
+  ];
 
   return (
     <nav className="sidebar-wrapper">
@@ -65,89 +158,45 @@ const Sidebar: React.FC = () => {
         <div className="sidebar-brand">LOGO SIGedu</div>
         <SimpleBarReact style={{ height: 'calc(100% - 70px)' }}>
           <ul className="sidebar-menu">
-            <li
-              className={`sidebar-dropdown text-black hover:text-blue-500 ${
-                ['', '/dashboard', '/region', '/school', '/class'].includes(
-                  activeMenu,
-                )
-                  ? 'active'
-                  : ''
-              }`}
-            >
-              <Link href="#" onClick={() => handleMenuClick('dashboard-item')}>
-                <PiAirplayFill className="icon mr-4" />
-                Painel Administrativo
-              </Link>
-              {renderSubMenu('dashboard-item', [
-                { path: '/dashboard', label: 'Dashboard do usuário' },
-                {
-                  path: '/region',
-                  label: 'Regiões',
-                  roles: ['SECRETARIO', 'COORDENADOR'],
-                },
-                {
-                  path: '/school',
-                  label: 'Escolas',
-                  roles: ['SECRETARIO', 'COORDENADOR', 'DIRETOR', 'PROFESSOR'],
-                },
-                {
-                  path: '/class',
-                  label: 'Turmas',
-                  roles: [
-                    'SECRETARIO',
-                    'COORDENADOR',
-                    'DIRETOR',
-                    'PROFESSOR',
-                    'USER',
-                  ],
-                },
-              ])}
-            </li>
-            <li
-              className={`sidebar-dropdown text-black hover:text-blue-500 ${
-                [
-                  '/dashboard',
-                  '/users/coordinator',
-                  '/users/director',
-                  '/users/teacher',
-                  '/users/student',
-                ].includes(activeMenu)
-                  ? 'active'
-                  : ''
-              }`}
-            >
-              <Link href="#" onClick={() => handleMenuClick('/users-item')}>
-                <BiSolidUserAccount className="icon mr-4" />
-                Usuários
-              </Link>
-              {renderSubMenu('/users-item', [
-                {
-                  path: '/users/secretaries',
-                  label: 'Secretário de Educação',
-                  roles: ['ADMIN'],
-                },
-                {
-                  path: '/users/coordinators',
-                  label: 'Coordenadores',
-                  roles: ['SECRETARIO'],
-                },
-                {
-                  path: '/users/directors',
-                  label: 'Diretores',
-                  roles: ['SECRETARIO', 'COORDENADOR'],
-                },
-                {
-                  path: '/users/teachers',
-                  label: 'Professores',
-                  roles: ['SECRETARIO', 'COORDENADOR', 'DIRETOR'],
-                },
-                {
-                  path: '/users/students',
-                  label: 'Alunos',
-                  roles: ['SECRETARIO', 'COORDENADOR', 'DIRETOR', 'PROFESSOR'],
-                },
-              ])}
-            </li>
+            {hasAccessToAnyItem(adminPanelItems) && (
+              <li
+                className={`sidebar-dropdown text-black hover:text-blue-500 ${
+                  ['', '/dashboard', '/region', '/school', '/class'].includes(
+                    activeMenu,
+                  )
+                    ? 'active'
+                    : ''
+                }`}
+              >
+                <Link href="#" onClick={() => handleMenuClick('dashboard-item')}>
+                  <PiAirplayFill className="icon mr-4" />
+                  Painel Administrativo
+                </Link>
+                {renderSubMenu('dashboard-item', adminPanelItems)}
+              </li>
+            )}
+            
+            {hasAccessToAnyItem(userPanelItems) && (
+              <li
+                className={`sidebar-dropdown text-black hover:text-blue-500 ${
+                  [
+                    '/users/secretaries',
+                    '/users/coordinators',
+                    '/users/directors',
+                    '/users/teachers',
+                    '/users/students',
+                  ].includes(activeMenu)
+                    ? 'active'
+                    : ''
+                }`}
+              >
+                <Link href="#" onClick={() => handleMenuClick('/users-item')}>
+                  <BiSolidUserAccount className="icon mr-4" />
+                  Painel de Usuários
+                </Link>
+                {renderSubMenu('/users-item', userPanelItems)}
+              </li>
+            )}
           </ul>
         </SimpleBarReact>
       </div>
