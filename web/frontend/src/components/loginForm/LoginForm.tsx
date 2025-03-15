@@ -53,7 +53,8 @@ const LoginForm: React.FC<LoginFormProps> = ({
         <div className="mt-20">
           <input
             type="submit"
-            className="py-2 px-5 inline-block tracking-wide border align-middle duration-500 text-base text-center bg-black hover:bg-indigo-600 border-white hover:border-white text-white hover:text-white rounded-md w-full cursor-pointer"
+            className="py-2 px-5 inline-block tracking-wide border align-middle duration-500 text-base text-center bg-blue-500 hover:bg-white border-blue-500 hover:border-blue-500 
+                     text-white hover:text-blue-500 transition-colors rounded-md w-full cursor-pointer"
             value="Entrar"
           />
         </div>

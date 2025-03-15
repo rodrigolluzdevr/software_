@@ -33,7 +33,7 @@
   }
 
   .top-header {
-    @apply start-[301px];
+    @apply start-[281px];
 
     @media (max-width: 1024px) {
       @apply start-0;

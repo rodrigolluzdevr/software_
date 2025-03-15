@@ -48,7 +48,7 @@ const Sidebar: React.FC = () => {
           .map((link) => (
             <li
               key={link.path}
-              className={`text-sm text-black flex items-center hover:text-indigo-600 ${
+              className={`text-sm text-black flex items-center hover:text-blue-500 ${
                 isActive(link.path) ? 'active' : ''
               }`}
             >
@@ -62,11 +62,11 @@ const Sidebar: React.FC = () => {
   return (
     <nav className="sidebar-wrapper">
       <div className="sidebar-content">
-        <div className="sidebar-brand">LOGO</div>
+        <div className="sidebar-brand">LOGO SIGedu</div>
         <SimpleBarReact style={{ height: 'calc(100% - 70px)' }}>
           <ul className="sidebar-menu">
             <li
-              className={`sidebar-dropdown text-black hover:text-indigo-600 ${
+              className={`sidebar-dropdown text-black hover:text-blue-500 ${
                 ['', '/dashboard', '/region', '/school', '/class'].includes(
                   activeMenu,
                 )
@@ -104,7 +104,7 @@ const Sidebar: React.FC = () => {
               ])}
             </li>
             <li
-              className={`sidebar-dropdown text-black hover:text-indigo-600 ${
+              className={`sidebar-dropdown text-black hover:text-blue-500 ${
                 [
                   '/dashboard',
                   '/users/coordinator',

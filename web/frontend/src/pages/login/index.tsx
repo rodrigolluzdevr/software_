@@ -54,7 +54,7 @@ export default function Login() {
   return (
     <div>
       <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-white"></div>
+        <div className="absolute inset-0 bg-blue-500"></div>
         <div className="container-fluid relative">
           <div className="md:flex items-center">
             <div className="xl:w-[30%] lg:w-1/3 md:w-1/2">

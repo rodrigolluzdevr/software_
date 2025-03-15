@@ -5,7 +5,7 @@
 }
 
 .sidebar-wrapper {
-  @apply fixed top-0 -start-[300px] z-999 shadow-sm bg-white duration-500 w-[300px] h-screen max-h-screen;
+  @apply fixed top-0 -start-[300px] z-999 shadow-sm bg-white duration-500 w-[280px] h-screen max-h-screen;
 
   @media (max-width: 1024px) {
     @apply start-0;

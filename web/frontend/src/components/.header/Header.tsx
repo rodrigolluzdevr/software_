@@ -66,7 +66,7 @@ const Header: React.FC<HeaderProps> = ({ setToggle, toggle }) => {
             className="size-8 inline-flex items-center justify-center tracking-wide align-middle duration-500 text-[20px] text-center bg-white border border-white text-slate-900 rounded-full"
             onClick={toggleSidebar}
           >
-            <BsLightningChargeFill className="size-6 hover:text-indigo-600" />
+            <BsLightningChargeFill className="size-6 hover:text-blue-500" />
           </button>
         </div>
 
@@ -78,9 +78,9 @@ const Header: React.FC<HeaderProps> = ({ setToggle, toggle }) => {
               type="button"
             >
               <span className="size-8 inline-flex items-center justify-center tracking-wide align-middle duration-500 text-[20px] text-center bg-white border border-white text-slate-900 rounded-full">
-                <BiSolidUserCircle className="size-8 hover:text-indigo-600" />
+                <BiSolidUserCircle className="size-8 hover:text-blue-500" />
               </span>
-              <span className="font-bold text-[14px] sm:inline-block hidden items-center py-2 px-4 hover:text-indigo-600">
+              <span className="font-bold text-[14px] sm:inline-block hidden items-center py-2 px-4 hover:text-blue-500">
                 {user ? user.name : "Usuário"}
               </span>
             </button>
@@ -93,7 +93,7 @@ const Header: React.FC<HeaderProps> = ({ setToggle, toggle }) => {
                   <li>
                     <Link
                       href="/profile"
-                      className="flex items-center font-medium py-1 px-4 hover:text-indigo-600"
+                      className="flex items-center font-medium py-1 px-4 hover:text-blue-500"
                     >
                       <BiSolidUser className="me-2" />
                       Perfil
@@ -102,7 +102,7 @@ const Header: React.FC<HeaderProps> = ({ setToggle, toggle }) => {
                   <li>
                     <Link
                       href="/profile-setting"
-                      className="flex items-center font-medium py-1 px-4 hover:text-indigo-600"
+                      className="flex items-center font-medium py-1 px-4 hover:text-blue-500"
                     >
                       <AiOutlineSetting className="me-2" />
                       Alterar Senha
@@ -113,7 +113,7 @@ const Header: React.FC<HeaderProps> = ({ setToggle, toggle }) => {
                     <Link
                       href="/login"
                       onClick={logout}
-                      className="flex items-center font-medium py-1 px-4 hover:text-indigo-600"
+                      className="flex items-center font-medium py-1 px-4 hover:text-blue-500"
                     >
                       <IoMdLogOut className="me-2" />
                       Logout
