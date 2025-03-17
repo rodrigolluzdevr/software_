@@ -1,46 +1,110 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import SimpleBarReact from 'simplebar-react';
 import 'simplebar-react/dist/simplebar.min.css';
 import { PiAirplayFill } from 'react-icons/pi';
 import { BiSolidUserAccount } from 'react-icons/bi';
 
+// Types
 interface LinkItem {
   path: string;
   label: string;
   roles?: string[];
 }
 
+interface SubMenusState {
+  [key: string]: boolean;
+}
+
+// Constants
+const SUBMENU_IDS = {
+  DASHBOARD: 'dashboard-item',
+  USERS: '/users-item',
+};
+
+const ROLES = {
+  ADMIN: 'ADMIN',
+  SECRETARIO: 'SECRETARIO',
+  COORDENADOR: 'COORDENADOR',
+  DIRETOR: 'DIRETOR',
+  PROFESSOR: 'PROFESSOR',
+  USER: 'USER',
+};
+
+/**
+ * Sidebar navigation component that displays menu items based on user role
+ */
 const Sidebar: React.FC = () => {
-  const [activeMenu, setActiveMenu] = useState('');
-  // Initialize subMenus with all menus open by default
-  const [subMenus, setSubMenus] = useState<{ [key: string]: boolean }>({
-    'dashboard-item': true,
-    '/users-item': true
+  const [activeMenu, setActiveMenu] = useState<string>('');
+  const [subMenus, setSubMenus] = useState<SubMenusState>({
+    [SUBMENU_IDS.DASHBOARD]: true,
+    [SUBMENU_IDS.USERS]: true,
   });
   const [role, setRole] = useState<string | null>(null);
   const currentPath = usePathname();
 
-  // Define which paths belong to which submenu
-  const pathToSubmenuMap: { [key: string]: string } = {
-    '/dashboard': 'dashboard-item',
-    '/region': 'dashboard-item',
-    '/school': 'dashboard-item',
-    '/class': 'dashboard-item',
-    '/users/secretaries': '/users-item',
-    '/users/coordinators': '/users-item',
-    '/users/directors': '/users-item',
-    '/users/teachers': '/users-item',
-    '/users/students': '/users-item',
-  };
+  // Menu data definitions
+  const adminPanelItems: LinkItem[] = [
+    { path: '/dashboard', label: 'Dashboard do usuário' },
+    {
+      path: '/region',
+      label: 'Regiões',
+      roles: [ROLES.SECRETARIO, ROLES.COORDENADOR],
+    },
+    {
+      path: '/school',
+      label: 'Escolas',
+      roles: [ROLES.SECRETARIO, ROLES.COORDENADOR, ROLES.DIRETOR, ROLES.PROFESSOR],
+    },
+    {
+      path: '/class',
+      label: 'Turmas',
+      roles: [
+        ROLES.SECRETARIO,
+        ROLES.COORDENADOR,
+        ROLES.DIRETOR,
+        ROLES.PROFESSOR,
+        ROLES.USER,
+      ],
+    },
+  ];
 
+  const userPanelItems: LinkItem[] = [
+    {
+      path: '/users/secretaries',
+      label: 'Secretário de Educação',
+      roles: [ROLES.ADMIN],
+    },
+    {
+      path: '/users/coordinators',
+      label: 'Coordenadores',
+      roles: [ROLES.SECRETARIO],
+    },
+    {
+      path: '/users/directors',
+      label: 'Diretores',
+      roles: [ROLES.SECRETARIO, ROLES.COORDENADOR],
+    },
+    {
+      path: '/users/teachers',
+      label: 'Professores',
+      roles: [ROLES.SECRETARIO, ROLES.COORDENADOR, ROLES.DIRETOR],
+    },
+    {
+      path: '/users/students',
+      label: 'Alunos',
+      roles: [ROLES.SECRETARIO, ROLES.COORDENADOR, ROLES.DIRETOR, ROLES.PROFESSOR],
+    },
+  ];
+
+  // Update active menu on path change
   useEffect(() => {
     setActiveMenu(currentPath);
     window.scrollTo(0, 0);
   }, [currentPath]);
 
+  // Load user role
   useEffect(() => {
     const storedRole = sessionStorage.getItem('role');
     if (storedRole) {
@@ -48,13 +112,13 @@ const Sidebar: React.FC = () => {
     }
   }, []);
 
+  // Utility functions
   const handleMenuClick = (menuName: string) => {
     setSubMenus((prev) => ({ ...prev, [menuName]: !prev[menuName] }));
   };
 
   const isActive = (path: string) => activeMenu === path;
   
-  // Check if user has access to any item in the submenu
   const hasAccessToAnyItem = (links: LinkItem[]): boolean => {
     return links.some(link => 
       !link.roles || 
@@ -64,31 +128,17 @@ const Sidebar: React.FC = () => {
     );
   };
 
+  // Render helpers
   const renderSubMenu = (menuName: string, links: LinkItem[]) => (
-    <div
-      className={`sidebar-submenu ${subMenus[menuName] ? 'block' : 'hidden'}`}
-    >
+    <div className={`sidebar-submenu ${subMenus[menuName] ? 'block' : 'hidden'}`}>
       <ul>
         {links
-          .filter(
-            (link) =>
-              !link.roles ||
-              link.roles.length === 0 ||
-              !role ||
-              link.roles.includes(role),
-          )
-          .map((link) => (
-            <li
-              key={link.path}
-              className={`text-sm flex items-center ${
-                isActive(link.path) ? 'active' : ''
-              }`}
-            >
+          .filter(link => !link.roles || link.roles.length === 0 || !role || link.roles.includes(role))
+          .map(link => (
+            <li key={link.path} className={`text-sm flex items-center ${isActive(link.path) ? 'active' : ''}`}>
               <Link
                 href={link.path}
-                className={`text-black hover:text-blue-500 ${
-                  isActive(link.path) ? 'text-blue-500' : ''
-                }`}
+                className={`text-black hover:text-blue-500 ${isActive(link.path) ? 'text-blue-500' : ''}`}
               >
                 {link.label}
               </Link>
@@ -98,59 +148,15 @@ const Sidebar: React.FC = () => {
     </div>
   );
 
-  // Define menu items for reuse
-  const adminPanelItems: LinkItem[] = [
-    { path: '/dashboard', label: 'Dashboard do usuário' },
-    {
-      path: '/region',
-      label: 'Regiões',
-      roles: ['SECRETARIO', 'COORDENADOR'],
-    },
-    {
-      path: '/school',
-      label: 'Escolas',
-      roles: ['SECRETARIO', 'COORDENADOR', 'DIRETOR', 'PROFESSOR'],
-    },
-    {
-      path: '/class',
-      label: 'Turmas',
-      roles: [
-        'SECRETARIO',
-        'COORDENADOR',
-        'DIRETOR',
-        'PROFESSOR',
-        'USER',
-      ],
-    },
-  ];
-
-  const userPanelItems: LinkItem[] = [
-    {
-      path: '/users/secretaries',
-      label: 'Secretário de Educação',
-      roles: ['ADMIN'],
-    },
-    {
-      path: '/users/coordinators',
-      label: 'Coordenadores',
-      roles: ['SECRETARIO'],
-    },
-    {
-      path: '/users/directors',
-      label: 'Diretores',
-      roles: ['SECRETARIO', 'COORDENADOR'],
-    },
-    {
-      path: '/users/teachers',
-      label: 'Professores',
-      roles: ['SECRETARIO', 'COORDENADOR', 'DIRETOR'],
-    },
-    {
-      path: '/users/students',
-      label: 'Alunos',
-      roles: ['SECRETARIO', 'COORDENADOR', 'DIRETOR', 'PROFESSOR'],
-    },
-  ];
+  // Active state helpers
+  const isAdminPanelActive = ['', '/dashboard', '/region', '/school', '/class'].includes(activeMenu);
+  const isUserPanelActive = [
+    '/users/secretaries',
+    '/users/coordinators',
+    '/users/directors',
+    '/users/teachers',
+    '/users/students',
+  ].includes(activeMenu);
 
   return (
     <nav className="sidebar-wrapper">
@@ -158,43 +164,25 @@ const Sidebar: React.FC = () => {
         <div className="sidebar-brand">LOGO SIGedu</div>
         <SimpleBarReact style={{ height: 'calc(100% - 70px)' }}>
           <ul className="sidebar-menu">
+            {/* Admin Panel Menu */}
             {hasAccessToAnyItem(adminPanelItems) && (
-              <li
-                className={`sidebar-dropdown text-black hover:text-blue-500 ${
-                  ['', '/dashboard', '/region', '/school', '/class'].includes(
-                    activeMenu,
-                  )
-                    ? 'active'
-                    : ''
-                }`}
-              >
-                <Link href="#" onClick={() => handleMenuClick('dashboard-item')}>
+              <li className={`sidebar-dropdown text-black hover:text-blue-500 ${isAdminPanelActive ? 'active' : ''}`}>
+                <Link href="#" onClick={() => handleMenuClick(SUBMENU_IDS.DASHBOARD)}>
                   <PiAirplayFill className="icon mr-4" />
                   Painel Administrativo
                 </Link>
-                {renderSubMenu('dashboard-item', adminPanelItems)}
+                {renderSubMenu(SUBMENU_IDS.DASHBOARD, adminPanelItems)}
               </li>
             )}
             
+            {/* Users Panel Menu */}
             {hasAccessToAnyItem(userPanelItems) && (
-              <li
-                className={`sidebar-dropdown text-black hover:text-blue-500 ${
-                  [
-                    '/users/secretaries',
-                    '/users/coordinators',
-                    '/users/directors',
-                    '/users/teachers',
-                    '/users/students',
-                  ].includes(activeMenu)
-                    ? 'active'
-                    : ''
-                }`}
-              >
-                <Link href="#" onClick={() => handleMenuClick('/users-item')}>
+              <li className={`sidebar-dropdown text-black hover:text-blue-500 ${isUserPanelActive ? 'active' : ''}`}>
+                <Link href="#" onClick={() => handleMenuClick(SUBMENU_IDS.USERS)}>
                   <BiSolidUserAccount className="icon mr-4" />
                   Painel de Usuários
                 </Link>
-                {renderSubMenu('/users-item', userPanelItems)}
+                {renderSubMenu(SUBMENU_IDS.USERS, userPanelItems)}
               </li>
             )}
           </ul>
