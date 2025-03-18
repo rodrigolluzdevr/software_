@@ -14,11 +14,11 @@ const StudentList = () => {
   const users = allUsers.filter(user => user.role === "USER");
 
   const handleRegisterClick = () => {
-    router.push('/dashboard/alunos');
+    router.push('/users/students/register');
   };
 
   const handleEditStudent = (userId: string | number) => {
-    router.push(`/dashboard/alunos/${userId}`);
+    router.push(`/users/students/update/${userId}`);
   };
 
   const formatDate = (dateString?: string) => {
