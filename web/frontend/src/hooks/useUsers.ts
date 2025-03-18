@@ -11,6 +11,12 @@ export const useUsers = () => {
       try {
         setIsLoading(true);
         const token = sessionStorage.getItem('token');
+        
+        // Verificar se o token existe
+        if (!token) {
+          throw new Error('Não autenticado - token não encontrado');
+        }
+        
         const response = await fetch('http://localhost:4000/users', {
           headers: {
             Authorization: `Bearer ${token}`,

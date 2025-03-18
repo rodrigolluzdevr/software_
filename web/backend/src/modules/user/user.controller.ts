@@ -18,11 +18,11 @@ import { RolesGuard } from '../auth/roles.guard';
 import { getOrganizationIdFromRequest } from 'src/utils/organization.util';
 
 @Controller('users')
-@UseGuards(RolesGuard)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get()
+  @UseGuards(RolesGuard)
   async getAllUsers(@Req() req: Request) {
     const organizationId = getOrganizationIdFromRequest(req);
     return this.userService.getAllUsersByOrganization(organizationId);
