@@ -1,99 +1,150 @@
 import { NextRouter } from 'next/router';
 import Link from 'next/link';
-import { BiEdit } from 'react-icons/bi';
+import {
+  BiUserPlus,
+  BiBook,
+  BiSolidSchool,
+  BiSliderAlt,
+  BiUserCircle,
+  BiUser,
+} from 'react-icons/bi';
+import { FaUserGraduate, FaChalkboardTeacher } from 'react-icons/fa';
 
-interface SecretaryPanelProps {
+interface SecretaryDashboardProps {
   router: NextRouter;
 }
 
-const SecretaryPanel = ({ router }: SecretaryPanelProps) => {
-  // Função para navegação
-  const navigateToRegister = () => router.push('/dashboard/alunos');
-  
+const SecretaryDashboard = ({ router }: SecretaryDashboardProps) => {
+  // Funções de navegação
+  const navigateToStudents = () => router.push('/users/student');
+  const navigateToClasses = () => router.push('/users/class');
+  const navigateToTeachers = () => router.push('/users/teacher');
+  const navigateToSchedule = () => router.push('/dashboard/horarios');
+
   return (
     <div className="w-full relative px-2 sm:px-3 md:px-4 lg:px-6">
       <div className="layout-specing">
-    <div className="w-full px-2 sm:px-3 md:px-4 lg:px-6">
-      <div className="py-4">
-        {/* Cabeçalho com título e botão alinhados em todas as resoluções */}
-        <div className="flex flex-row justify-between items-center mb-4">
-          <h5 className="text-lg font-semibold">Lista De Alunos</h5>
-          
-          <button
-            onClick={navigateToRegister}
-            className="py-1 px-4 font-semibold tracking-wide border rounded-md 
-                     bg-blue-500 hover:bg-white border-blue-500 hover:border-blue-500 
-                     text-white hover:text-blue-500 transition-colors"
-          >
-            Cadastrar
-          </button>
-        </div>
-        
-        {/* Breadcrumb simplificado */}
-        <div className="mb-6">
-          <ul className="flex items-center text-[14px] font-bold">
-            <li className="hover:text-blue-500 transition-colors">
-              <Link href="/">Painel</Link>
-            </li>
-            <li className="mx-2">/</li>
-            <li className="text-blue-500">Alunos</li>
-          </ul>
-        </div>
-        
-        {/* Tabela responsiva */}
-        <div className="overflow-hidden rounded-md shadow-sm">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left font-light">
-              <thead className="text-xs md:text-sm uppercase bg-white">
-                <tr>
-                  {/* ID - menor prioridade */}
-                  <th className="text-center p-2 md:p-4 w-4 hidden xl:table-cell">#</th>
-                  {/* Aluno - maior prioridade */}
-                  <th className="text-left p-2 md:p-4">Aluno</th>
-                  {/* Escola - prioridade média-baixa */}
-                  <th className="text-center p-2 md:p-4 hidden sm:table-cell">Escola</th>
-                  {/* Turma - prioridade média */}
-                  <th className="text-center p-2 md:p-4 hidden md:table-cell">Turma</th>
-                  {/* Data - prioridade média-alta */}
-                  <th className="text-center p-2 md:p-4 hidden lg:table-cell">Data de Matrícula</th>
-                  {/* Editar - alta prioridade */}
-                  <th className="text-center p-2 md:p-4 w-10 md:w-20">Editar</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr className="bg-white border-b">
-                  <td className="text-center p-2 md:p-4 hidden xl:table-cell">1</td>
-                  <td className="p-2 md:p-4">João Silva</td>
-                  <td className="text-center p-2 md:p-4 hidden sm:table-cell">Escola Municipal Professor Barro Duro</td>
-                  <td className="text-center p-2 md:p-4 hidden md:table-cell">2025 - 9 ºB Manhã</td>
-                  <td className="text-center p-2 md:p-4 hidden lg:table-cell">01/03/2025</td>
-                  <td className="text-center p-2 md:p-4">
-                    <button className="text-black hover:text-blue-500 transition-colors">
-                      <BiEdit className="text-xl md:text-2xl" />
-                    </button>
-                  </td>
-                </tr>
-                <tr className="bg-white">
-                  <td className="text-center p-2 md:p-4 hidden xl:table-cell">2</td>
-                  <td className="p-2 md:p-4">Maria Santos</td>
-                  <td className="text-center p-2 md:p-4 hidden sm:table-cell">Barro Duro Municipal</td>
-                  <td className="text-center p-2 md:p-4 hidden md:table-cell">2025 - 9 ºB Manhã</td>
-                  <td className="text-center p-2 md:p-4 hidden lg:table-cell">05/03/2025</td>
-                  <td className="text-center p-2 md:p-4">
-                    <button className="text-black hover:text-blue-500 transition-colors">
-                      <BiEdit className="text-xl md:text-2xl" />
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+        <div className="w-full px-2 sm:px-3 md:px-4 lg:px-6">
+          <div className="py-4">
+            {/* Cabeçalho com título */}
+            <div className="flex flex-row justify-between items-center mb-4">
+              <h5 className="text-lg font-semibold">Dashboard Do Usuário</h5>
+            </div>
+
+            {/* Breadcrumb simplificado */}
+            <div className="mb-6">
+              <ul className="flex items-center text-[14px] font-bold">
+                <li className="hover:text-blue-500 transition-colors">
+                  <Link href="/">Início</Link>
+                </li>
+                <li className="mx-2">/</li>
+                <li className="text-blue-500">Dashboard</li>
+              </ul>
+            </div>
+
+            {/* Cards de estatísticas */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div className="bg-white rounded-md shadow-sm p-4 flex items-center">
+                <div className="bg-blue-100 p-3 rounded-full">
+                  <BiSliderAlt className="text-blue-500 text-xl" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-gray-500 text-sm">Regiões</p>
+                  <h4 className="font-semibold text-lg">6</h4>
+                </div>
+              </div>
+              <div className="bg-white rounded-md shadow-sm p-4 flex items-center">
+                <div className="bg-blue-100 p-3 rounded-full">
+                  <BiSolidSchool className="text-blue-500 text-xl" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-gray-500 text-sm">Escolas</p>
+                  <h4 className="font-semibold text-lg">6</h4>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-md shadow-sm p-4 flex items-center">
+                <div className="bg-blue-100 p-3 rounded-full">
+                  <BiUser className="text-blue-500 text-xl" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-gray-500 text-sm">Coordenadores</p>
+                  <h4 className="font-semibold text-lg">3</h4>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-md shadow-sm p-4 flex items-center">
+                <div className="bg-blue-100 p-3 rounded-full">
+                  <BiUser className="text-blue-500 text-xl" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-gray-500 text-sm">Diretores</p>
+                  <h4 className="font-semibold text-lg">6</h4>
+                </div>
+              </div>
+
+
+              <div className="bg-white rounded-md shadow-sm p-4 flex items-center">
+                <div className="bg-blue-100 p-3 rounded-full">
+                  <BiBook className="text-blue-500 text-xl" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-gray-500 text-sm">Turmas</p>
+                  <h4 className="font-semibold text-lg">64</h4>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-md shadow-sm p-4 flex items-center">
+                <div className="bg-blue-100 p-3 rounded-full">
+                  <FaChalkboardTeacher className="text-blue-500 text-xl" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-gray-500 text-sm">Professores</p>
+                  <h4 className="font-semibold text-lg">22</h4>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-md shadow-sm p-4 flex items-center">
+                <div className="bg-blue-100 p-3 rounded-full">
+                  <FaUserGraduate className="text-blue-500 text-xl" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-gray-500 text-sm">Alunos</p>
+                  <h4 className="font-semibold text-lg">542</h4>
+                </div>
+              </div>
+            </div>
+
+
+            {/* Cards de acesso rápido */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              <div className="bg-white rounded-md shadow-sm p-4">
+                <h6 className="font-semibold mb-4">Acesso Rápido</h6>
+                <div className="grid grid-cols-2 sm:grid-cols-2 gap-3">
+                  <button
+                    onClick={navigateToStudents}
+                    className="flex flex-col-2 items-center justify-center p-3 bg-gray-50 hover:bg-gray-100 rounded-md transition-colors"
+                  >
+                    <BiUserPlus className="text-2xl text-blue-500 mb-1" />
+                    <span className="text-sm ml-2">
+                      Cadastrar Coordenadores
+                    </span>
+                  </button>
+                  <button
+                    onClick={navigateToTeachers}
+                    className="flex flex-col-2 items-center justify-center p-3 bg-gray-50 hover:bg-gray-100 rounded-md transition-colors"
+                  >
+                    <BiUserPlus className="text-2xl text-blue-500 mb-1" />
+                    <span className="text-sm ml-2">Cadastrar Diretores</span>
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-        </div>
         </div>
       </div>
     </div>
   );
 };
 
-export default SecretaryPanel;
+export default SecretaryDashboard;

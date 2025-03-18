@@ -72,11 +72,6 @@ const Sidebar: React.FC = () => {
 
   const userPanelItems: LinkItem[] = [
     {
-      path: '/users/secretaries',
-      label: 'Secretário de Educação',
-      roles: [ROLES.ADMIN],
-    },
-    {
       path: '/users/coordinators',
       label: 'Coordenadores',
       roles: [ROLES.SECRETARIO],
@@ -151,7 +146,6 @@ const Sidebar: React.FC = () => {
   // Active state helpers
   const isAdminPanelActive = ['', '/dashboard', '/region', '/school', '/class'].includes(activeMenu);
   const isUserPanelActive = [
-    '/users/secretaries',
     '/users/coordinators',
     '/users/directors',
     '/users/teachers',
