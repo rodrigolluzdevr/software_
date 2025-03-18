@@ -5,7 +5,6 @@ import {
   BiBook,
   BiSolidSchool,
   BiSliderAlt,
-  BiUserCircle,
   BiUser,
 } from 'react-icons/bi';
 import { FaUserGraduate, FaChalkboardTeacher } from 'react-icons/fa';
@@ -16,10 +15,8 @@ interface SecretaryDashboardProps {
 
 const SecretaryDashboard = ({ router }: SecretaryDashboardProps) => {
   // Funções de navegação
-  const navigateToStudents = () => router.push('/users/student');
-  const navigateToClasses = () => router.push('/users/class');
-  const navigateToTeachers = () => router.push('/users/teacher');
-  const navigateToSchedule = () => router.push('/dashboard/horarios');
+  const navigateToCoordinators = () => router.push('/users/coordinators/register');
+  const navigateToDirectors = () => router.push('/users/directors/register');
 
   return (
     <div className="w-full relative px-2 sm:px-3 md:px-4 lg:px-6">
@@ -122,7 +119,7 @@ const SecretaryDashboard = ({ router }: SecretaryDashboardProps) => {
                 <h6 className="font-semibold mb-4">Acesso Rápido</h6>
                 <div className="grid grid-cols-2 sm:grid-cols-2 gap-3">
                   <button
-                    onClick={navigateToStudents}
+                    onClick={navigateToCoordinators}
                     className="flex flex-col-2 items-center justify-center p-3 bg-gray-50 hover:bg-gray-100 rounded-md transition-colors"
                   >
                     <BiUserPlus className="text-2xl text-blue-500 mb-1" />
@@ -131,7 +128,7 @@ const SecretaryDashboard = ({ router }: SecretaryDashboardProps) => {
                     </span>
                   </button>
                   <button
-                    onClick={navigateToTeachers}
+                    onClick={navigateToDirectors}
                     className="flex flex-col-2 items-center justify-center p-3 bg-gray-50 hover:bg-gray-100 rounded-md transition-colors"
                   >
                     <BiUserPlus className="text-2xl text-blue-500 mb-1" />
