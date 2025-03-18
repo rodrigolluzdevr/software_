@@ -4,11 +4,14 @@ import { BiEdit } from 'react-icons/bi';
 import { useUsers } from '@/hooks/useUsers';
 
 /**
- * StudentList component displays a table of student users with filtering and navigation
+ * StudentList component displays a table of student users (ROLE=USER) with navigation
  */
 const StudentList = () => {
   const router = useRouter();
-  const { users = [], isLoading, error } = useUsers();
+  const { users: allUsers = [], isLoading, error } = useUsers();
+  
+  // Filter users to only include those with ROLE="USER"
+  const users = allUsers.filter(user => user.role === "USER");
 
   const handleRegisterClick = () => {
     router.push('/dashboard/alunos');
@@ -75,7 +78,7 @@ const StudentList = () => {
                   <table className="w-full text-left font-light">
                     <thead className="text-xs md:text-sm uppercase bg-white">
                       <tr>
-                        <th scope="col" className="text-center p-2 md:p-4 w-4 hidden xl:table-cell">Id</th>
+                        <th scope="col" className="text-center p-2 md:p-4 w-4 hidden xl:table-cell">ID</th>
                         <th scope="col" className="text-left p-2 md:p-4">Aluno</th>
                         <th scope="col" className="text-center p-2 md:p-4 hidden sm:table-cell">Escola</th>
                         <th scope="col" className="text-center p-2 md:p-4 hidden md:table-cell">Turma</th>
@@ -85,12 +88,12 @@ const StudentList = () => {
                     </thead>
                     <tbody>
                       {users.length === 0 ? (
-                        <tr className="bg-white border-b">
+                        <tr className="bg-white">
                           <td colSpan={6} className="text-center p-4">Nenhum aluno encontrado</td>
                         </tr>
                       ) : (
                         users.map((user) => (
-                          <tr key={user.id} className="bg-white border-b hover:bg-gray-50">
+                          <tr key={user.id} className="bg-white hover:bg-gray-50">
                             <td className="text-center p-2 md:p-4 hidden xl:table-cell">{user.id}</td>
                             <td className="p-2 md:p-4">{user.name}</td>
                             <td className="text-center p-2 md:p-4 hidden sm:table-cell">{user.organizationName || "Não informada"}</td>
