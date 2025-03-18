@@ -1,11 +1,23 @@
-import { useRouter } from 'next/router';
-import { VscMention } from 'react-icons/vsc';
+import { useState } from 'react';
 
 const StudentRegister = () => {
-  const router = useRouter();
+  const [name, setName] = useState<string>('');
+  const [cpf, setCpf] = useState<string>('');
+  const [cep, setCep] = useState<string>('');
+  const [registrationNumber, setRegistrationNumber] = useState<string>('');
+  const [birthDate, setBirthDate] = useState('');
+  const [address, setAddress] = useState<string>('');
+  const [numberAdress, setNumberAdress] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
+  const [isActive, setIsActive] = useState<boolean>(true);
+
+  // Toggle handler for isActive state
+  const handleToggleActive = () => {
+    setIsActive(!isActive);
+  };
 
   return (
-    <section className="w-full relative px-2 sm:px-3 md:px-4 lg:px-6">
+    <form className="w-full relative px-2 sm:px-3 md:px-4 lg:px-6">
       <div className="layout-specing">
         <div className="w-full px-2 sm:px-3 md:px-4 lg:px-6">
           <div className="py-4">
@@ -20,6 +32,8 @@ const StudentRegister = () => {
                     <div className="col-span-6 sm:col-span-2 lg:col-span-2">
                       <label className="form-label font-semibold">Nome *</label>
                       <input
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
                         type="text"
                         className="form-input w-full py-2 px-3 h-10 bg-transparent rounded outline-none border border-gray-200 focus:border-blue-500 focus:ring-0 mt-2"
                         placeholder="Digite o Nome"
@@ -31,6 +45,8 @@ const StudentRegister = () => {
                     <div className="col-span-6 sm:col-span-2 lg:col-span-1">
                       <label className="form-label font-semibold">CPF *</label>
                       <input
+                        value={cpf}
+                        onChange={(e) => setCpf(e.target.value)}
                         type="text"
                         className="form-input w-full py-2 px-3 h-10 bg-transparent rounded outline-none border border-gray-200 focus:border-blue-500 focus:ring-0 mt-2"
                         placeholder="Digite o CPF"
@@ -42,10 +58,12 @@ const StudentRegister = () => {
                     <div className="col-span-6 sm:col-span-2 lg:col-span-1">
                       <label className="form-label font-semibold">CEP *</label>
                       <input
+                        value={cep}
+                        onChange={(e) => setCep(e.target.value)}
                         type="text"
                         className="form-input w-full py-2 px-3 h-10 bg-transparent rounded outline-none border border-gray-200 focus:border-blue-500 focus:ring-0 mt-2"
                         placeholder="Digite o CEP"
-                        name="text"
+                        name="cep"
                         required
                       />
                     </div>
@@ -55,10 +73,12 @@ const StudentRegister = () => {
                         Matrícula
                       </label>
                       <input
+                        value={registrationNumber}
+                        onChange={(e) => setRegistrationNumber(e.target.value)}
                         type="text"
                         className="form-input w-full py-2 px-3 h-10 bg-transparent rounded outline-none border border-gray-200 focus:border-blue-500 focus:ring-0 mt-2"
                         placeholder="Digite a Matrícula"
-                        name="text"
+                        name="registrationNumber"
                       />
                     </div>
 
@@ -67,6 +87,8 @@ const StudentRegister = () => {
                         Data de Nascimento *
                       </label>
                       <input
+                        value={birthDate}
+                        onChange={(e) => setBirthDate(e.target.value)}
                         type="date"
                         className="form-input w-full py-2 px-3 h-10 bg-transparent rounded outline-none border border-gray-200 focus:border-blue-500 focus:ring-0 mt-2"
                         placeholder=""
@@ -83,6 +105,8 @@ const StudentRegister = () => {
                         Endereço *
                       </label>
                       <input
+                        value={address}
+                        onChange={(e) => setAddress(e.target.value)}
                         type="text"
                         className="form-input w-full py-2 px-3 h-10 bg-transparent rounded outline-none border border-gray-200 focus:border-blue-500 focus:ring-0 mt-2"
                         placeholder="Digite o Endereço"
@@ -96,11 +120,12 @@ const StudentRegister = () => {
                         Número *
                       </label>
                       <input
+                        value={numberAdress}
+                        onChange={(e) => setNumberAdress(e.target.value)}
                         type="text"
                         className="form-input w-full py-2 px-3 h-10 bg-transparent rounded outline-none border border-gray-200 focus:border-blue-500 focus:ring-0 mt-2"
                         placeholder="Digite o Número"
-                        id="cpf"
-                        name="cpf"
+                        name="numberAdress"
                         required
                       />
                     </div>
@@ -110,6 +135,8 @@ const StudentRegister = () => {
                         Email *
                       </label>
                       <input
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                         type="email"
                         className="form-input w-full py-2 px-3 h-10 bg-transparent rounded outline-none border border-gray-200 focus:border-blue-500 focus:ring-0 mt-2"
                         placeholder="Digite o Email"
@@ -117,12 +144,38 @@ const StudentRegister = () => {
                         required
                       />
                     </div>
+
+                    <div className="col-span-6 sm:col-span-2 lg:col-span-1 mt-2">
+                      <label className="form-label font-semibold  flex items-center justify-center">Status do Aluno</label>
+                      <div className="mt-3 flex items-center justify-center">
+                        <div 
+                          onClick={handleToggleActive}
+                          className={`relative inline-flex flex-shrink-0 h-6 w-12 cursor-pointer transition-colors ease-in-out duration-200 border-2 border-transparent rounded-full focus:outline-none ${
+                            isActive ? 'bg-green-500' : 'bg-gray-200'
+                          }`}
+                          role="switch"
+                          aria-checked={isActive}
+                          tabIndex={0}
+                        >
+                          <span className="sr-only">Ativar aluno</span>
+                          <span 
+                            aria-hidden="true" 
+                            className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200 ${
+                              isActive ? 'translate-x-6' : 'translate-x-0'
+                            }`}
+                          />
+                        </div>
+                        <span className="ml-2 text-sm">
+                          {isActive ? 'Ativo' : 'Inativo'}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                   {/* 3 line */}
                   <div className="grid grid-cols-6 gap-6 mb-6">
                     <div className="col-span-6 sm:col-span-2 lg:col-span-1">
                       <label className="font-semibold">
-                        Selecione a Região
+                        Região
                       </label>
                       <select className="form-select form-input mt-2 w-full py-2 px-3 h-10 bg-transparent rounded outline-none border border-gray-200 focus:border-indigo-600 focus:ring-0">
                         <option value=""> </option>
@@ -134,7 +187,7 @@ const StudentRegister = () => {
 
                     <div className="col-span-6 sm:col-span-2 lg:col-span-1">
                       <label className="font-semibold">
-                        Selecione a Escola
+                        Escola
                       </label>
                       <select className="form-select form-input mt-2 w-full py-2 px-3 h-10 bg-transparent rounded outline-none border border-gray-200 focus:border-indigo-600 focus:ring-0">
                         <option value=""> </option>
@@ -149,7 +202,7 @@ const StudentRegister = () => {
                     </div>
 
                     <div className="col-span-6 sm:col-span-2 lg:col-span-1">
-                      <label className="font-semibold">Selecione a Turma</label>
+                      <label className="font-semibold">Turma</label>
                       <select className="form-select form-input mt-2 w-full py-2 px-3 h-10 bg-transparent rounded outline-none border border-gray-200 focus:border-indigo-600 focus:ring-0">
                         <option value=""> </option>
                         <option value="2025 1º B">2025 1º B</option>
@@ -157,6 +210,8 @@ const StudentRegister = () => {
                         <option value="2025 2º A">2025 2º A</option>
                       </select>
                     </div>
+                    
+                    
                   </div>
                 </form>
               </div>
@@ -164,7 +219,7 @@ const StudentRegister = () => {
           </div>
         </div>
       </div>
-    </section>
+    </form>
   );
 };
 
