@@ -2,6 +2,17 @@ import { Injectable, NestMiddleware } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 import * as jwt from 'jsonwebtoken';
 
+// Extend Express Request interface
+declare global {
+  namespace Express {
+    interface Request {
+      user?: any;
+      organizationId?: string;
+      regionIds?: number[];
+    }
+  }
+}
+
 @Injectable()
 export class AuthMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction) {
@@ -26,8 +37,8 @@ export class AuthMiddleware implements NestMiddleware {
       // Adiciona a organização do usuário ao req
       req.organizationId = decoded.organizationId;
 
-      // Adiciona a organização do usuário ao req
-      req.regionId = decoded.regionId;
+      // Adiciona a região do usuário ao req
+      req.regionIds = decoded.regionIds;
 
       next();
     } catch (err) {

@@ -36,7 +36,7 @@ model Region {
   updatedAt      DateTime     @updatedAt
   isActive       Boolean      @default(true)
   schools        School[]
-  users          User[]
+  users          User[]       // Relação muitos-para-muitos com User
 }
 
 model School {
@@ -77,8 +77,7 @@ model User {
   numberAdress        String               @db.VarChar(10)
   organizationId      Int?                 // Tornado opcional
   organization        Organization?        @relation(fields: [organizationId], references: [id]) // Tornado opcional
-  regionId            Int?
-  region              Region?              @relation(fields: [regionId], references: [id])
+  regions             Region[]             // Relação muitos-para-muitos com Region
   schoolId            Int?
   school              School?              @relation(fields: [schoolId], references: [id])
   classId             Int?

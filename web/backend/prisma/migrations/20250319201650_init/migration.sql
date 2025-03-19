@@ -61,7 +61,6 @@ CREATE TABLE "User" (
     "cep" VARCHAR(9) NOT NULL,
     "numberAdress" VARCHAR(10) NOT NULL,
     "organizationId" INTEGER,
-    "regionId" INTEGER,
     "schoolId" INTEGER,
     "classId" INTEGER,
     "isActive" BOOLEAN NOT NULL DEFAULT true,
@@ -138,6 +137,14 @@ CREATE TABLE "Attendance" (
     CONSTRAINT "Attendance_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "_RegionToUser" (
+    "A" INTEGER NOT NULL,
+    "B" INTEGER NOT NULL,
+
+    CONSTRAINT "_RegionToUser_AB_pkey" PRIMARY KEY ("A","B")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "User_cpf_key" ON "User"("cpf");
 
@@ -146,6 +153,9 @@ CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Attendance_studentId_classId_period_key" ON "Attendance"("studentId", "classId", "period");
+
+-- CreateIndex
+CREATE INDEX "_RegionToUser_B_index" ON "_RegionToUser"("B");
 
 -- AddForeignKey
 ALTER TABLE "Region" ADD CONSTRAINT "Region_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -158,9 +168,6 @@ ALTER TABLE "Class" ADD CONSTRAINT "Class_schoolId_fkey" FOREIGN KEY ("schoolId"
 
 -- AddForeignKey
 ALTER TABLE "User" ADD CONSTRAINT "User_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "User" ADD CONSTRAINT "User_regionId_fkey" FOREIGN KEY ("regionId") REFERENCES "Region"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "User" ADD CONSTRAINT "User_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -185,3 +192,9 @@ ALTER TABLE "Attendance" ADD CONSTRAINT "Attendance_studentId_fkey" FOREIGN KEY 
 
 -- AddForeignKey
 ALTER TABLE "Attendance" ADD CONSTRAINT "Attendance_classId_fkey" FOREIGN KEY ("classId") REFERENCES "Class"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_RegionToUser" ADD CONSTRAINT "_RegionToUser_A_fkey" FOREIGN KEY ("A") REFERENCES "Region"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_RegionToUser" ADD CONSTRAINT "_RegionToUser_B_fkey" FOREIGN KEY ("B") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;

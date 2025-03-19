@@ -9,6 +9,10 @@ export class SchoolController {
   @Get()
   @UseGuards(RolesGuard)
   async getAllSchools(@Req() req) {
-    return this.schoolService.getAllSchools(req.user.regionId);
+    // Extrair IDs de todas as regiões do usuário
+    const regionIds = req.user.regions.map(region => region.id);
+    
+    // Passar o array de IDs para buscar todas as escolas
+    return this.schoolService.getAllSchools(regionIds);
   }
 }

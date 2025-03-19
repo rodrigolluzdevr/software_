@@ -45,6 +45,7 @@ export class AuthService {
   }
 
   async login(cpf: string, password: string) {
+    // Fetch user data
     const user = await this.prisma.user.findUnique({
       where: { cpf },
       select: {
@@ -53,16 +54,26 @@ export class AuthService {
         password: true,
         role: true,
         organizationId: true,
-        regionId: true,
+        regions: {
+          select: {
+            id: true,
+            name: true,
+            organizationId: true,
+          },
+        },
       },
     });
     if (!user) {
-      throw new NotFoundException('Usuário não encontrado, verifique suas credenciais.');
+      throw new NotFoundException(
+        'Usuário não encontrado, verifique suas credenciais.',
+      );
     }
 
     const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword) {
-      throw new UnauthorizedException('Credenciais inválidas, entre em contato com o admnistrador.');
+      throw new UnauthorizedException(
+        'Credenciais inválidas, entre em contato com o admnistrador.',
+      );
     }
 
     const payload = {
@@ -70,7 +81,13 @@ export class AuthService {
       cpf: user.cpf,
       role: user.role,
       organizationId: user.organizationId,
-      regionId: user.regionId,
+      regions: user.regions && user.regions.length > 0 
+        ? user.regions.map(region => ({
+            id: region.id,
+            name: region.name,
+            organizationId: region.organizationId
+          }))
+        : []
     };
     const token = this.jwtService.sign(payload);
 
