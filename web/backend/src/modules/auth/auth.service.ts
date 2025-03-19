@@ -53,6 +53,7 @@ export class AuthService {
         password: true,
         role: true,
         organizationId: true,
+        regionId: true,
       },
     });
     if (!user) {
@@ -69,6 +70,7 @@ export class AuthService {
       cpf: user.cpf,
       role: user.role,
       organizationId: user.organizationId,
+      regionId: user.regionId,
     };
     const token = this.jwtService.sign(payload);
 

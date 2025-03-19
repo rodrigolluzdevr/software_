@@ -26,6 +26,9 @@ export class AuthMiddleware implements NestMiddleware {
       // Adiciona a organização do usuário ao req
       req.organizationId = decoded.organizationId;
 
+      // Adiciona a organização do usuário ao req
+      req.regionId = decoded.regionId;
+
       next();
     } catch (err) {
       return res.status(401).json({ message: 'Token inválido.' });

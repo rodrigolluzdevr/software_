@@ -4,6 +4,7 @@ import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
 import * as dotenv from 'dotenv'; // Importando dotenv
 import { RegionModule } from './modules/region/region.module';
+import { SchoolModule } from './modules/school/school.module';
 
 // Carregar variáveis do .env
 dotenv.config();
@@ -13,6 +14,7 @@ dotenv.config();
     UserModule,
     AuthModule,
     RegionModule,
+    SchoolModule,
   ],
   providers: [PrismaService],
 })

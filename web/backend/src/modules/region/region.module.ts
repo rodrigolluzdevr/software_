@@ -1,7 +1,6 @@
 import { Module, type MiddlewareConsumer, type NestModule } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { RegionService } from './region.service';
-import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/database/prisma.service';
 import { RegionController } from './region.controller';
 import { AuthMiddleware } from 'src/middleware/auth.middleware';
