@@ -6,9 +6,10 @@ import { PrismaService } from 'src/database/prisma.service';
 export class RegionService {
   constructor(private prisma: PrismaService) {}
 
-  async getAllRegions(): Promise<Region[]> {
-    return this.prisma.region.findMany();
-    
+  async getAllRegions(organizationId: number): Promise<Region[]> {
+    return this.prisma.region.findMany({
+      where: { organizationId },
+    });
   }
 
   async getRegionById(id: number): Promise<Region | null>{

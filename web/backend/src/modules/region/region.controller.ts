@@ -8,7 +8,7 @@ export class RegionController {
 
     @Get()
     @UseGuards(RolesGuard)
-    async getAllRegions() {
-        return this.regionService.getAllRegions();
+    async getAllRegions(@Req() req) {
+        return this.regionService.getAllRegions(req.user.organizationId);
     }
 }
