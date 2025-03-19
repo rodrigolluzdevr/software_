@@ -5,9 +5,9 @@ CREATE TYPE "Role" AS ENUM ('ADMIN', 'SECRETARIO', 'COORDENADOR', 'DIRETOR', 'PR
 CREATE TABLE "Organization" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
-    "type" VARCHAR(50) NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
 
     CONSTRAINT "Organization_pkey" PRIMARY KEY ("id")
 );
@@ -16,10 +16,10 @@ CREATE TABLE "Organization" (
 CREATE TABLE "Region" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
-    "type" VARCHAR(50) NOT NULL,
-    "organizationID" INTEGER NOT NULL,
+    "organizationId" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
 
     CONSTRAINT "Region_pkey" PRIMARY KEY ("id")
 );
@@ -28,10 +28,10 @@ CREATE TABLE "Region" (
 CREATE TABLE "School" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
-    "type" VARCHAR(50) NOT NULL,
-    "regionID" INTEGER NOT NULL,
+    "regionId" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
 
     CONSTRAINT "School_pkey" PRIMARY KEY ("id")
 );
@@ -44,6 +44,7 @@ CREATE TABLE "Class" (
     "year" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
 
     CONSTRAINT "Class_pkey" PRIMARY KEY ("id")
 );
@@ -147,10 +148,10 @@ CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 CREATE UNIQUE INDEX "Attendance_studentId_classId_period_key" ON "Attendance"("studentId", "classId", "period");
 
 -- AddForeignKey
-ALTER TABLE "Region" ADD CONSTRAINT "Region_organizationID_fkey" FOREIGN KEY ("organizationID") REFERENCES "Organization"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Region" ADD CONSTRAINT "Region_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "School" ADD CONSTRAINT "School_regionID_fkey" FOREIGN KEY ("regionID") REFERENCES "Region"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "School" ADD CONSTRAINT "School_regionId_fkey" FOREIGN KEY ("regionId") REFERENCES "Region"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Class" ADD CONSTRAINT "Class_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

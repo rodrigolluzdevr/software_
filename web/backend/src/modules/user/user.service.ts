@@ -10,9 +10,9 @@ export class UserService {
     return this.prisma.user.findMany();
   }
 
-  async getAllUsersByOrganization(organizationId: number): Promise<User[]> {
-    return this.prisma.user.findMany({
-      where: { organizationId },
+  async getUserById(id: number): Promise<User | null> {
+    return this.prisma.user.findUnique({
+      where: { id },
     });
   }
 
@@ -22,13 +22,10 @@ export class UserService {
     });
   }
 
-  async getUserById(id: number): Promise<User | null> { // Permitir retorno null
-    return this.prisma.user.findUnique({
-      where: { id },
-    });
-  }
-
-  async updateUser(id: number, userData: Prisma.UserUpdateInput): Promise<User> {
+  async updateUser(
+    id: number,
+    userData: Prisma.UserUpdateInput,
+  ): Promise<User> {
     return this.prisma.user.update({
       where: { id },
       data: userData,
@@ -38,6 +35,12 @@ export class UserService {
   async deleteUser(id: number): Promise<User> {
     return this.prisma.user.delete({
       where: { id },
+    });
+  }
+
+  async getAllUsersByOrganization(organizationId: number): Promise<User[]> {
+    return this.prisma.user.findMany({
+      where: { organizationId },
     });
   }
 }
