@@ -12,19 +12,24 @@ export class RegionService {
     });
   }
 
-  async getRegionById(id: number): Promise<Region | null>{
+  async getRegionById(id: number): Promise<Region | null> {
     return this.prisma.region.findUnique({
       where: { id },
     });
   }
 
-  async createRegion(regionData: Prisma.RegionUncheckedCreateInput): Promise<Region> {
+  async createRegion(
+    regionData: Prisma.RegionUncheckedCreateInput,
+  ): Promise<Region> {
     return this.prisma.region.create({
       data: regionData,
     });
   }
 
-  async updateRegion(id: number, regionData: Prisma.RegionUpdateInput): Promise<Region> {
+  async updateRegion(
+    id: number,
+    regionData: Prisma.RegionUpdateInput,
+  ): Promise<Region> {
     return this.prisma.region.update({
       where: { id },
       data: regionData,

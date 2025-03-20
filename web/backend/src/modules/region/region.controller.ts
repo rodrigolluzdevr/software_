@@ -87,7 +87,7 @@ export class RegionController {
     }
     return this.regionService.updateRegion(Number(id), regionData);
   }
-  
+
   @Delete(':id')
   async deleteRegion(@Param('id') id: string, @Req() req: Request) {
     const organizationId = getOrganizationIdFromRequest(req);
