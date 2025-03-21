@@ -19,10 +19,11 @@ import {
   userHasAccessToOrganization,
 } from 'src/utils/organization.util';
 import { Request } from 'express';
-import type { Region } from '@prisma/client';
+import { Region } from '@prisma/client';
 import { Roles } from '../auth/decorators/roles.decorator';
-import type { CreateRegionDto } from './dto/create-region.dto';
+import { CreateRegionDto } from './dto/create-region.dto';
 import { ParseIdPipe } from '../common/pipes/parse-id.pipe';
+import { UpdateRegionDto } from './dto/update-region.dto';
 
 @Controller('regions')
 @UseGuards(RolesGuard)
@@ -54,10 +55,7 @@ export class RegionController {
     @Body() createRegionDto: CreateRegionDto,
     @Req() req: Request,
   ): Promise<Region> {
-    this.validateOrganizationAccess(
-      req,
-      createRegionDto.organizationId,
-      'criar',
+    this.validateOrganizationAccess(req, createRegionDto.organizationId, 'criar',
     );
     return this.regionService.createRegion(createRegionDto);
   }
@@ -66,12 +64,12 @@ export class RegionController {
   @Roles('SECRETARIO')
   async updateRegion(
     @Param('id', ParseIdPipe) id: number,
-    @Body() createRegionDto: CreateRegionDto,
+    @Body() updateRegionDto: UpdateRegionDto,
     @Req() req: Request,
   ): Promise<Region> {
     const region = await this.findRegionOrFail(id);
     this.validateOrganizationAccess(req, region.organizationId, 'atualizar');
-    return this.regionService.updateRegion(id, createRegionDto);
+    return this.regionService.updateRegion(id, updateRegionDto);
   }
 
   @Delete(':id')

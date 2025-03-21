@@ -1,4 +1,4 @@
-import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsOptional, IsString } from 'class-validator';
 
 export class UpdateRegionDto {
   @IsOptional()
@@ -6,6 +6,6 @@ export class UpdateRegionDto {
   readonly name?: string;
 
   @IsOptional()
-  @IsNumber()
-  readonly isActive?: number;
+  @IsBoolean()
+  readonly isActive?: boolean;
 }
