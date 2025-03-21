@@ -61,6 +61,13 @@ export class AuthService {
             organizationId: true,
           },
         },
+        schools: {
+          select: {
+            id: true,
+            name: true,
+            regionId: true,
+          },
+        },
       },
     });
     if (!user) {
@@ -81,14 +88,25 @@ export class AuthService {
       cpf: user.cpf,
       role: user.role,
       organizationId: user.organizationId,
-      regions: user.regions && user.regions.length > 0 
-        ? user.regions.map(region => ({
-            id: region.id,
-            name: region.name,
-            organizationId: region.organizationId
-          }))
-        : []
+      regions:
+        user.regions && user.regions.length > 0
+          ? user.regions.map((region) => ({
+              id: region.id,
+              name: region.name,
+              organizationId: region.organizationId,
+            }))
+          : [],
+
+      schools:
+        user.schools && user.schools.length > 0
+          ? user.schools.map((school) => ({
+              id: school.id,
+              name: school.name,
+              regionId: school.regionId,
+            }))
+          : [],
     };
+
     const token = this.jwtService.sign(payload);
 
     return { token };

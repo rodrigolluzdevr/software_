@@ -78,10 +78,8 @@ model User {
   organizationId      Int?                 // Tornado opcional
   organization        Organization?        @relation(fields: [organizationId], references: [id]) // Tornado opcional
   regions             Region[]             // Relação muitos-para-muitos com Region
-  schoolId            Int?
-  school              School?              @relation(fields: [schoolId], references: [id])
-  classId             Int?
-  class               Class?               @relation(fields: [classId], references: [id])
+  schools             School[]             // Relação muitos-para-muitos com School
+  class               Class[]             // Relação muitos-para-muitos com School
   isActive            Boolean              @default(true)
   createdAt           DateTime             @default(now())
   updatedAt           DateTime             @updatedAt
