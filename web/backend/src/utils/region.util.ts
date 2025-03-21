@@ -1,16 +1,14 @@
 import { Request } from 'express';
+import { ForbiddenException } from '@nestjs/common';
 
-/**
- * Obtém o ID da primeira região do usuário
- */
 export function getRegionIdFromRequest(req: Request): number {
   const regions = req.user?.regions || [];
   
-  if (regions.length > 0) {
-    return regions[0].id;
+  if (!regions.length) {
+    throw new ForbiddenException('Usuário não possui regiões associadas');
   }
   
-  throw new Error('Usuário não possui regiões');
+  return regions[0].id;
 }
 
 export function userHasAccessToRegion(req: Request, regionId: number): boolean {

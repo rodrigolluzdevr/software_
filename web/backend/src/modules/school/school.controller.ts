@@ -4,120 +4,102 @@ import {
   Delete,
   ForbiddenException,
   Get,
+  NotFoundException,
   Param,
   Patch,
   Post,
   Req,
   UseGuards,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { SchoolService } from './school.service';
 import { RolesGuard } from '../auth/roles.guard';
-import {
-  getRegionIdFromRequest,
-  userHasAccessToRegion,
-} from 'src/utils/region.util';
+import { userHasAccessToRegion } from 'src/utils/region.util';
 import { Request } from 'express';
+import { CreateSchoolDto } from './dto/create-school.dto';
+import { UpdateSchoolDto } from './dto/update-school.dto';
+import { ParseIdPipe } from '../common/pipes/parse-id.pipe';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { School } from '@prisma/client';
 
 @Controller('schools')
+@UseGuards(RolesGuard)
+@UsePipes(new ValidationPipe({ transform: true }))
 export class SchoolController {
+  private readonly ADMIN_ROLES = ['SECRETARIO', 'COORDENADOR'];
+
   constructor(private readonly schoolService: SchoolService) {}
 
   @Get()
-  @UseGuards(RolesGuard)
-  async getAllSchools(@Req() req) {
-    const regionIds = req.user.regions.map((region) => region.id);
-
+  async getAllSchools(@Req() req: Request): Promise<School[]> {
+    const regionIds = this.extractRegionIds(req);
     return this.schoolService.getAllSchools(regionIds);
   }
 
   @Post()
+  @Roles('SECRETARIO', 'COORDENADOR')
   async createSchool(
-    @Body()
-    schoolData: {
-      name: string;
-      regionId: number;
-    },
+    @Body() createSchoolDto: CreateSchoolDto,
     @Req() req: Request,
-  ) {
-
-    const userRole = req.user.role;
-    if (userRole !== 'SECRETARIO' && userRole !== 'COORDENADOR') {
-      throw new ForbiddenException(
-        'Você não tem permissão para criar escolas.',
-      );
-    }
-
-    if (!userHasAccessToRegion(req, schoolData.regionId)) {
-      throw new ForbiddenException(
-        'Você não tem permissão para criar escolas fora da sua região',
-      );
-    }
-    return this.schoolService.createSchool(schoolData);
+  ): Promise<School> {
+    this.validateRegionAccess(req, createSchoolDto.regionId, 'criar');
+    return this.schoolService.createSchool(createSchoolDto);
   }
 
   @Get(':id')
-  async getSchoolById(@Param('id') id: string, @Req() req: Request) {
-    const school = await this.schoolService.getSchoolById(Number(id));
-
-    if (!school) {
-      throw new ForbiddenException('Escola não encontrada');
-    }
-
-    if (!userHasAccessToRegion(req, school.regionId)) {
-      throw new ForbiddenException(
-        'Você não tem permissão para acessar essa escola',
-      );
-    }
-
+  async getSchoolById(
+    @Param('id', ParseIdPipe) id: number,
+    @Req() req: Request,
+  ): Promise<School> {
+    const school = await this.findSchoolOrFail(id);
+    this.validateRegionAccess(req, school.regionId, 'acessar');
     return school;
   }
 
   @Patch(':id')
+  @Roles('SECRETARIO', 'COORDENADOR')
   async updateSchool(
-    @Param('id') id: string,
-    @Body()
-    schoolData: {
-      name: string;
-      isActive: boolean;
-    },
+    @Param('id', ParseIdPipe) id: number,
+    @Body() updateSchoolDto: UpdateSchoolDto,
     @Req() req: Request,
-  ) {
-    const school = await this.schoolService.getSchoolById(Number(id));
-
-    if (!school) {
-      throw new ForbiddenException('Escola não encontrada');
-    }
-
-    if (!userHasAccessToRegion(req, school.regionId)) {
-      throw new ForbiddenException(
-        'Você não tem permissão para atualizar escolas fora da sua região',
-      );
-    }
-
-    return this.schoolService.updateSchool(Number(id), schoolData);
+  ): Promise<School> {
+    const school = await this.findSchoolOrFail(id);
+    this.validateRegionAccess(req, school.regionId, 'atualizar');
+    return this.schoolService.updateSchool(id, updateSchoolDto);
   }
 
   @Delete(':id')
-  async deleteSchool(@Param('id') id: string, @Req() req: Request) {
-    const school = await this.schoolService.getSchoolById(Number(id));
+  @Roles('SECRETARIO', 'COORDENADOR')
+  async deleteSchool(
+    @Param('id', ParseIdPipe) id: number,
+    @Req() req: Request,
+  ): Promise<School> {
+    const school = await this.findSchoolOrFail(id);
+    this.validateRegionAccess(req, school.regionId, 'deletar');
+    return this.schoolService.deleteSchool(id);
+  }
 
+  // Métodos auxiliares privados
+  private extractRegionIds(req: Request): number[] {
+    return req.user.regions.map((region) => region.id);
+  }
+
+  private async findSchoolOrFail(id: number): Promise<School> {
+    const school = await this.schoolService.getSchoolById(id);
+    
     if (!school) {
-      throw new ForbiddenException('Escola não encontrada');
+      throw new NotFoundException('Escola não encontrada');
     }
+    
+    return school;
+  }
 
-    const userRole = req.user.role;
-    if (userRole !== 'SECRETARIO' && userRole !== 'COORDENADOR') {
+  private validateRegionAccess(req: Request, regionId: number, action: string): void {
+    if (!userHasAccessToRegion(req, regionId)) {
       throw new ForbiddenException(
-        'Você não tem permissão para deletar escolas.',
+        `Você não tem permissão para ${action} escolas fora da sua região`,
       );
     }
-
-    if (!userHasAccessToRegion(req, school.regionId)) {
-      throw new ForbiddenException(
-        'Você não tem permissão para deletar escolas fora da sua região',
-      );
-    }
-
-    return this.schoolService.deleteSchool(Number(id));
   }
 }
