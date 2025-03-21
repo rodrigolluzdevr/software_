@@ -9,98 +9,106 @@ import {
   Post,
   Req,
   UseGuards,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { RegionService } from './region.service';
 import { RolesGuard } from '../auth/roles.guard';
-import { getOrganizationIdFromRequest } from 'src/utils/organization.util';
+import {
+  getOrganizationIdFromRequest,
+  userHasAccessToOrganization,
+} from 'src/utils/organization.util';
 import { Request } from 'express';
+import type { Region } from '@prisma/client';
+import { Roles } from '../auth/decorators/roles.decorator';
+import type { CreateRegionDto } from './dto/create-region.dto';
+import { ParseIdPipe } from '../common/pipes/parse-id.pipe';
 
 @Controller('regions')
+@UseGuards(RolesGuard)
+@UsePipes(new ValidationPipe({ transform: true }))
 export class RegionController {
+  private readonly ADMIN_ROLES = ['SECRETARIO'];
+
   constructor(private readonly regionService: RegionService) {}
 
   @Get()
-  @UseGuards(RolesGuard)
-  async getAllRegions(@Req() req) {
-    return this.regionService.getAllRegions(req.user.organizationId);
-  }
-
-  @Post()
-  async createRegion(
-    @Body()
-    regionData: {
-      name: string;
-      organizationId: number;
-    },
-    @Req() req: Request,
-  ) {
-    const organizationId = getOrganizationIdFromRequest(req);
-    const userRole = req.user.role;
-    {
-      if (
-        userRole !== 'ADMIN' &&
-        regionData.organizationId !== organizationId
-      ) {
-        throw new ForbiddenException(
-          'Você não tem permissão para criar usuários fora da sua organização',
-        );
-      }
-      return this.regionService.createRegion(regionData);
-    }
+  async getAllRegions(@Req() req: Request): Promise<Region[]> {
+    const organizationId = this.extractRegionIds(req);
+    return this.regionService.getAllRegions(organizationId);
   }
 
   @Get(':id')
-  async getRegionById(@Param('id') id: string, @Req() req: Request) {
-    const organizationId = getOrganizationIdFromRequest(req);
-    const region = await this.regionService.getRegionById(Number(id));
-    if (!region) {
-      throw new ForbiddenException('Região não encontrada');
-    }
-    if (region.organizationId !== organizationId) {
-      throw new ForbiddenException(
-        'Você não tem permissão para acessar essa região',
-      );
-    }
+  async getRegionById(
+    @Param('id', ParseIdPipe) id: number,
+    @Req() req: Request,
+  ): Promise<Region> {
+    const region = await this.findRegionOrFail(id);
+    this.validateOrganizationAccess(req, region.organizationId, 'acessar');
     return region;
   }
 
-  @Patch(':id')
-  async updateRegion(
-    @Param('id') id: string,
-    @Body()
-    regionData: {
-      name: string;
-      isActive: boolean;
-    },
+  @Post()
+  @Roles('SECRETARIO')
+  async createRegion(
+    @Body() createRegionDto: CreateRegionDto,
     @Req() req: Request,
-  ) {
-    const organizationId = getOrganizationIdFromRequest(req);
-    const userRole = req.user.role;
-    const region = await this.regionService.getRegionById(Number(id));
-    if (!region) {
-      throw new ForbiddenException('Região não encontrada');
-    }
-    if (userRole !== 'ADMIN' && region.organizationId !== organizationId) {
-      throw new ForbiddenException(
-        'Você não tem permissão para atualizar regiões fora da sua organização',
-      );
-    }
-    return this.regionService.updateRegion(Number(id), regionData);
+  ): Promise<Region> {
+    this.validateOrganizationAccess(
+      req,
+      createRegionDto.organizationId,
+      'criar',
+    );
+    return this.regionService.createRegion(createRegionDto);
+  }
+
+  @Patch(':id')
+  @Roles('SECRETARIO')
+  async updateRegion(
+    @Param('id', ParseIdPipe) id: number,
+    @Body() createRegionDto: CreateRegionDto,
+    @Req() req: Request,
+  ): Promise<Region> {
+    const region = await this.findRegionOrFail(id);
+    this.validateOrganizationAccess(req, region.organizationId, 'atualizar');
+    return this.regionService.updateRegion(id, createRegionDto);
   }
 
   @Delete(':id')
-  async deleteRegion(@Param('id') id: string, @Req() req: Request) {
-    const organizationId = getOrganizationIdFromRequest(req);
-    const userRole = req.user.role;
-    const region = await this.regionService.getRegionById(Number(id));
+  @Roles('SECRETARIO')
+  async deleteRegion(
+    @Param('id', ParseIdPipe) id: number,
+    @Req() req: Request,
+  ): Promise<Region> {
+    const region = await this.findRegionOrFail(id);
+    this.validateOrganizationAccess(req, region.organizationId, 'deletar');
+    return this.regionService.deleteRegion(id);
+  }
+
+  // Métodos auxiliares privados
+  private extractRegionIds(req: Request): number {
+    return getOrganizationIdFromRequest(req);
+  }
+
+  private async findRegionOrFail(id: number): Promise<Region> {
+    const region = await this.regionService.getRegionById(id);
+
     if (!region) {
       throw new ForbiddenException('Região não encontrada');
     }
-    if (userRole !== 'ADMIN' && region.organizationId !== organizationId) {
+
+    return region;
+  }
+
+  private validateOrganizationAccess(
+    req: Request,
+    organizationId: number,
+    action: string,
+  ): void {
+    if (!userHasAccessToOrganization(req, organizationId)) {
       throw new ForbiddenException(
-        'Você não tem permissão para deletar regiões fora da sua organização',
+        `Você não tem permissão para ${action} regiões fora da sua organização`,
       );
     }
-    return this.regionService.deleteRegion(Number(id));
   }
 }

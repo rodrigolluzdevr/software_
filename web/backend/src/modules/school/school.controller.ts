@@ -37,16 +37,6 @@ export class SchoolController {
     return this.schoolService.getAllSchools(regionIds);
   }
 
-  @Post()
-  @Roles('SECRETARIO', 'COORDENADOR')
-  async createSchool(
-    @Body() createSchoolDto: CreateSchoolDto,
-    @Req() req: Request,
-  ): Promise<School> {
-    this.validateRegionAccess(req, createSchoolDto.regionId, 'criar');
-    return this.schoolService.createSchool(createSchoolDto);
-  }
-
   @Get(':id')
   async getSchoolById(
     @Param('id', ParseIdPipe) id: number,
@@ -55,6 +45,16 @@ export class SchoolController {
     const school = await this.findSchoolOrFail(id);
     this.validateRegionAccess(req, school.regionId, 'acessar');
     return school;
+  }
+
+  @Post()
+  @Roles('SECRETARIO', 'COORDENADOR')
+  async createSchool(
+    @Body() createSchoolDto: CreateSchoolDto,
+    @Req() req: Request,
+  ): Promise<School> {
+    this.validateRegionAccess(req, createSchoolDto.regionId, 'criar');
+    return this.schoolService.createSchool(createSchoolDto);
   }
 
   @Patch(':id')
