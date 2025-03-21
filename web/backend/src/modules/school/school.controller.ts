@@ -25,10 +25,8 @@ export class SchoolController {
   @Get()
   @UseGuards(RolesGuard)
   async getAllSchools(@Req() req) {
-    // Extrair IDs de todas as regiões do usuário
     const regionIds = req.user.regions.map((region) => region.id);
 
-    // Passar o array de IDs para buscar todas as escolas
     return this.schoolService.getAllSchools(regionIds);
   }
 
@@ -41,43 +39,36 @@ export class SchoolController {
     },
     @Req() req: Request,
   ) {
-    // Extrair o ID da região do usuário
-    const regionId = getRegionIdFromRequest(req);
 
-    // Verificar se o usuário tem permissões para criar escolas
     const userRole = req.user.role;
     if (userRole !== 'SECRETARIO' && userRole !== 'COORDENADOR') {
       throw new ForbiddenException(
         'Você não tem permissão para criar escolas.',
       );
     }
-    if (schoolData.regionId !== regionId) {
+
+    if (!userHasAccessToRegion(req, schoolData.regionId)) {
       throw new ForbiddenException(
-        'Você não tem permissão para criar escolas fora da sua região.',
+        'Você não tem permissão para criar escolas fora da sua região',
       );
     }
-    // Criar a escola
     return this.schoolService.createSchool(schoolData);
   }
 
   @Get(':id')
   async getSchoolById(@Param('id') id: string, @Req() req: Request) {
-    // Buscar a escola
     const school = await this.schoolService.getSchoolById(Number(id));
 
-    // Verificar se a escola existe
     if (!school) {
       throw new ForbiddenException('Escola não encontrada');
     }
 
-    // Verificar se o usuário tem permissões para acessar a escola
     if (!userHasAccessToRegion(req, school.regionId)) {
       throw new ForbiddenException(
         'Você não tem permissão para acessar essa escola',
       );
     }
 
-    // Retornar a escola
     return school;
   }
 
@@ -91,36 +82,29 @@ export class SchoolController {
     },
     @Req() req: Request,
   ) {
-    // Buscar a escola
     const school = await this.schoolService.getSchoolById(Number(id));
 
-    // Verificar se a escola existe
     if (!school) {
       throw new ForbiddenException('Escola não encontrada');
     }
 
-    // Verificar se o usuário tem acesso à região da escola
     if (!userHasAccessToRegion(req, school.regionId)) {
       throw new ForbiddenException(
         'Você não tem permissão para atualizar escolas fora da sua região',
       );
     }
 
-    // Atualizar a escola
     return this.schoolService.updateSchool(Number(id), schoolData);
   }
 
   @Delete(':id')
   async deleteSchool(@Param('id') id: string, @Req() req: Request) {
-    // Buscar a escola
     const school = await this.schoolService.getSchoolById(Number(id));
 
-    // Verificar se a escola existe
     if (!school) {
       throw new ForbiddenException('Escola não encontrada');
     }
 
-    // Verificar se o usuário tem permissões para deletar escolas
     const userRole = req.user.role;
     if (userRole !== 'SECRETARIO' && userRole !== 'COORDENADOR') {
       throw new ForbiddenException(
@@ -128,14 +112,12 @@ export class SchoolController {
       );
     }
 
-    // Verificar se o usuário tem acesso à região da escola
     if (!userHasAccessToRegion(req, school.regionId)) {
       throw new ForbiddenException(
         'Você não tem permissão para deletar escolas fora da sua região',
       );
     }
 
-    // Deletar a escola
     return this.schoolService.deleteSchool(Number(id));
   }
 }
