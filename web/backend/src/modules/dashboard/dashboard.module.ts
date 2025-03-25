@@ -1,8 +1,9 @@
-import { Module } from '@nestjs/common';
+import { Module, type MiddlewareConsumer, type NestModule } from '@nestjs/common';
 import { DashboardController } from './dashboard.controller';
 import { DashboardService } from './dashboard.service';
 import { PrismaService } from '../../database/prisma.service'; // Ajuste o caminho para o módulo
 import { JwtModule } from '@nestjs/jwt';
+import { AuthMiddleware } from 'src/middleware/auth.middleware';
 
 @Module({
   imports: [
@@ -15,4 +16,8 @@ import { JwtModule } from '@nestjs/jwt';
   controllers: [DashboardController],
   exports: [DashboardService],
 })
-export class DashboardModule {}
+export class DashboardModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(AuthMiddleware).forRoutes(DashboardController);
+  }
+}

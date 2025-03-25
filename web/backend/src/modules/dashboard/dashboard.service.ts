@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../../database/prisma.service';  // Ajuste o caminho conforme sua estrutura
+import { PrismaService } from '../../database/prisma.service'; // Ajuste o caminho conforme sua estrutura
 
 @Injectable()
 export class DashboardService {
@@ -14,66 +14,60 @@ export class DashboardService {
       directorsCount,
       classesCount,
       teachersCount,
-      studentsCount
+      studentsCount,
     ] = await Promise.all([
       // Contagem de regiões
       this.prisma.region.count({
-        where: { organizationId, isActive: true }
+        where: { organizationId, isActive: true },
       }),
-      
-      // Contagem de escolas (de todas as regiões da organização)
+
       this.prisma.school.count({
-        where: { 
+        where: {
           region: { organizationId },
-          isActive: true 
-        }
+          isActive: true,
+        },
       }),
-      
-      // Contagem de coordenadores
+
       this.prisma.user.count({
-        where: { 
+        where: {
           organizationId,
           role: 'COORDENADOR',
-          isActive: true 
-        }
+          isActive: true,
+        },
       }),
-      
-      // Contagem de diretores
+
       this.prisma.user.count({
-        where: { 
+        where: {
           organizationId,
           role: 'DIRETOR',
-          isActive: true 
-        }
+          isActive: true,
+        },
       }),
-      
-      // Contagem de turmas
+
       this.prisma.class.count({
         where: {
           school: {
-            region: { organizationId }
+            region: { organizationId },
           },
-          isActive: true
-        }
+          isActive: true,
+        },
       }),
-      
-      // Contagem de professores
+
       this.prisma.user.count({
-        where: { 
+        where: {
           organizationId,
           role: 'PROFESSOR',
-          isActive: true 
-        }
+          isActive: true,
+        },
       }),
-      
-      // Contagem de professores
+
       this.prisma.user.count({
-        where: { 
+        where: {
           organizationId,
           role: 'USER',
-          isActive: true 
-        }
-      })
+          isActive: true,
+        },
+      }),
     ]);
 
     return {
@@ -83,7 +77,7 @@ export class DashboardService {
       directors: directorsCount,
       classes: classesCount,
       teachers: teachersCount,
-      students: studentsCount
+      students: studentsCount,
     };
   }
 }
