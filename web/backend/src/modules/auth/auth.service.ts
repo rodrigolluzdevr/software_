@@ -109,6 +109,16 @@ export class AuthService {
 
     const token = this.jwtService.sign(payload);
 
-    return { token };
+    return { 
+      token,
+      user: {
+        id: user.id,
+        cpf: user.cpf,
+        role: user.role,
+        organizationId: user.organizationId,
+        regions: payload.regions,
+        schools: payload.schools,
+      }
+    };
   }
 }

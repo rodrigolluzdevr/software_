@@ -17,16 +17,17 @@ import { RolesGuard } from '../auth/roles.guard';
 import { ClassService } from './school-class.service';
 import { Class } from '@prisma/client';
 import { Request } from 'express';
-import { userHasAccessToSchool } from 'src/utils/class.util';
+import { userHasAccessToSchool } from 'src/utils/school.util';
 import { ParseIdPipe } from '../common/pipes/parse-id.pipe';
 import { CreateClassDto } from './dto/create-class.dto';
 import { Roles } from '../auth/decorators/roles.decorator';
+import type { UpdateClassDto } from './dto/update-class.dto';
 
 @Controller('class')
 @UseGuards(RolesGuard)
 @UsePipes(new ValidationPipe({ transform: true }))
 export class ClassController {
-  private readonly ADMIN_ROLES = ['DIRECTOR'];
+  private readonly ADMIN_ROLES = ['DIRETOR'];
   constructor(private readonly classService: ClassService) {}
 
   @Get()
@@ -46,7 +47,7 @@ export class ClassController {
   }
 
   @Post()
-  @Roles('DIRECTOR')
+  @Roles('DIRETOR')
   async createClass(
     @Body() createClassDto: CreateClassDto,
     @Req() req: Request,
@@ -56,10 +57,10 @@ export class ClassController {
   }
 
   @Patch(':id')
-  @Roles('DIRECTOR')
+  @Roles('DIRETOR')
   async updateClass(
     @Param('id', ParseIdPipe) id: number,
-    @Body() updateClassDto: CreateClassDto,
+    @Body() updateClassDto: UpdateClassDto,
     @Req() req: Request,
   ): Promise<Class> {
     const schoolClass = await this.findClassOrFail(id);
@@ -68,7 +69,7 @@ export class ClassController {
   }
 
   @Delete(':id')
-  @Roles('DIRECTOR')
+  @Roles('DIRETOR')
   async deleteClass(
     @Param('id', ParseIdPipe) id: number,
     @Req() req: Request,
@@ -91,8 +92,8 @@ export class ClassController {
     return schoolClass;
   }
 
-  private validateSchoolAccess(req: Request, schoolId: number, action: string) {
-    if (!userHasAccessToSchool(req.user, schoolId)) {
+  private validateSchoolAccess(req: Request, schoolId: number, action: string): void {
+    if (!userHasAccessToSchool(req, schoolId)) {
       throw new ForbiddenException(
         `Usuário não tem permissão para ${action} turmas dessa escola`,
       );
