@@ -1,11 +1,13 @@
 import { Controller, Get, Req, UseGuards } from '@nestjs/common';
 import { RolesGuard } from '../auth/roles.guard';
-import { SetMetadata } from '@nestjs/common';
 import { Request } from 'express';
+import { DashboardService } from './dashboard.service';
 
 @Controller('dashboard')
 @UseGuards(RolesGuard)
 export class DashboardController {
+  constructor(private dashboardService: DashboardService) {}
+  
   private getDashboardMessage(role: string, organizationId: number): string {
     return `Bem-vindo ao painel do ${role.toLowerCase()} da organização ${organizationId}`;
   }
@@ -25,5 +27,12 @@ export class DashboardController {
 
     // Retorna as informações específicas para a Role
     return dashboards[role] || { message: 'Role não reconhecida' };
+  }
+  
+  // Adicione este novo endpoint para estatísticas do dashboard
+  @Get('stats')
+  async getDashboardStats(@Req() req: Request) {
+    const { organizationId } = req.user;
+    return this.dashboardService.getStatsByOrganization(organizationId);
   }
 }

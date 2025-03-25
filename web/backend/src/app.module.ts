@@ -7,6 +7,7 @@ import { RegionModule } from './modules/region/region.module';
 import { SchoolModule } from './modules/school/school.module';
 import { ClassModule } from './modules/school-class/school-class.module';
 import { OrganizationModule } from './modules/organization/organization.module';
+import { DashboardModule } from './modules/dashboard/dashboard.module';
 
 // Carregar variáveis do .env
 dotenv.config();
@@ -19,6 +20,7 @@ dotenv.config();
     SchoolModule,
     ClassModule,
     OrganizationModule,
+    DashboardModule,
   ],
   providers: [PrismaService],
 })
