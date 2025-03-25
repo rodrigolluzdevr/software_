@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { ClassService } from './school-class.service';
 import { PrismaService } from 'src/database/prisma.service';
+import { ClassController } from './school-class.controller';
 
 @Module({
   imports: [
@@ -11,7 +12,7 @@ import { PrismaService } from 'src/database/prisma.service';
     }),
   ],
   providers: [ClassService, PrismaService],
-  controllers: [],
+  controllers: [ClassController],
   exports: [ClassService],
 })
 export class SchoolClassModule {}
