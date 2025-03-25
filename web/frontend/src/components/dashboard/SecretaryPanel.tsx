@@ -33,12 +33,13 @@ const SecretaryDashboard = ({ router }: SecretaryDashboardProps) => {
     directors: 0,
     classes: 0,
     teachers: 0,
-    students: 0
+    students: 0,
   });
   const [loading, setLoading] = useState<boolean>(true);
 
   // Funções de navegação
-  const navigateToCoordinators = () => router.push('/users/coordinators/register');
+  const navigateToCoordinators = () =>
+    router.push('/users/coordinators/register');
   const navigateToDirectors = () => router.push('/users/directors/register');
 
   useEffect(() => {

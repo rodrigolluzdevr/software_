@@ -33,7 +33,7 @@ const CoordinatorDashboard = ({ router }: CoordinatorDashboardProps) => {
     directors: 0,
     classes: 0,
     teachers: 0,
-    students: 0
+    students: 0,
   });
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -81,35 +81,12 @@ const CoordinatorDashboard = ({ router }: CoordinatorDashboardProps) => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
               <div className="bg-white rounded-md shadow-sm p-4 flex items-center">
                 <div className="bg-blue-100 p-3 rounded-full">
-                  <BiSliderAlt className="text-blue-500 text-xl" />
-                </div>
-                <div className="ml-4">
-                  <p className="text-gray-500 text-sm">Regiões</p>
-                  <h4 className="font-semibold text-lg">
-                    {loading ? '...' : stats.regions}
-                  </h4>
-                </div>
-              </div>
-              <div className="bg-white rounded-md shadow-sm p-4 flex items-center">
-                <div className="bg-blue-100 p-3 rounded-full">
                   <BiSolidSchool className="text-blue-500 text-xl" />
                 </div>
                 <div className="ml-4">
                   <p className="text-gray-500 text-sm">Escolas</p>
                   <h4 className="font-semibold text-lg">
                     {loading ? '...' : stats.schools}
-                  </h4>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-md shadow-sm p-4 flex items-center">
-                <div className="bg-blue-100 p-3 rounded-full">
-                  <BiUser className="text-blue-500 text-xl" />
-                </div>
-                <div className="ml-4">
-                  <p className="text-gray-500 text-sm">Coordenadores</p>
-                  <h4 className="font-semibold text-lg">
-                    {loading ? '...' : stats.coordinators}
                   </h4>
                 </div>
               </div>
