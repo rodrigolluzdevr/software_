@@ -21,7 +21,7 @@ import { userHasAccessToSchool } from 'src/utils/school.util';
 import { ParseIdPipe } from '../common/pipes/parse-id.pipe';
 import { CreateClassDto } from './dto/create-class.dto';
 import { Roles } from '../auth/decorators/roles.decorator';
-import type { UpdateClassDto } from './dto/update-class.dto';
+import { UpdateClassDto } from './dto/update-class.dto';
 
 @Controller('class')
 @UseGuards(RolesGuard)
