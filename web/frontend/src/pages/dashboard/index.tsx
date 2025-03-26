@@ -42,7 +42,7 @@ const Dashboard = () => {
         )}
 
         {role === 'PROFESSOR' && <ProfessorPanel router={router} />}
-        {(role === 'SECRETARIO' || role == null) && <SecretaryPanel router={router} />}
+        {role === 'SECRETARIO' && <SecretaryPanel router={router} />}
         {role === 'COORDENADOR' && <CoordinatorPanel router={router} />}
         {role === 'DIRETOR' && <DirectorPanel router={router} />}
         {role === 'USER' && <StudentPanel router={router} />}
@@ -51,4 +51,4 @@ const Dashboard = () => {
   );
 };
 
-export default (Dashboard);
+export default withAuth(Dashboard);

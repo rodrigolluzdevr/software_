@@ -18,7 +18,7 @@ interface DirectorDashboardProps {
 interface DashboardStats {
   regions: number;
   schools: number;
-  Directors: number;
+  coordinators: number;
   directors: number;
   classes: number;
   teachers: number;
@@ -29,7 +29,7 @@ const DirectorDashboard = ({ router }: DirectorDashboardProps) => {
   const [stats, setStats] = useState<DashboardStats>({
     regions: 0,
     schools: 0,
-    Directors: 0,
+    coordinators: 0,
     directors: 0,
     classes: 0,
     teachers: 0,

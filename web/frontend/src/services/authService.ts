@@ -1,5 +1,5 @@
 import { jwtDecode } from "jwt-decode";
-import api from "./api"; // Importando o serviço api que criamos anteriormente
+import api from "./api";
 
 interface User {
   id: number;
