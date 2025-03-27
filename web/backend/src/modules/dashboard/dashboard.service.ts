@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../../database/prisma.service'; // Ajuste o caminho conforme sua estrutura
+import { PrismaService } from '../../database/prisma.service';
 
 @Injectable()
 export class DashboardService {
@@ -78,6 +78,139 @@ export class DashboardService {
       classes: classesCount,
       teachers: teachersCount,
       students: studentsCount,
+    };
+  }
+
+  async getStatsByCoordinator(organizationId: number, regionIds: number[]) {
+    const [
+      regionsCount,
+      schoolsCount,
+      coordinatorsCount,
+      directorsCount,
+      classesCount,
+      teachersCount,
+      studentsCount,
+    ] = await Promise.all([
+      // Contagem de regiões
+      this.prisma.region.count({
+        where: { 
+          id: { in: regionIds }, 
+          isActive: true 
+        },
+      }),
+      
+      // Contagem de escolas
+      this.prisma.school.count({
+        where: {
+          regionId: { in: regionIds },
+          isActive: true,
+        },
+      }),
+      
+      // Contagem de coordenadores 
+      this.prisma.user.count({
+        where: {
+          OR: [
+            { regions: { some: { id: { in: regionIds } } } },
+            { schools: { some: { regionId: { in: regionIds } } } }
+          ],
+          organizationId,
+          role: 'COORDENADOR',
+          isActive: true,
+        },
+      }),
+      
+      // Contagem de diretores
+      this.prisma.user.count({
+        where: {
+          OR: [
+            { regions: { some: { id: { in: regionIds } } } },
+            { schools: { some: { regionId: { in: regionIds } } } }
+          ],
+          organizationId,
+          role: 'DIRETOR',
+          isActive: true,
+        },
+      }),
+      
+      // Contagem de turmas
+      this.prisma.class.count({
+        where: {
+          school: {
+            regionId: { in: regionIds },
+          },
+          isActive: true,
+        },
+      }),
+      
+      // Contagem de professores - verificando tanto relações diretas quanto indiretas
+      this.prisma.user.count({
+        where: {
+          OR: [
+            // Professores diretamente associados a regiões
+            { regions: { some: { id: { in: regionIds } } } },
+            // Professores associados a escolas nas regiões
+            { schools: { some: { regionId: { in: regionIds } } } },
+            // Professores associados a turmas em escolas nas regiões
+            { class: { some: { school: { regionId: { in: regionIds } } } } },
+          ],
+          organizationId,
+          role: 'PROFESSOR',
+          isActive: true,
+        },
+      }),
+      
+      // Contagem de alunos - verificando tanto relações diretas quanto indiretas
+      this.prisma.user.count({
+        where: {
+          OR: [
+            // Alunos diretamente associados a regiões
+            { regions: { some: { id: { in: regionIds } } } },
+            // Alunos associados a escolas nas regiões
+            { schools: { some: { regionId: { in: regionIds } } } },
+            // Alunos associados a turmas em escolas nas regiões
+            { class: { some: { school: { regionId: { in: regionIds } } } } },
+          ],
+          organizationId,
+          role: 'USER',
+          isActive: true,
+        },
+      }),
+    ]);
+
+    return {
+      regions: regionsCount,
+      schools: schoolsCount,
+      coordinators: coordinatorsCount,
+      directors: directorsCount,
+      classes: classesCount,
+      teachers: teachersCount,
+      students: studentsCount,
+    };
+  }
+
+  // Método adicional que pode ser útil para obter estatísticas gerais
+  async getOverallStats() {
+    const [
+      organizationsCount,
+      regionsCount,
+      schoolsCount,
+      usersCount,
+      classesCount,
+    ] = await Promise.all([
+      this.prisma.organization.count({ where: { isActive: true } }),
+      this.prisma.region.count({ where: { isActive: true } }),
+      this.prisma.school.count({ where: { isActive: true } }),
+      this.prisma.user.count({ where: { isActive: true } }),
+      this.prisma.class.count({ where: { isActive: true } }),
+    ]);
+
+    return {
+      organizations: organizationsCount,
+      regions: regionsCount,
+      schools: schoolsCount,
+      users: usersCount,
+      classes: classesCount,
     };
   }
 }

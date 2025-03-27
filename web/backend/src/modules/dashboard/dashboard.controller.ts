@@ -32,7 +32,11 @@ export class DashboardController {
   // Adicione este novo endpoint para estatísticas do dashboard
   @Get('stats')
   async getDashboardStats(@Req() req: Request) {
-    const { organizationId } = req.user;
+    const { organizationId, role, regions } = req.user;
+    if (role === 'COORDENADOR') {
+      const regionIds = (regions || []).map((r) => r.id);
+      return this.dashboardService.getStatsByCoordinator(organizationId, regionIds);
+    }
     return this.dashboardService.getStatsByOrganization(organizationId);
   }
 }
