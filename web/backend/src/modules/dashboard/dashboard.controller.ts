@@ -34,8 +34,9 @@ export class DashboardController {
   async getDashboardStats(
     @Req() req: Request,
     @Query('regionId') regionIdParam?: string,
+    @Query('schoolId') schoolIdParam?: string,
   ) {
-    const { organizationId, role, regions = [] } = req.user;
+    const { organizationId, role, regions = [], schools = [] } = req.user;
     
     // Para coordenador, processar múltiplas regiões
     if (role === 'COORDENADOR') {
@@ -86,6 +87,28 @@ export class DashboardController {
         this.logger.error(`Erro ao processar estatísticas: ${error.message}`, error.stack);
         throw error;
       }
+    } else if (role === 'DIRETOR') {
+      let schoolIds = schools.map((s) => s.id);
+      if (schoolIdParam) {
+        const requestedIds = schoolIdParam.includes(',')
+          ? schoolIdParam.split(',').map((id) => Number(id.trim()))
+          : [Number(schoolIdParam)];
+        schoolIds = requestedIds.filter(
+          (id) => schoolIds.includes(id) && !isNaN(id),
+        );
+        if (!schoolIds.length) {
+          return {
+            regions: 0,
+            schools: 0,
+            coordinators: 0,
+            directors: 0,
+            classes: 0,
+            teachers: 0,
+            students: 0,
+          };
+        }
+      }
+      return this.dashboardService.getStatsByDirector(organizationId, schoolIds);
     }
     
     // Para outros papéis

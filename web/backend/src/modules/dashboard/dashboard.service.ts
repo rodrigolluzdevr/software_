@@ -189,6 +189,88 @@ export class DashboardService {
     };
   }
 
+  async getStatsByDirector(organizationId: number, schoolIds: number[]) {
+    const [
+      regionsCount,
+      schoolsCount,
+      coordinatorsCount,
+      directorsCount,
+      classesCount,
+      teachersCount,
+      studentsCount,
+    ] = await Promise.all([
+      this.prisma.region.count({
+        where: {
+          isActive: true,
+          schools: { some: { id: { in: schoolIds } } },
+        },
+      }),
+      this.prisma.school.count({
+        where: {
+          id: { in: schoolIds },
+          isActive: true,
+        },
+      }),
+      this.prisma.user.count({
+        where: {
+          OR: [
+            { schools: { some: { id: { in: schoolIds } } } },
+            { class: { some: { schoolId: { in: schoolIds } } } },
+          ],
+          organizationId,
+          role: 'COORDENADOR',
+          isActive: true,
+        },
+      }),
+      this.prisma.user.count({
+        where: {
+          schools: { some: { id: { in: schoolIds } } },
+          organizationId,
+          role: 'DIRETOR',
+          isActive: true,
+        },
+      }),
+      this.prisma.class.count({
+        where: {
+          schoolId: { in: schoolIds },
+          isActive: true,
+        },
+      }),
+      this.prisma.user.count({
+        where: {
+          OR: [
+            { schools: { some: { id: { in: schoolIds } } } },
+            { class: { some: { schoolId: { in: schoolIds } } } },
+          ],
+          organizationId,
+          role: 'PROFESSOR',
+          isActive: true,
+        },
+      }),
+      this.prisma.user.count({
+        where: {
+          OR: [
+            { schools: { some: { id: { in: schoolIds } } } },
+            { class: { some: { schoolId: { in: schoolIds } } } },
+          ],
+          organizationId,
+          role: 'USER',
+          isActive: true,
+        },
+      }),
+    ]);
+
+    return {
+      regions: regionsCount,
+      schools: schoolsCount,
+      coordinators: coordinatorsCount,
+      directors: directorsCount,
+      classes: classesCount,
+      teachers: teachersCount,
+      students: studentsCount,
+    };
+  }
+
   // Método adicional que pode ser útil para obter estatísticas gerais
   async getOverallStats() {
     const [
