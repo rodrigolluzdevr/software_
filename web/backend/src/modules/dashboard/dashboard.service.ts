@@ -199,59 +199,98 @@ export class DashboardService {
       teachersCount,
       studentsCount,
     ] = await Promise.all([
+      // Regiões que contêm as escolas gerenciadas pelo diretor
       this.prisma.region.count({
         where: {
           isActive: true,
-          schools: { some: { id: { in: schoolIds } } },
+          schools: { 
+            some: { 
+              id: { in: schoolIds },
+              isActive: true
+            } 
+          },
         },
       }),
+      
+      // Escolas gerenciadas pelo diretor
       this.prisma.school.count({
         where: {
           id: { in: schoolIds },
           isActive: true,
         },
       }),
+      
+      // Coordenadores associados às escolas gerenciadas ou turmas dessas escolas
       this.prisma.user.count({
         where: {
           OR: [
-            { schools: { some: { id: { in: schoolIds } } } },
-            { class: { some: { schoolId: { in: schoolIds } } } },
+            { schools: { some: { id: { in: schoolIds }, isActive: true } } },
+            { 
+              class: { 
+                some: { 
+                  schoolId: { in: schoolIds },
+                  isActive: true 
+                } 
+              } 
+            },
           ],
           organizationId,
           role: 'COORDENADOR',
           isActive: true,
         },
       }),
+      
+      // Diretores associados às escolas gerenciadas
       this.prisma.user.count({
         where: {
-          schools: { some: { id: { in: schoolIds } } },
+          schools: { some: { id: { in: schoolIds }, isActive: true } },
           organizationId,
           role: 'DIRETOR',
           isActive: true,
         },
       }),
+      
+      // Turmas pertencentes às escolas gerenciadas pelo diretor
       this.prisma.class.count({
         where: {
           schoolId: { in: schoolIds },
           isActive: true,
         },
       }),
+      
+      // Professores associados às escolas gerenciadas ou a turmas dessas escolas
       this.prisma.user.count({
         where: {
           OR: [
-            { schools: { some: { id: { in: schoolIds } } } },
-            { class: { some: { schoolId: { in: schoolIds } } } },
+            { schools: { some: { id: { in: schoolIds }, isActive: true } } },
+            { 
+              class: { 
+                some: { 
+                  schoolId: { in: schoolIds },
+                  isActive: true 
+                } 
+              } 
+            },
           ],
           organizationId,
           role: 'PROFESSOR',
           isActive: true,
         },
       }),
+      
+      // Alunos associados às escolas gerenciadas ou a turmas dessas escolas
       this.prisma.user.count({
         where: {
           OR: [
-            { schools: { some: { id: { in: schoolIds } } } },
-            { class: { some: { schoolId: { in: schoolIds } } } },
+            { schools: { some: { id: { in: schoolIds }, isActive: true } } },
+            { 
+              class: { 
+                some: { 
+                  schoolId: { in: schoolIds },
+                  isActive: true 
+                } 
+              } 
+            },
           ],
           organizationId,
           role: 'USER',
@@ -259,7 +298,7 @@ export class DashboardService {
         },
       }),
     ]);
-
+  
     return {
       regions: regionsCount,
       schools: schoolsCount,
