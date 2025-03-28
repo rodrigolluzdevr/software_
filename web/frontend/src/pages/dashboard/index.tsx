@@ -7,11 +7,11 @@ import { UserRole } from '@/types/auth';
 import { User } from '@/types/user';
 import { useUsers } from '@/hooks/useUsers';
 import AdminPanel from '@/components/dashboard/AdminPanel';
-import ProfessorPanel from '@/components/dashboard/ProfessorPanel';
 import SecretaryPanel from '@/components/dashboard/SecretaryPanel';
 import CoordinatorPanel from '@/components/dashboard/CoordinatorPanel';
 import DirectorPanel from '@/components/dashboard/DirectorPanel';
 import StudentPanel from '@/components/dashboard/StudentPanel';
+import TeacherPanel from '@/components/dashboard/TeacherPanel';
 
 const Dashboard = () => {
   const [role, setRole] = useState<UserRole | null>(null);
@@ -41,7 +41,7 @@ const Dashboard = () => {
           />
         )}
 
-        {role === 'PROFESSOR' && <ProfessorPanel router={router} />}
+        {role === 'PROFESSOR' && <TeacherPanel router={router} />}
         {role === 'SECRETARIO' && <SecretaryPanel router={router} />}
         {role === 'COORDENADOR' && <CoordinatorPanel router={router} />}
         {role === 'DIRETOR' && <DirectorPanel router={router} />}
