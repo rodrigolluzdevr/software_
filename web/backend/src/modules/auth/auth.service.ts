@@ -26,6 +26,7 @@ export class AuthService {
     numberAdress: string;
     organizationId: number;
   }) {
+    // ...existing code...
     const hashPassword = await bcrypt.hash(userData.password, 10);
     return this.prisma.user.create({
       data: {
@@ -45,7 +46,7 @@ export class AuthService {
   }
 
   async login(cpf: string, password: string) {
-    // Fetch user data
+    // Buscar usuário por CPF e selecionar regiões, escolas e classes
     const user = await this.prisma.user.findUnique({
       where: { cpf },
       select: {
@@ -68,48 +69,60 @@ export class AuthService {
             regionId: true,
           },
         },
+        class: {
+          select: {
+            id: true,
+            name: true,
+            schoolId: true,
+          },
+        },
       },
     });
     if (!user) {
-      throw new NotFoundException(
-        'Usuário não encontrado, verifique suas credenciais.',
-      );
+      throw new NotFoundException('Usuário não encontrado, verifique suas credenciais.');
     }
 
+    // Conferir senha
     const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword) {
       throw new UnauthorizedException(
-        'Credenciais inválidas, entre em contato com o admnistrador.',
+        'Credenciais inválidas, entre em contato com o administrador.',
       );
     }
 
+    // Montar payload do token
     const payload = {
       sub: user.id,
       cpf: user.cpf,
       role: user.role,
       organizationId: user.organizationId,
-      regions:
-        user.regions && user.regions.length > 0
-          ? user.regions.map((region) => ({
-              id: region.id,
-              name: region.name,
-              organizationId: region.organizationId,
-            }))
-          : [],
-
-      schools:
-        user.schools && user.schools.length > 0
-          ? user.schools.map((school) => ({
-              id: school.id,
-              name: school.name,
-              regionId: school.regionId,
-            }))
-          : [],
+      regions: user.regions?.length
+        ? user.regions.map((region) => ({
+            id: region.id,
+            name: region.name,
+            organizationId: region.organizationId,
+          }))
+        : [],
+      schools: user.schools?.length
+        ? user.schools.map((school) => ({
+            id: school.id,
+            name: school.name,
+            regionId: school.regionId,
+          }))
+        : [],
+      class: user.class?.length
+        ? user.class.map((cls) => ({
+            id: cls.id,
+            name: cls.name,
+            schoolId: cls.schoolId,
+          }))
+        : [],
     };
 
+    // Assinar token
     const token = this.jwtService.sign(payload);
 
-    return { 
+    return {
       token,
       user: {
         id: user.id,
@@ -118,7 +131,8 @@ export class AuthService {
         organizationId: user.organizationId,
         regions: payload.regions,
         schools: payload.schools,
-      }
+        class: payload.class,
+      },
     };
   }
 }

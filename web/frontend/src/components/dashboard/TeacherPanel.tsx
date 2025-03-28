@@ -1,9 +1,7 @@
 import { NextRouter } from 'next/router';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import {
-  BiBook,
-} from 'react-icons/bi';
+import { BiBook } from 'react-icons/bi';
 import { FaUserGraduate } from 'react-icons/fa';
 import api from '../../services/api';
 
@@ -41,7 +39,7 @@ export default function TeacherPanel({ router }: TeacherDashboardProps) {
   const [userClasses, setUserClasses] = useState<ClassData[]>([]);
   const [selectedClassId, setSelectedClassId] = useState<string>('');
 
-  // Obter payload do usuário a partir do sessionStorage (ou localStorage)
+  // Carregar informações do usuário
   const getUserInfo = () => {
     try {
       const userInfo = sessionStorage.getItem('user');
@@ -52,6 +50,7 @@ export default function TeacherPanel({ router }: TeacherDashboardProps) {
     }
   };
 
+  // Buscar estatísticas do dashboard
   const fetchDashboardData = async (classFilter?: string) => {
     setLoading(true);
     try {
@@ -67,100 +66,96 @@ export default function TeacherPanel({ router }: TeacherDashboardProps) {
     }
   };
 
-  const handleClassChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const classId = e.target.value;
+  // Manipula troca da classe selecionada
+  const handleClassChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const classId = event.target.value;
     setSelectedClassId(classId);
     fetchDashboardData(classId);
   };
 
   useEffect(() => {
     const user = getUserInfo();
-    if (user && user.classes) {
-      setUserClasses(user.classes);
+    if (user && user.class) {
+      // Ajustar caso o campo seja "class" ao invés de "classes"
+      setUserClasses(user.class);
     }
+    // Busca dados iniciais
     fetchDashboardData();
   }, []);
 
   return (
     <div className="w-full relative px-2 sm:px-3 md:px-4 lg:px-6">
-      {/* Opção de filtrar por classe */}
-      {userClasses.length > 0 && (
-        <div className="mt-2 mb-4">
-          <select
-            value={selectedClassId}
-            onChange={handleClassChange}
-            className="border border-gray-300 rounded-md px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="">Todas as Classes ({userClasses.length})</option>
-            {userClasses.map((classItem) => (
-              <option key={classItem.id} value={classItem.id}>
-                {classItem.name}
-              </option>
-            ))}
-          </select>
-        </div>
-      )}
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white rounded-md shadow-sm p-4 flex items-center">
-          <div className="bg-blue-100 p-3 rounded-full">
-            <BiBook className="text-blue-500 text-xl" />
-          </div>
-          <div className="ml-4">
-            <p className="text-gray-500 text-sm">Turmas</p>
-            <h4 className="font-semibold text-lg">
-              {loading ? '...' : stats.classes}
-            </h4>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-md shadow-sm p-4 flex items-center">
-          <div className="bg-blue-100 p-3 rounded-full">
-            <FaUserGraduate className="text-blue-500 text-xl" />
-          </div>
-          <div className="ml-4">
-            <p className="text-gray-500 text-sm">Alunos</p>
-            <h4 className="font-semibold text-lg">
-              {loading ? '...' : stats.students}
-            </h4>
-          </div>
-        </div>
-      </div>
-      {/* Exemplo adicional de métricas semelhantes às do diretor */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div className="mb-6">
-          <ul className="flex items-center text-[14px] font-bold">
-            <li className="hover:text-blue-500 transition-colors">
-              <Link href="/">Início</Link>
-            </li>
-            <li className="mx-2">/</li>
-            <li className="text-blue-500">Dashboard</li>
-          </ul>
-        </div>
-
-        {/* Cards de estatísticas */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <div className="bg-white rounded-md shadow-sm p-4 flex items-center">
-            <div className="bg-blue-100 p-3 rounded-full">
-              <BiBook className="text-blue-500 text-xl" />
+      <div className="layout-specing">
+        <div className="w-full px-2 sm:px-3 md:px-4 lg:px-6">
+          <div className="py-4">
+            {/* Cabeçalho com título e filtro de classe */}
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
+              <h5 className="text-lg font-semibold">Dashboard do Professor</h5>
+              {/* Filtro de classe */}
+              {userClasses.length > 0 && (
+                <div className="mt-2 sm:mt-0">
+                  <select
+                    value={selectedClassId}
+                    onChange={handleClassChange}
+                    className="border border-gray-300 rounded-md px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">
+                      Todas as turmas ({userClasses.length})
+                    </option>
+                    {userClasses.map((classItem) => (
+                      <option key={classItem.id} value={classItem.id}>
+                        {classItem.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
             </div>
-            <div className="ml-4">
-              <p className="text-gray-500 text-sm">Turmas</p>
-              <h4 className="font-semibold text-lg">
-                {loading ? '...' : stats.classes}
-              </h4>
-            </div>
-          </div>
 
-          <div className="bg-white rounded-md shadow-sm p-4 flex items-center">
-            <div className="bg-blue-100 p-3 rounded-full">
-              <FaUserGraduate className="text-blue-500 text-xl" />
+            {/* Breadcrumb */}
+            <div className="mb-6">
+              <ul className="flex items-center text-[14px] font-bold">
+                <li className="hover:text-blue-500 transition-colors">
+                  <Link href="/">Início</Link>
+                </li>
+                <li className="mx-2">/</li>
+                <li className="text-blue-500">Dashboard</li>
+              </ul>
             </div>
-            <div className="ml-4">
-              <p className="text-gray-500 text-sm">Alunos</p>
-              <h4 className="font-semibold text-lg">
-                {loading ? '...' : stats.students}
-              </h4>
+
+            {/* Cards de estatísticas */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+              <div className="bg-white rounded-md shadow-sm p-4 flex items-center">
+                <div className="bg-blue-100 p-3 rounded-full">
+                  <BiBook className="text-blue-500 text-xl" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-gray-500 text-sm">Turmas</p>
+                  <h4 className="font-semibold text-lg">
+                    {loading ? '...' : stats.classes}
+                  </h4>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-md shadow-sm p-4 flex items-center">
+                <div className="bg-blue-100 p-3 rounded-full">
+                  <FaUserGraduate className="text-blue-500 text-xl" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-gray-500 text-sm">Alunos</p>
+                  <h4 className="font-semibold text-lg">
+                    {loading ? '...' : stats.students}
+                  </h4>
+                </div>
+              </div>
+            </div>
+
+            {/* Seção adicional (exemplo) */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+              <div className="bg-white rounded-md shadow-sm p-4 flex items-center">
+                {/* Adicione outras métricas se necessário */}
+                <p className="text-gray-600">Outras informações aqui...</p>
+              </div>
             </div>
           </div>
         </div>
