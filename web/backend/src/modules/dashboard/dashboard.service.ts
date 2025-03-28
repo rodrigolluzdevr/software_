@@ -281,7 +281,7 @@ export class DashboardService {
       teachersCount,
       studentsCount,
     ] = await Promise.all([
-      // Contagem de regiões ativas com escolas que possuam turmas (class) nos classIds
+      // Contagem de regiões ativas com escolas que possuam as turmas do professor
       this.prisma.region.count({
         where: {
           isActive: true,
@@ -296,7 +296,7 @@ export class DashboardService {
         },
       }),
   
-      // Contagem de escolas ativas que tenham turmas (class) nos classIds
+      // Contagem de escolas ativas que tenham as turmas do professor
       this.prisma.school.count({
         where: {
           isActive: true,
@@ -306,59 +306,31 @@ export class DashboardService {
         },
       }),
   
-      // Contar coordenadores relacionados às turmas (class) ou escolas dessas turmas
+      // SOMENTE coordenadores diretamente ligados às turmas do professor
       this.prisma.user.count({
         where: {
-          OR: [
-            {
-              class: {
-                some: { id: { in: classIds }, isActive: true },
-              },
-            },
-            {
-              schools: {
-                some: {
-                  isActive: true,
-                  classes: {
-                    some: { id: { in: classIds }, isActive: true },
-                  },
-                },
-              },
-            },
-          ],
+          class: {
+            some: { id: { in: classIds }, isActive: true },
+          },
           organizationId,
           role: 'COORDENADOR',
           isActive: true,
         },
       }),
   
-      // Contar diretores relacionados a essas turmas (class) ou escolas dessas turmas
+      // SOMENTE diretores diretamente ligados às turmas do professor
       this.prisma.user.count({
         where: {
-          OR: [
-            {
-              class: {
-                some: { id: { in: classIds }, isActive: true },
-              },
-            },
-            {
-              schools: {
-                some: {
-                  isActive: true,
-                  classes: {
-                    some: { id: { in: classIds }, isActive: true },
-                  },
-                },
-              },
-            },
-          ],
+          class: {
+            some: { id: { in: classIds }, isActive: true },
+          },
           organizationId,
           role: 'DIRETOR',
           isActive: true,
         },
       }),
   
-      // Contar as próprias turmas (class) ativas cujo ID está nos classIds
+      // Contar as turmas do professor
       this.prisma.class.count({
         where: {
           id: { in: classIds },
@@ -366,52 +338,24 @@ export class DashboardService {
         },
       }),
   
-      // Contar professores relacionados a essas turmas ou escolas associadas
+      // SOMENTE professores diretamente ligados às turmas
       this.prisma.user.count({
         where: {
-          OR: [
-            {
-              class: {
-                some: { id: { in: classIds }, isActive: true },
-              },
-            },
-            {
-              schools: {
-                some: {
-                  isActive: true,
-                  classes: {
-                    some: { id: { in: classIds }, isActive: true },
-                  },
-                },
-              },
-            },
-          ],
+          class: {
+            some: { id: { in: classIds }, isActive: true },
+          },
           organizationId,
           role: 'PROFESSOR',
           isActive: true,
         },
       }),
   
-      // Contar alunos (role = USER) relacionados a essas turmas ou escolas
+      // SOMENTE alunos diretamente ligados às turmas
       this.prisma.user.count({
         where: {
-          OR: [
-            {
-              class: {
-                some: { id: { in: classIds }, isActive: true },
-              },
-            },
-            {
-              schools: {
-                some: {
-                  isActive: true,
-                  classes: {
-                    some: { id: { in: classIds }, isActive: true },
-                  },
-                },
-              },
-            },
-          ],
+          class: {
+            some: { id: { in: classIds }, isActive: true },
+          },
           organizationId,
           role: 'USER',
           isActive: true,
