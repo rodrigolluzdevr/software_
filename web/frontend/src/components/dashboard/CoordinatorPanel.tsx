@@ -1,7 +1,13 @@
 import { NextRouter } from 'next/router';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { BiUserPlus, BiBook, BiSolidSchool, BiUser, BiSliderAlt } from 'react-icons/bi';
+import {
+  BiUserPlus,
+  BiBook,
+  BiSolidSchool,
+  BiUser,
+  BiSliderAlt,
+} from 'react-icons/bi';
 import { FaUserGraduate, FaChalkboardTeacher } from 'react-icons/fa';
 import api from '../../services/api';
 
@@ -40,7 +46,12 @@ const CoordinatorDashboard = ({ router }: CoordinatorDashboardProps) => {
   const [selectedRegionId, setSelectedRegionId] = useState<string>('');
 
   // Funções de navegação
+  const navigateToRegions = () => router.push('/users/regions/register');
+  const navigateToSchools = () => router.push('/users/schools/register');
+  const navigateToCoordinators = () =>
+    router.push('/users/coordinators/register');
   const navigateToDirectors = () => router.push('/users/directors/register');
+  const navigateToTeachers = () => router.push('/users/teachers/register');
 
   // Obter informações do usuário/coordenador do localStorage
   const getUserInfo = () => {
@@ -58,10 +69,10 @@ const CoordinatorDashboard = ({ router }: CoordinatorDashboardProps) => {
     setLoading(true);
     try {
       // Adicionar filtro de região se especificado
-      const endpoint = regionFilter 
-        ? `/dashboard/stats?regionId=${regionFilter}` 
+      const endpoint = regionFilter
+        ? `/dashboard/stats?regionId=${regionFilter}`
         : '/dashboard/stats';
-      
+
       const { data } = await api.get(endpoint);
       setStats(data);
     } catch (error) {
@@ -96,8 +107,10 @@ const CoordinatorDashboard = ({ router }: CoordinatorDashboardProps) => {
           <div className="py-4">
             {/* Cabeçalho com título e filtro de região */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
-              <h5 className="text-lg font-semibold">Dashboard Do Coordenador</h5>
-              
+              <h5 className="text-lg font-semibold">
+                Dashboard Do Coordenador
+              </h5>
+
               {/* Filtro de região */}
               {userRegions.length > 0 && (
                 <div className="mt-2 sm:mt-0">
@@ -106,8 +119,10 @@ const CoordinatorDashboard = ({ router }: CoordinatorDashboardProps) => {
                     onChange={handleRegionChange}
                     className="border border-gray-300 rounded-md px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
-                    <option value="">Todas as regiões ({userRegions.length})</option>
-                    {userRegions.map(region => (
+                    <option value="">
+                      Todas as regiões ({userRegions.length})
+                    </option>
+                    {userRegions.map((region) => (
                       <option key={region.id} value={region.id}>
                         {region.name}
                       </option>
@@ -204,16 +219,30 @@ const CoordinatorDashboard = ({ router }: CoordinatorDashboardProps) => {
             </div>
 
             {/* Cards de acesso rápido */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-1 gap-4 mb-6">
               <div className="bg-white rounded-md shadow-sm p-4">
                 <h6 className="font-semibold mb-4">Acesso Rápido</h6>
-                <div className="grid grid-cols-2 sm:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                  <button
+                    onClick={navigateToSchools}
+                    className="flex flex-col-2 items-center justify-center p-3 bg-gray-50 hover:bg-gray-100 rounded-md transition-colors"
+                  >
+                    <BiUserPlus className="text-2xl text-blue-500 mb-1" />
+                    <span className="text-sm ml-2">Cadastrar Escolas</span>
+                  </button>
                   <button
                     onClick={navigateToDirectors}
                     className="flex flex-col-2 items-center justify-center p-3 bg-gray-50 hover:bg-gray-100 rounded-md transition-colors"
                   >
                     <BiUserPlus className="text-2xl text-blue-500 mb-1" />
                     <span className="text-sm ml-2">Cadastrar Diretores</span>
+                  </button>
+                  <button
+                    onClick={navigateToTeachers}
+                    className="flex flex-col-2 items-center justify-center p-3 bg-gray-50 hover:bg-gray-100 rounded-md transition-colors"
+                  >
+                    <BiUserPlus className="text-2xl text-blue-500 mb-1" />
+                    <span className="text-sm ml-2">Cadastrar Professores</span>
                   </button>
                 </div>
               </div>

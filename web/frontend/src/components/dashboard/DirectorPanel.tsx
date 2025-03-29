@@ -50,6 +50,8 @@ export default function DirectorPanel({ router }: DirectorDashboardProps) {
 
   const navigateToStudents = () => router.push('/users/students/register');
 
+  const navigateToClass = () => router.push('/users/class/register');
+
   const getUserInfo = () => {
     try {
       const userInfo = sessionStorage.getItem('user');
@@ -183,10 +185,10 @@ export default function DirectorPanel({ router }: DirectorDashboardProps) {
             </div>
 
             {/* Acesso rápido (exemplo) */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-1 gap-4 mb-6">
               <div className="bg-white rounded-md shadow-sm p-4">
                 <h6 className="font-semibold mb-4">Acesso Rápido</h6>
-                <div className="grid grid-cols-2 sm:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
                   <button
                     onClick={navigateToTeachers}
                     className="flex flex-col-2 items-center justify-center p-3 bg-gray-50 hover:bg-gray-100 rounded-md transition-colors"
@@ -202,6 +204,13 @@ export default function DirectorPanel({ router }: DirectorDashboardProps) {
                   >
                     <BiUserPlus className="text-2xl text-blue-500 mb-1" />
                     <span className="text-sm ml-2">Cadastrar Alunos</span>
+                  </button>
+                  <button
+                    onClick={navigateToClass}
+                    className="flex flex-col-2 items-center justify-center p-3 bg-gray-50 hover:bg-gray-100 rounded-md transition-colors"
+                  >
+                    <BiUserPlus className="text-2xl text-blue-500 mb-1" />
+                    <span className="text-sm ml-2">Cadastrar Turmas</span>
                   </button>
                 </div>
               </div>

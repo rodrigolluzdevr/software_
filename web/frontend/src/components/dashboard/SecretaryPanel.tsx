@@ -38,8 +38,9 @@ const SecretaryDashboard = ({ router }: SecretaryDashboardProps) => {
   const [loading, setLoading] = useState<boolean>(true);
 
   // Funções de navegação
-  const navigateToCoordinators = () =>
-    router.push('/users/coordinators/register');
+  const navigateToRegions = () => router.push('/users/regions/register');
+  const navigateToSchools = () => router.push('/users/schools/register');
+  const navigateToCoordinators = () => router.push('/users/coordinators/register');
   const navigateToDirectors = () => router.push('/users/directors/register');
 
   useEffect(() => {
@@ -65,7 +66,7 @@ const SecretaryDashboard = ({ router }: SecretaryDashboardProps) => {
           <div className="py-4">
             {/* Cabeçalho com título */}
             <div className="flex flex-row justify-between items-center mb-4">
-              <h5 className="text-lg font-semibold">Dashboard Do Usuário</h5>
+              <h5 className="text-lg font-semibold">Dashboard Do Secretário</h5>
             </div>
 
             {/* Breadcrumb simplificado */}
@@ -166,25 +167,37 @@ const SecretaryDashboard = ({ router }: SecretaryDashboardProps) => {
             </div>
 
             {/* Cards de acesso rápido */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-1 gap-4 mb-6">
               <div className="bg-white rounded-md shadow-sm p-4">
                 <h6 className="font-semibold mb-4">Acesso Rápido</h6>
-                <div className="grid grid-cols-2 sm:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                  <button
+                    onClick={navigateToRegions}
+                    className="flex flex-col-2 items-center justify-center p-3 bg-gray-50 hover:bg-gray-100 rounded-md transition-colors"
+                  >
+                    <BiUserPlus className="text-2xl text-blue-500 mb-1" />
+                    <span className="text-sm ml-2">Cadastrar Regiões</span>
+                  </button>
+                  <button
+                    onClick={navigateToSchools}
+                    className="flex flex-col-2 items-center justify-center p-3 bg-gray-50 hover:bg-gray-100 rounded-md transition-colors"
+                  >
+                    <BiUserPlus className="text-2xl text-blue-500 mb-1" />
+                    <span className="text-sm ml-2">Cadastrar Escolas</span>
+                  </button>
                   <button
                     onClick={navigateToCoordinators}
                     className="flex flex-col-2 items-center justify-center p-3 bg-gray-50 hover:bg-gray-100 rounded-md transition-colors"
                   >
                     <BiUserPlus className="text-2xl text-blue-500 mb-1" />
-                    <span className="text-sm ml-2">
-                      Cadastrar Coordenadores
-                    </span>
+                    <span className="text-sm ml-2">Cadastrar Diretores</span>
                   </button>
                   <button
                     onClick={navigateToDirectors}
                     className="flex flex-col-2 items-center justify-center p-3 bg-gray-50 hover:bg-gray-100 rounded-md transition-colors"
                   >
                     <BiUserPlus className="text-2xl text-blue-500 mb-1" />
-                    <span className="text-sm ml-2">Cadastrar Diretores</span>
+                    <span className="text-sm ml-2">Cadastrar Professores</span>
                   </button>
                 </div>
               </div>
