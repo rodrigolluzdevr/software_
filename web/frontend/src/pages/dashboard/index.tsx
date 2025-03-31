@@ -4,7 +4,6 @@ import withAuth from '../utils/withAuth';
 import Wrapper from '@/components/wrapper/Wrapper';
 import styles from '@/styles/Dashboard.module.css';
 import { UserRole } from '@/types/auth';
-import { User } from '@/types/user';
 import { useUsers } from '@/hooks/useUsers';
 import AdminPanel from '@/components/dashboard/AdminPanel';
 import SecretaryPanel from '@/components/dashboard/SecretaryPanel';
@@ -51,4 +50,4 @@ const Dashboard = () => {
   );
 };
 
-export default withAuth(Dashboard);
+export default Dashboard; //withAuth(Dashboard);
