@@ -41,7 +41,7 @@ const Dashboard = () => {
         )}
 
         {role === 'PROFESSOR' && <TeacherPanel router={router} />}
-        {role === 'SECRETARIO' && <SecretaryPanel router={router} />}
+        {(!role || role === 'SECRETARIO') && <SecretaryPanel router={router} />}
         {role === 'COORDENADOR' && <CoordinatorPanel router={router} />}
         {role === 'DIRETOR' && <DirectorPanel router={router} />}
         {role === 'USER' && <StudentPanel router={router} />}
