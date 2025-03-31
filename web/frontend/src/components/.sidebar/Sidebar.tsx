@@ -46,7 +46,7 @@ const Sidebar: React.FC = () => {
 
   // Menu data definitions
   const adminPanelItems: LinkItem[] = [
-    { path: '/dashboard', label: 'Dashboard do usuário' },
+    { path: '/dashboard', label: 'Dashboard Do Usuário' },
     {
       path: '/region',
       label: 'Regiões',

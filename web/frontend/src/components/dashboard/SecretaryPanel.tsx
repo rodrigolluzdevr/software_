@@ -66,7 +66,7 @@ const SecretaryDashboard = ({ router }: SecretaryDashboardProps) => {
           <div className="py-4">
             {/* Cabeçalho com título */}
             <div className="flex flex-row justify-between items-center mb-4">
-              <h5 className="text-lg font-semibold">Dashboard Do Secretário</h5>
+              <h5 className="text-lg font-semibold">Dashboard Do Usuário</h5>
             </div>
 
             {/* Breadcrumb simplificado */}
@@ -190,14 +190,14 @@ const SecretaryDashboard = ({ router }: SecretaryDashboardProps) => {
                     className="flex flex-col-2 items-center justify-center p-3 bg-gray-50 hover:bg-gray-100 rounded-md transition-colors"
                   >
                     <BiUserPlus className="text-2xl text-blue-500 mb-1" />
-                    <span className="text-sm ml-2">Cadastrar Diretores</span>
+                    <span className="text-sm ml-2">Cadastrar Coordenadores</span>
                   </button>
                   <button
                     onClick={navigateToDirectors}
                     className="flex flex-col-2 items-center justify-center p-3 bg-gray-50 hover:bg-gray-100 rounded-md transition-colors"
                   >
                     <BiUserPlus className="text-2xl text-blue-500 mb-1" />
-                    <span className="text-sm ml-2">Cadastrar Professores</span>
+                    <span className="text-sm ml-2">Cadastrar Diretores</span>
                   </button>
                 </div>
               </div>

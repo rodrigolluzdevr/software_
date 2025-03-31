@@ -99,7 +99,7 @@ export default function DirectorPanel({ router }: DirectorDashboardProps) {
           <div className="py-4">
             {/* Cabeçalho com título e filtro de escola */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
-              <h5 className="text-lg font-semibold">Dashboard Do Diretor</h5>
+              <h5 className="text-lg font-semibold">Dashboard Do Usuário</h5>
 
               {/* Filtro de escola */}
               {userSchools.length > 0 && (

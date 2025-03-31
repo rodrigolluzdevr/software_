@@ -90,7 +90,7 @@ export default function TeacherPanel({ router }: TeacherDashboardProps) {
           <div className="py-4">
             {/* Cabeçalho com título e filtro de classe */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
-              <h5 className="text-lg font-semibold">Dashboard do Professor</h5>
+              <h5 className="text-lg font-semibold">Dashboard Do Usuário</h5>
               {/* Filtro de classe */}
               {userClasses.length > 0 && (
                 <div className="mt-2 sm:mt-0">

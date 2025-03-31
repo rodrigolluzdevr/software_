@@ -108,7 +108,7 @@ const CoordinatorDashboard = ({ router }: CoordinatorDashboardProps) => {
             {/* Cabeçalho com título e filtro de região */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
               <h5 className="text-lg font-semibold">
-                Dashboard Do Coordenador
+                Dashboard Do Usuário
               </h5>
 
               {/* Filtro de região */}
