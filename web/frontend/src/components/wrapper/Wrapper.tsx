@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
-import Sidebar from "../.sidebar/Sidebar";
-import Header from "../.header/Header";
+import Sidebar from "../sidebar/Sidebar";
+import Header from "../header/Header";
 
 export default function Wrapper(props: any) {
   let [toggle, setToggle] = useState(true);

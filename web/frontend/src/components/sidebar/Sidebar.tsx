@@ -48,17 +48,17 @@ const Sidebar: React.FC = () => {
   const adminPanelItems: LinkItem[] = [
     { path: '/dashboard', label: 'Dashboard Do Usuário' },
     {
-      path: '/region',
+      path: '/regions',
       label: 'Regiões',
       roles: [ROLES.SECRETARIO, ROLES.COORDENADOR],
     },
     {
-      path: '/school',
+      path: '/schools',
       label: 'Escolas',
       roles: [ROLES.SECRETARIO, ROLES.COORDENADOR, ROLES.DIRETOR, ROLES.PROFESSOR],
     },
     {
-      path: '/class',
+      path: '/school-class',
       label: 'Turmas',
       roles: [
         ROLES.SECRETARIO,
@@ -144,7 +144,7 @@ const Sidebar: React.FC = () => {
   );
 
   // Active state helpers
-  const isAdminPanelActive = ['', '/dashboard', '/region', '/school', '/class'].includes(activeMenu);
+  const isAdminPanelActive = ['', '/dashboard', '/regions', '/schools', '/school-class'].includes(activeMenu);
   const isUserPanelActive = [
     '/users/coordinators',
     '/users/directors',
