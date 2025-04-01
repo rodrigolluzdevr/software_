@@ -1,18 +1,18 @@
 import { useRouter } from 'next/router';
 import { useState, useEffect, useMemo } from 'react';
-import { useSchools } from '@/hooks/useSchools';
+import { useClasses } from '@/hooks/useClasses';
 
 import { PageHeader } from '@/components/common/PageHeader';
 import { Breadcrumb } from '@/components/common/Breadcrumb';
 import { SearchBar } from '@/components/common/SearchBar';
-import { SchoolsTable } from './SchoolsTable';
+import { ClassesTable } from './ClassesTable';
 import { Pagination } from '@/components/common/Pagination';
 
 const ITEMS_PER_PAGE = 10;
 
-export default function SchoolsList() {
+export default function ClassesList() {
   const router = useRouter();
-  const { schools: allSchools = [], isLoading, error } = useSchools();
+  const { classes: allClasses = [], isLoading, error } = useClasses();
 
   // Estado para busca e ordenação
   const [searchTerm, setSearchTerm] = useState('');
@@ -20,12 +20,12 @@ export default function SchoolsList() {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Filtragem e ordenação de escolas
-  const filteredSchools = useMemo(() => {
-    let results = [...allSchools];
+  // Filtragem e ordenação de turmas
+  const filteredClasses = useMemo(() => {
+    let results = [...allClasses];
     if (searchTerm) {
-      results = results.filter((school) =>
-        school.name.toLowerCase().includes(searchTerm.toLowerCase()),
+      results = results.filter((schoolclass) =>
+        schoolclass.name.toLowerCase().includes(searchTerm.toLowerCase()),
       );
     }
     if (sortBy) {
@@ -40,7 +40,7 @@ export default function SchoolsList() {
       });
     }
     return results;
-  }, [allSchools, searchTerm, sortBy, sortOrder]);
+  }, [allClasses, searchTerm, sortBy, sortOrder]);
 
   //Resetar para a primeira página quando o filtro muda
   useEffect(() => {
@@ -48,14 +48,14 @@ export default function SchoolsList() {
   }, [searchTerm]);
 
   // Cálculos para paginação
-  const totalItems = filteredSchools.length;
+  const totalItems = filteredClasses.length;
   const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
 
-  // Obter apenas as escolas para a página atual
-  const paginatedSchools = useMemo(() => {
+  // Obter apenas as turmas para a página atual
+  const paginatedClasses = useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    return filteredSchools.slice(startIndex, startIndex + ITEMS_PER_PAGE);
-  }, [filteredSchools, currentPage]);
+    return filteredClasses.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [filteredClasses, currentPage]);
 
   // Handlers
   function handlePageChange(page: number) {
@@ -69,11 +69,11 @@ export default function SchoolsList() {
   }
 
   function handleRegisterClick() {
-    router.push('/schools/register');
+    router.push('/school-classes/register');
   }
 
-  function handleEditRegion(schoolId: number) {
-    router.push(`/schools/update?schoolId=${schoolId}`);
+  function handleEditRegion(classId: number) {
+    router.push(`/school-classes/update?classId=${classId}`);
   }
 
   function handleSort(field: string) {
@@ -96,7 +96,7 @@ export default function SchoolsList() {
   // Breadcrumb items
   const breadcrumbItems = [
     { label: 'Início', href: '/' },
-    { label: 'Escolas', href: '/schools' },
+    { label: 'Turmas', href: '/school-classes' },
   ];
 
   return (
@@ -104,7 +104,7 @@ export default function SchoolsList() {
       <div className="layout-specing">
         {/* Header */}
         <PageHeader
-          title="Escolas"
+          title="Turmas"
           buttonLabel="Cadastrar"
           onButtonClick={handleRegisterClick}
         />
@@ -115,7 +115,7 @@ export default function SchoolsList() {
         {/* Loading State */}
         {isLoading && (
           <div className="text-center py-4" aria-live="polite">
-            <p>Carregando escolas...</p>
+            <p>Carregando turmas...</p>
           </div>
         )}
 
@@ -130,12 +130,12 @@ export default function SchoolsList() {
         {!isLoading && !error && (
           <>
             <SearchBar
-              placeholder="Pesquisar escolas..."
+              placeholder="Pesquisar turmas..."
               value={searchTerm}
               onChange={handleSearchChange}
             />
-            <SchoolsTable
-              schools={paginatedSchools}
+            <ClassesTable
+              classes={paginatedClasses}
               sortBy={sortBy}
               sortOrder={sortOrder}
               onSort={handleSort}

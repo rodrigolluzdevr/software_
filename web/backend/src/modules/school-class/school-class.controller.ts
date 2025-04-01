@@ -23,7 +23,7 @@ import { CreateClassDto } from './dto/create-class.dto';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UpdateClassDto } from './dto/update-class.dto';
 
-@Controller('class')
+@Controller('classes')
 @UseGuards(RolesGuard)
 @UsePipes(new ValidationPipe({ transform: true }))
 export class ClassController {

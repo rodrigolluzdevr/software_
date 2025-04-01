@@ -50,7 +50,7 @@ const Sidebar: React.FC = () => {
     {
       path: '/regions',
       label: 'Regiões',
-      roles: [ROLES.SECRETARIO, ROLES.COORDENADOR],
+      roles: [ROLES.SECRETARIO],
     },
     {
       path: '/schools',
@@ -58,14 +58,13 @@ const Sidebar: React.FC = () => {
       roles: [ROLES.SECRETARIO, ROLES.COORDENADOR, ROLES.DIRETOR, ROLES.PROFESSOR],
     },
     {
-      path: '/school-class',
+      path: '/school-classes',
       label: 'Turmas',
       roles: [
         ROLES.SECRETARIO,
         ROLES.COORDENADOR,
         ROLES.DIRETOR,
         ROLES.PROFESSOR,
-        ROLES.USER,
       ],
     },
   ];
@@ -144,7 +143,7 @@ const Sidebar: React.FC = () => {
   );
 
   // Active state helpers
-  const isAdminPanelActive = ['', '/dashboard', '/regions', '/schools', '/school-class'].includes(activeMenu);
+  const isAdminPanelActive = ['', '/dashboard', '/regions', '/schools', '/school-classes'].includes(activeMenu);
   const isUserPanelActive = [
     '/users/coordinators',
     '/users/directors',

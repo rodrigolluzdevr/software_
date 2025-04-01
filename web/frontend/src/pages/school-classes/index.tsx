@@ -1,8 +1,15 @@
+import Wrapper from '@/components/wrapper/Wrapper';
+import styles from '@/styles/Dashboard.module.css';
+import ClassesList from '@/components/school-classes';
+
 const Classes = () => {
   return (
-    <div>
-      <h1>Classes</h1>
-      <p>This is the classes page.</p>
-    </div>
+    <Wrapper>
+      <div className={styles.dashboardContainer}>
+        <ClassesList />
+      </div>
+    </Wrapper>
   );
 };
+
+export default Classes;
