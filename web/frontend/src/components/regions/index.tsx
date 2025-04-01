@@ -8,7 +8,7 @@ import { SearchBar } from '@/components/common/SearchBar';
 import { RegionsTable } from './RegionsTable';
 import { Pagination } from '@/components/common/Pagination';
 
-const ITEMS_PER_PAGE = 10;
+const ITEMS_PER_PAGE = 8;
 
 const RegionsList = () => {
   const router = useRouter();
