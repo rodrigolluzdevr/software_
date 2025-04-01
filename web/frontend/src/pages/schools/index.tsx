@@ -1,8 +1,14 @@
+import SchoolsList from "@/components/schools";
+import Wrapper from "@/components/wrapper/Wrapper"
+
 const Schools = () => {
   return (
-    <div>
-      <h1>Schools</h1>
-      <p>List of schools will be displayed here.</p>
-    </div>
+    <Wrapper> 
+      <div className="dashboardContainer">
+        <SchoolsList/>
+      </div>
+    </Wrapper>
   );
 };
+
+export default Schools;

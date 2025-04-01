@@ -45,4 +45,42 @@ export class ClassService {
       where: { id },
     });
   }
+
+  async getAllClassNoFilter(): Promise<Class[]> {
+    return this.prisma.class.findMany();
+  }
+
+  async getAllClassByOrganization(organizationId: number): Promise<Class[]> {
+    return this.prisma.class.findMany({
+      where: {
+        school: {
+          region: {
+            organizationId,
+          },
+        },
+      },
+    });
+  }
+
+  async getAllClassByRegion(regionId: number): Promise<Class[]> {
+    return this.prisma.class.findMany({
+      where: {
+        school: {
+          regionId
+        },
+      },
+    });
+  }
+
+  async getAllClassByRegionIds(regionIds: number[]): Promise<Class[]> {
+    return this.prisma.class.findMany({
+      where: {
+        school: {
+          regionId: {
+            in: regionIds
+          }
+        }
+      }
+    });
+  }
 }

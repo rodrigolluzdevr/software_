@@ -45,4 +45,18 @@ export class SchoolService {
       where: { id },
     });
   }
+
+  async getAllSchoolsNoFilter(): Promise<School[]> {
+    return this.prisma.school.findMany();
+  }
+
+  async getAllSchoolsByOrganization(organizationId: number): Promise<School[]> {
+    return this.prisma.school.findMany({
+      where: {
+        region: {
+          organizationId,
+        },
+      },
+    });
+  }
 }

@@ -31,12 +31,23 @@ export class ClassController {
   constructor(private readonly classService: ClassService) {}
 
   @Get()
+  @Roles('SECRETARIO', 'COORDENADOR', 'DIRETOR')
   async getAllClass(@Req() req: Request): Promise<Class[]> {
+    if (req.user.role === 'SECRETARIO') {
+      return this.classService.getAllClassByOrganization(req.user.organizationId);
+    }
+
+    if (req.user.role === 'COORDENADOR') {
+      const regionId = req.user.regions[0]?.id;
+      return this.classService.getAllClassByRegion(regionId);
+    }
+
     const schoolIds = this.extractSchoolIds(req);
     return this.classService.getAllClass(schoolIds);
   }
 
   @Get(':id')
+  @Roles('SECRETARIO', 'COORDENADOR', 'DIRETOR')
   async getClassById(
     @Param('id', ParseIdPipe) id: number,
     @Req() req: Request,

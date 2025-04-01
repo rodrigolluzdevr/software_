@@ -32,12 +32,17 @@ export class SchoolController {
   constructor(private readonly schoolService: SchoolService) {}
 
   @Get()
+  @Roles('SECRETARIO', 'COORDENADOR')
   async getAllSchools(@Req() req: Request): Promise<School[]> {
+    if (req.user.role === 'SECRETARIO') {
+      return this.schoolService.getAllSchoolsByOrganization(req.user.organizationId);
+    }
     const regionIds = this.extractRegionIds(req);
     return this.schoolService.getAllSchools(regionIds);
   }
 
   @Get(':id')
+  @Roles('SECRETARIO', 'COORDENADOR')
   async getSchoolById(
     @Param('id', ParseIdPipe) id: number,
     @Req() req: Request,
@@ -87,15 +92,16 @@ export class SchoolController {
 
   private async findSchoolOrFail(id: number): Promise<School> {
     const school = await this.schoolService.getSchoolById(id);
-    
     if (!school) {
       throw new NotFoundException('Escola não encontrada');
     }
-    
     return school;
   }
 
   private validateRegionAccess(req: Request, regionId: number, action: string): void {
+    if (req.user.role === 'SECRETARIO') {
+      return;
+    }
     if (!userHasAccessToRegion(req, regionId)) {
       throw new ForbiddenException(
         `Você não tem permissão para ${action} escolas fora da sua região`,

@@ -1,31 +1,34 @@
 import { useRouter } from 'next/router';
 import { useState, useEffect, useMemo } from 'react';
-import { useRegions } from '@/hooks/useRegions';
+import { useSchools } from '@/hooks/useSchools';
 
 import { PageHeader } from '@/components/common/PageHeader';
 import { Breadcrumb } from '@/components/common/Breadcrumb';
 import { SearchBar } from '@/components/common/SearchBar';
-import { RegionsTable } from './RegionsTable';
+import { SchoolsTable } from './SchoolsTable';
 import { Pagination } from '@/components/common/Pagination';
-
 const ITEMS_PER_PAGE = 10;
 
-export default function RegionsList() {
+export default function SchoolsList() {
   const router = useRouter();
-  const { regions: allRegions = [], isLoading, error } = useRegions();
+  const { schools: allSchools = [], isLoading, error } = useSchools();
 
-  // Estado para busca e e ordenação
+  // Adicione esse log para depuração
+  console.log('Estado atual:', { escolas: allSchools, carregando: isLoading, erro: error });
+  
+
+  // Estado para busca e ordenação
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState<'id' | 'name' | null>(null);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [currentPage, setCurrentPage] = useState(1);
 
   // Filtragem e ordenação de regiões
-  const filteredRegions = useMemo(() => {
-    let results = [...allRegions];
+  const filteredSchools = useMemo(() => {
+    let results = [...allSchools];
     if (searchTerm) {
-      results = results.filter((region) =>
-        region.name.toLowerCase().includes(searchTerm.toLowerCase()),
+      results = results.filter((school) =>
+        school.name.toLowerCase().includes(searchTerm.toLowerCase()),
       );
     }
     if (sortBy) {
@@ -40,22 +43,22 @@ export default function RegionsList() {
       });
     }
     return results;
-  }, [allRegions, searchTerm, sortBy, sortOrder]);
+  }, [allSchools, searchTerm, sortBy, sortOrder]);
 
-  // Resetar para a primeira página quando o filtro muda
+  //Resetar para a primeira página quando o filtro muda
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm]);
 
   // Cálculos para paginação
-  const totalItems = filteredRegions.length;
+  const totalItems = filteredSchools.length;
   const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
 
   // Obter apenas as regiões para a página atual
-  const paginatedRegions = useMemo(() => {
+  const paginatedSchools = useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    return filteredRegions.slice(startIndex, startIndex + ITEMS_PER_PAGE);
-  }, [filteredRegions, currentPage]);
+    return filteredSchools.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [filteredSchools, currentPage]);
 
   // Handlers
   function handlePageChange(page: number) {
@@ -69,11 +72,11 @@ export default function RegionsList() {
   }
 
   function handleRegisterClick() {
-    router.push('/regions/register');
+    router.push('/schools/register');
   }
 
-  function handleEditRegion(regionId: number) {
-    router.push(`/regions/update/${regionId}`);
+  function handleEditRegion(schoolId: number) {
+    router.push(`/schools/update?schoolId=${schoolId}`);
   }
 
   function handleSort(field: string) {
@@ -96,7 +99,7 @@ export default function RegionsList() {
   // Breadcrumb items
   const breadcrumbItems = [
     { label: 'Início', href: '/' },
-    { label: 'Regiões', active: true },
+    { label: 'Escolas', href: '/schools' },
   ];
 
   return (
@@ -104,7 +107,7 @@ export default function RegionsList() {
       <div className="layout-specing">
         {/* Header */}
         <PageHeader
-          title="Regiões"
+          title="Escolas"
           buttonLabel="Cadastrar"
           onButtonClick={handleRegisterClick}
         />
@@ -130,12 +133,12 @@ export default function RegionsList() {
         {!isLoading && !error && (
           <>
             <SearchBar
-              placeholder="Pesquisar regiões..."
+              placeholder="Pesquisar escolas..."
               value={searchTerm}
               onChange={handleSearchChange}
             />
-            <RegionsTable
-              regions={paginatedRegions}
+            <SchoolsTable
+              schools={paginatedSchools}
               sortBy={sortBy}
               sortOrder={sortOrder}
               onSort={handleSort}
