@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Region } from '@/types/region';
 
-export const regions = () => {
+export const useRegions = () => {
   const [regions, setRegions] = useState<Region[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
