@@ -42,6 +42,11 @@ export class ClassController {
       return this.classService.getAllClassByRegion(regionId);
     }
 
+    if (req.user.role === 'PROFESSOR') {
+      const classIds = req.user.class.map((classItem) => classItem.id);
+      return this.classService.getAllClassByClassIds(classIds);
+    }
+
     const schoolIds = this.extractSchoolIds(req);
     return this.classService.getAllClass(schoolIds);
   }

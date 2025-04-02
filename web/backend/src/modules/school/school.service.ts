@@ -60,11 +60,11 @@ export class SchoolService {
     });
   }
 
-  async getAllSchoolsByRegisterId(Ids: number[]): Promise<School[]> {
+  async getSchoolsByIds(schoolIds: number[]): Promise<School[]> {
     return this.prisma.school.findMany({
       where: {
         id: {
-          in: Ids,
+          in: schoolIds,
         },
       },
     });

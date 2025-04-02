@@ -83,4 +83,14 @@ export class ClassService {
       }
     });
   }
+
+  async getAllClassByClassIds(ids: number[]): Promise<Class[]> {
+    return this.prisma.class.findMany({
+      where: {
+        id: {
+          in: ids,
+        },
+      },
+    });
+  }
 }

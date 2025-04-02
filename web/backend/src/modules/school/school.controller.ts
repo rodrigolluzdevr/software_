@@ -37,10 +37,18 @@ export class SchoolController {
     if (req.user.role === 'SECRETARIO') {
       return this.schoolService.getAllSchoolsByOrganization(req.user.organizationId);
     }
-    if (req.user.role === 'DIRETOR', 'PROFESSOR') {
-      const schoolIds = req.user.schools.map((school) => school.id);
-      return this.schoolService.getAllSchools(schoolIds);
+
+    if (req.user.role === 'DIRETOR') {
+      const schoolIds = [...new Set(req.user.schools.map((school) => school.id))] as number[];
+      return this.schoolService.getSchoolsByIds(schoolIds);
     }
+
+    if (req.user.role === 'PROFESSOR') {
+      // Extract unique school IDs from the classes the professor teaches
+      const schoolIds = [...new Set(req.user.class.map((classItem) => classItem.schoolId))] as number[];
+      return this.schoolService.getSchoolsByIds(schoolIds);
+    }
+
     const regionIds = this.extractRegionIds(req);
     return this.schoolService.getAllSchools(regionIds);
   }
