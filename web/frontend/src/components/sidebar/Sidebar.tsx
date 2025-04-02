@@ -50,7 +50,7 @@ const Sidebar: React.FC = () => {
     {
       path: '/regions',
       label: 'Regiões',
-      roles: [ROLES.SECRETARIO],
+      roles: [ROLES.SECRETARIO, ROLES.COORDENADOR],
     },
     {
       path: '/schools',
