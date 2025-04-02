@@ -31,7 +31,7 @@ export class ClassController {
   constructor(private readonly classService: ClassService) {}
 
   @Get()
-  @Roles('SECRETARIO', 'COORDENADOR', 'DIRETOR')
+  @Roles('SECRETARIO', 'COORDENADOR', 'DIRETOR', 'PROFESSOR')
   async getAllClass(@Req() req: Request): Promise<Class[]> {
     if (req.user.role === 'SECRETARIO') {
       return this.classService.getAllClassByOrganization(req.user.organizationId);
@@ -47,7 +47,7 @@ export class ClassController {
   }
 
   @Get(':id')
-  @Roles('SECRETARIO', 'COORDENADOR', 'DIRETOR')
+  @Roles('SECRETARIO', 'COORDENADOR', 'DIRETOR', 'PROFESSOR')
   async getClassById(
     @Param('id', ParseIdPipe) id: number,
     @Req() req: Request,
@@ -58,7 +58,7 @@ export class ClassController {
   }
 
   @Post()
-  @Roles('DIRETOR')
+  @Roles('SECRETARIO', 'COORDENADOR', 'DIRETOR')
   async createClass(
     @Body() createClassDto: CreateClassDto,
     @Req() req: Request,
@@ -68,7 +68,7 @@ export class ClassController {
   }
 
   @Patch(':id')
-  @Roles('DIRETOR')
+  @Roles('SECRETARIO', 'COORDENADOR', 'DIRETOR')
   async updateClass(
     @Param('id', ParseIdPipe) id: number,
     @Body() updateClassDto: UpdateClassDto,
@@ -80,7 +80,7 @@ export class ClassController {
   }
 
   @Delete(':id')
-  @Roles('DIRETOR')
+  @Roles('SECRETARIO', 'COORDENADOR', 'DIRETOR')
   async deleteClass(
     @Param('id', ParseIdPipe) id: number,
     @Req() req: Request,

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Region, type Prisma} from '@prisma/client';
+import { Region, type Prisma } from '@prisma/client';
 import { PrismaService } from 'src/database/prisma.service';
 
 @Injectable()
@@ -39,6 +39,16 @@ export class RegionService {
   async deleteRegion(id: number): Promise<Region> {
     return this.prisma.region.delete({
       where: { id },
+    });
+  }
+
+  async getAllRegionByRegionIds(ids: number[]): Promise<Region[]> {
+    return this.prisma.region.findMany({
+      where: {
+        id: {
+          in: ids,
+        },
+      },
     });
   }
 }

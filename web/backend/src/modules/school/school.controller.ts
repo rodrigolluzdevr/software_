@@ -32,17 +32,21 @@ export class SchoolController {
   constructor(private readonly schoolService: SchoolService) {}
 
   @Get()
-  @Roles('SECRETARIO', 'COORDENADOR')
+  @Roles('SECRETARIO', 'COORDENADOR', 'DIRETOR', 'PROFESSOR')
   async getAllSchools(@Req() req: Request): Promise<School[]> {
     if (req.user.role === 'SECRETARIO') {
       return this.schoolService.getAllSchoolsByOrganization(req.user.organizationId);
+    }
+    if (req.user.role === 'DIRETOR', 'PROFESSOR') {
+      const schoolIds = req.user.schools.map((school) => school.id);
+      return this.schoolService.getAllSchools(schoolIds);
     }
     const regionIds = this.extractRegionIds(req);
     return this.schoolService.getAllSchools(regionIds);
   }
 
   @Get(':id')
-  @Roles('SECRETARIO', 'COORDENADOR')
+  @Roles('SECRETARIO', 'COORDENADOR', 'DIRETOR', 'PROFESSOR')
   async getSchoolById(
     @Param('id', ParseIdPipe) id: number,
     @Req() req: Request,

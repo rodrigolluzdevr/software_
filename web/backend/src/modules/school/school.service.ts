@@ -59,4 +59,14 @@ export class SchoolService {
       },
     });
   }
+
+  async getAllSchoolsByRegisterId(Ids: number[]): Promise<School[]> {
+    return this.prisma.school.findMany({
+      where: {
+        id: {
+          in: Ids,
+        },
+      },
+    });
+  }
 }

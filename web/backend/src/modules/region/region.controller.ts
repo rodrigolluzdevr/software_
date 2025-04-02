@@ -34,12 +34,18 @@ export class RegionController {
   constructor(private readonly regionService: RegionService) {}
 
   @Get()
+  @Roles('SECRETARIO', 'COORDENADOR')
   async getAllRegions(@Req() req: Request): Promise<Region[]> {
+    if (req.user.role === 'COORDENADOR') {
+      const regionIds = req.user.regions.map((region) => region.id);
+      return this.regionService.getAllRegionByRegionIds(regionIds);
+    }
     const organizationId = this.extractRegionIds(req);
     return this.regionService.getAllRegions(organizationId);
   }
 
   @Get(':id')
+  @Roles('SECRETARIO', 'COORDENADOR')
   async getRegionById(
     @Param('id', ParseIdPipe) id: number,
     @Req() req: Request,
@@ -55,7 +61,10 @@ export class RegionController {
     @Body() createRegionDto: CreateRegionDto,
     @Req() req: Request,
   ): Promise<Region> {
-    this.validateOrganizationAccess(req, createRegionDto.organizationId, 'criar',
+    this.validateOrganizationAccess(
+      req,
+      createRegionDto.organizationId,
+      'criar',
     );
     return this.regionService.createRegion(createRegionDto);
   }
