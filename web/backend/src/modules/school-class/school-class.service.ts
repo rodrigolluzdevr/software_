@@ -62,15 +62,6 @@ export class ClassService {
     });
   }
 
-  async getAllClassByRegion(regionId: number): Promise<Class[]> {
-    return this.prisma.class.findMany({
-      where: {
-        school: {
-          regionId
-        },
-      },
-    });
-  }
 
   async getAllClassByRegionIds(regionIds: number[]): Promise<Class[]> {
     return this.prisma.class.findMany({

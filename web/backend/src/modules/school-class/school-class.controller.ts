@@ -38,8 +38,8 @@ export class ClassController {
     }
 
     if (req.user.role === 'COORDENADOR') {
-      const regionId = req.user.regions[0]?.id;
-      return this.classService.getAllClassByRegion(regionId);
+      const regionIds = req.user.regions.map(region => region.id);
+      return this.classService.getAllClassByRegionIds(regionIds);
     }
 
     if (req.user.role === 'PROFESSOR') {
