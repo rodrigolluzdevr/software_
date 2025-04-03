@@ -1,4 +1,4 @@
-import CoordinatorsList from "@/components/users/coordinator";
+import CoordinatorsList from "@/components/users/coordinators";
 import Wrapper from "@/components/wrapper/Wrapper";
 import styles from '@/styles/Dashboard.module.css';
 
