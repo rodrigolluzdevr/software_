@@ -2,7 +2,7 @@ import { useRouter } from 'next/router';
 import { useState, useEffect, useMemo } from 'react';
 import { useClasses } from '@/hooks/useClasses';
 
-import { PageHeader } from '@/components/common/PageHeader';
+import { PageHeader } from '@/components/common/PageHeaderDirector';
 import { Breadcrumb } from '@/components/common/Breadcrumb';
 import { SearchBar } from '@/components/common/SearchBar';
 import { ClassesTable } from './ClassesTable';

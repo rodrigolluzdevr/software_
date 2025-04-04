@@ -2,7 +2,7 @@ import { useRouter } from 'next/router';
 import { useState, useEffect, useMemo } from 'react';
 import { useRegions } from '@/hooks/useRegions';
 
-import { PageHeader } from '@/components/common/PageHeader';
+import { PageHeader } from '@/components/common/PageHeaderSecretary';
 import { Breadcrumb } from '@/components/common/Breadcrumb';
 import { SearchBar } from '@/components/common/SearchBar';
 import { RegionsTable } from './RegionsTable';
