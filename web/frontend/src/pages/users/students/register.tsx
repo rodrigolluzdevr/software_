@@ -1,4 +1,4 @@
-import StudentRegister from '@/components/users/student/StudentRegister';
+import StudentRegister from '@/components/users/students/StudentRegister';
 import Wrapper from '@/components/wrapper/Wrapper';
 import styles from '@/styles/Dashboard.module.css';
 
