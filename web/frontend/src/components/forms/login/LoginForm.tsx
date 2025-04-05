@@ -1,6 +1,6 @@
 import React from 'react';
-import InputField from '../inputField/InputField';
-import ErrorMessage from '../errorMessage/ErrorMessage';
+import InputField from './InputField';
+import ErrorMessage from '../../errorMessage/ErrorMessage';
 
 interface LoginFormProps {
   cpf: string;

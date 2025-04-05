@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { jwtDecode } from "jwt-decode";
 import BackButton from "@/components/back/Back.Button";
-import LoginForm from "../../components/loginForm/LoginForm";
+import LoginForm from "../../components/forms/login/LoginForm";
 import Footer from "../../components/footer/Footer";
 
 export default function Login() {
