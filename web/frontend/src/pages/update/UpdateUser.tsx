@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
+import withAuth from "../utils/withAuth";
 
 interface User {
   id: number;
@@ -88,3 +89,6 @@ export default function UpdateUser() {
     </form>
   );
 }
+
+
+withAuth(UpdateUser, ['ADMIN']);

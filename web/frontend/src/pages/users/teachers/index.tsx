@@ -1,6 +1,7 @@
 
 import TeachersList from "@/components/users/teachers";
 import Wrapper from "@/components/wrapper/Wrapper";
+import withAuth from "@/pages/utils/withAuth";
 import styles from '@/styles/Dashboard.module.css';
 
 
@@ -14,4 +15,4 @@ const Teachers = () => {
   );
 }
 
-export default Teachers;
+export default withAuth(Teachers, ['SECRETARIO', 'COORDENADOR', 'DIRETOR']);

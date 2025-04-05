@@ -1,5 +1,6 @@
 import SchoolsList from "@/components/schools";
 import Wrapper from "@/components/wrapper/Wrapper"
+import withAuth from "../utils/withAuth";
 
 const Schools = () => {
   return (
@@ -11,4 +12,4 @@ const Schools = () => {
   );
 };
 
-export default Schools;
+export default withAuth(Schools, ['SECRETARIO', 'COORDENADOR', 'DIRETOR', 'PROFESSOR']);

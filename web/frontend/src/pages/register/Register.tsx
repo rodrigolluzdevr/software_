@@ -1,4 +1,5 @@
 import { useState } from "react";
+import withAuth from "../utils/withAuth";
 
 export default function Register() {
   const [name, setName] = useState('');
@@ -50,3 +51,5 @@ export default function Register() {
     </form>
   );
 }
+
+withAuth(Register, ['ADMIN']);
