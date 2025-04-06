@@ -197,7 +197,7 @@ const TeacherRegister = () => {
                   <form onSubmit={handleSubmit}>
                     {/* Personal Information Section */}
                     <div className="grid grid-cols-6 gap-6 mb-6">
-                      <div className="col-span-6 sm:col-span-2 lg:col-span-2">
+                      <div className="col-span-6 sm:col-span-2 md:col-span-3 lg:col-span-2">
                         <FormInput
                           label="Nome"
                           value={name}
@@ -214,7 +214,25 @@ const TeacherRegister = () => {
                         />
                       </div>
 
-                      <div className="col-span-6 sm:col-span-2 lg:col-span-1">
+                      <div className="col-span-6 sm:col-span-3 md:col-span-2 lg:col-span-2">
+                        <FormInput
+                          label="Email"
+                          value={email}
+                          onChange={(e) => {
+                            setEmail(e.target.value);
+                            if (attemptedSubmit && e.target.value.trim()) {
+                              setErrors(prev => ({ ...prev, email: undefined }));
+                            }
+                          }}
+                          type="email"
+                          placeholder="Digite o Email"
+                          required
+                          error={errors.email}
+                          attemptedSubmit={attemptedSubmit}
+                        />
+                      </div>
+
+                      <div className="col-span-6 sm:col-span-3 lg:col-span-1">
                         <FormInput
                           label="CPF"
                           value={cpf}
@@ -228,6 +246,18 @@ const TeacherRegister = () => {
                         />
                       </div>
 
+                      <div className="col-span-6 md:col-span-2 lg:col-span-1">
+                        <FormInput
+                          label="Data de Nascimento"
+                          value={birthDate}
+                          onChange={(e) => setBirthDate(e.target.value)}
+                          type="date"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Address and Contact Section */}
+                    <div className="grid grid-cols-6 gap-6 mb-6">
                       <div className="col-span-6 sm:col-span-2 lg:col-span-1">
                         <FormInput
                           label="CEP"
@@ -246,28 +276,7 @@ const TeacherRegister = () => {
                           maxLength={9} // 9 characters with mask: 99999-999
                         />
                       </div>
-
-                      <div className="col-span-6 sm:col-span-2 lg:col-span-1">
-                        <FormInput
-                          label="Matrícula"
-                          value={registrationNumber}
-                          onChange={(e) => setRegistrationNumber(e.target.value)}
-                          placeholder="Digite a Matrícula"
-                        />
-                      </div>
-
-                      <div className="col-span-6 md:col-span-3 lg:col-span-1">
-                        <FormInput
-                          label="Data de Nascimento"
-                          value={birthDate}
-                          onChange={(e) => setBirthDate(e.target.value)}
-                          type="date"
-                        />
-                      </div>
-                    </div>
-
-                    {/* Address and Contact Section */}
-                    <div className="grid grid-cols-6 gap-6 mb-6">
+                    
                       <div className="col-span-6 sm:col-span-2 lg:col-span-2">
                         <FormInput
                           label="Endereço"
@@ -301,29 +310,20 @@ const TeacherRegister = () => {
                           attemptedSubmit={attemptedSubmit}
                         />
                       </div>
-
-                      <div className="col-span-6 sm:col-span-4 md:col-span-3 lg:col-span-2">
-                        <FormInput
-                          label="Email"
-                          value={email}
-                          onChange={(e) => {
-                            setEmail(e.target.value);
-                            if (attemptedSubmit && e.target.value.trim()) {
-                              setErrors(prev => ({ ...prev, email: undefined }));
-                            }
-                          }}
-                          type="email"
-                          placeholder="Digite o Email"
-                          required
-                          error={errors.email}
-                          attemptedSubmit={attemptedSubmit}
-                        />
-                      </div>
                     </div>
 
                     {/* Teacher-specific Information Section */}
                     <div className="grid grid-cols-6 gap-6 mb-6">
-                      <div className="col-span-6 sm:col-span-3 lg:col-span-3">
+                      <div className="col-span-6 sm:col-span-2 lg:col-span-1">
+                        <FormInput
+                          label="Matrícula"
+                          value={registrationNumber}
+                          onChange={(e) => setRegistrationNumber(e.target.value)}
+                          placeholder="Digite a Matrícula"
+                        />
+                      </div>
+
+                      <div className="col-span-6 sm:col-span-3 lg:col-span-1">
                         <FormInput
                           label="Especialização"
                           value={specialization}
@@ -333,7 +333,7 @@ const TeacherRegister = () => {
                         />
                       </div>
 
-                      <div className="col-span-6 sm:col-span-2 lg:col-span-2">
+                      <div className="col-span-6 sm:col-span-2 lg:col-span-1">
                         <FormInput
                           label="Data de Contratação"
                           value={hireDate}
@@ -353,12 +353,14 @@ const TeacherRegister = () => {
 
                     {/* Submit Button Section */}
                     <div className="grid grid-cols-1 mt-6">
+                      <div className='flex justify-center mt-10'>
                       <button
                         type="submit"
-                        className="py-2 px-5 inline-block font-semibold tracking-wide border align-middle duration-500 text-base text-center bg-blue-600 hover:bg-blue-700 border-blue-600 hover:border-blue-700 text-white rounded-md"
+                        className="py-2 px-8 inline-block font-semibold tracking-wide border align-middle duration-500 text-base text-center bg-blue-600 hover:bg-blue-700 border-blue-600 hover:border-blue-700 text-white rounded-md"
                       >
-                        Cadastrar Professor
+                        Cadastrar
                       </button>
+                      </div>
                       {error && <p className="mt-2 text-red-500">{error}</p>}
                     </div>
                   </form>
@@ -372,4 +374,5 @@ const TeacherRegister = () => {
   );
 };
 
-export default withAuth(TeacherRegister, ['SECRETARIO', 'COORDENADOR', 'DIRETOR']);
+export default TeacherRegister
+//export default withAuth(TeacherRegister, ['SECRETARIO', 'COORDENADOR', 'DIRETOR']);
