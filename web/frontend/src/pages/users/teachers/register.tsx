@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { useRouter } from 'next/router';
 import withAuth from '../../utils/withAuth';
 import Wrapper from '@/components/wrapper/Wrapper';
@@ -7,7 +7,7 @@ import ToggleSwitch from '@/components/forms/ToggleSwitch';
 import { formatCPF, formatCEP, getNumericValue } from '../../utils/maskUtils';
 import { jwtDecode } from 'jwt-decode';
 
-// Define JWT payload interface for type safety
+// Types
 interface JwtPayload {
   sub: number;
   cpf: string;
@@ -15,7 +15,6 @@ interface JwtPayload {
   organizationId: number;
 }
 
-// Define validation errors interface
 interface ValidationErrors {
   name?: string;
   cpf?: string;
@@ -25,43 +24,70 @@ interface ValidationErrors {
   numberAdress?: string;
 }
 
-/**
- * TeacherRegister Component
- * Handles the registration of new teachers in the system with form validation.
- * Implements input masking for CPF and CEP fields.
- */
+interface TeacherFormData {
+  personalInfo: {
+    name: string;
+    email: string;
+    cpf: string;
+    birthDate: string;
+  };
+  address: {
+    cep: string;
+    street: string;
+    number: string;
+  };
+  professionalInfo: {
+    registrationNumber: string;
+    specialization: string;
+    hireDate: string;
+    isActive: boolean;
+  };
+}
+
 const TeacherRegister = () => {
   const router = useRouter();
   
-  // Form state management
-  const [name, setName] = useState<string>('');
-  const [cpf, setCpf] = useState<string>(''); // This will hold the masked CPF
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
-  const [address, setAddress] = useState<string>('');
-  const [cep, setCep] = useState<string>(''); // This will hold the masked CEP
-  const [numberAdress, setNumberAdress] = useState<string>('');
-  const [organizationId, setOrganizationId] = useState<number>(0);
-  const [isActive, setIsActive] = useState<boolean>(true);
+  // Form state with structured data model
+  const [formData, setFormData] = useState<TeacherFormData>({
+    personalInfo: {
+      name: '',
+      email: '',
+      cpf: '',
+      birthDate: '',
+    },
+    address: {
+      cep: '',
+      street: '',
+      number: '',
+    },
+    professionalInfo: {
+      registrationNumber: '',
+      specialization: '',
+      hireDate: '',
+      isActive: true,
+    },
+  });
 
-  // Teacher-specific fields
-  const [registrationNumber, setRegistrationNumber] = useState<string>('');
-  const [birthDate, setBirthDate] = useState<string>('');
-  const [specialization, setSpecialization] = useState<string>('');
-  const [hireDate, setHireDate] = useState<string>('');
-  
-  // Form submission and validation state
+  // Additional state
+  const [password, setPassword] = useState<string>('');
+  const [organizationId, setOrganizationId] = useState<number>(0);
   const [error, setError] = useState<string>('');
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [attemptedSubmit, setAttemptedSubmit] = useState<boolean>(false);
 
-  /**
-   * Effect hook to retrieve organizationId from JWT token
-   */
+  // Extract values for easier access in the component
+  const { personalInfo, address, professionalInfo } = formData;
+  
+  // Load organization ID from token on component mount
   useEffect(() => {
-    const token = sessionStorage.getItem('token');
-
-    if (token) {
+    const fetchOrganizationId = () => {
+      const token = sessionStorage.getItem('token');
+      
+      if (!token) {
+        setError('Usuário não está autenticado');
+        return;
+      }
+      
       try {
         const decoded = jwtDecode<JwtPayload>(token);
         setOrganizationId(decoded.organizationId);
@@ -69,117 +95,239 @@ const TeacherRegister = () => {
         console.error('Failed to decode token:', error);
         setError('Erro ao obter informações do usuário logado');
       }
-    } else {
-      setError('Usuário não está autenticado');
-    }
+    };
+    
+    fetchOrganizationId();
   }, []);
 
-  /**
-   * Validates form fields and returns any validation errors
-   */
+  // Field update functions
+  const updatePersonalInfo = (field: string, value: string) => {
+    setFormData({
+      ...formData,
+      personalInfo: {
+        ...personalInfo,
+        [field]: value,
+      },
+    });
+  };
+
+  const updateAddress = (field: string, value: string) => {
+    setFormData({
+      ...formData,
+      address: {
+        ...address,
+        [field]: value,
+      },
+    });
+  };
+
+  const updateProfessionalInfo = (field: string, value: string | boolean) => {
+    setFormData({
+      ...formData,
+      professionalInfo: {
+        ...professionalInfo,
+        [field]: value,
+      },
+    });
+  };
+
+  // Clear error for a field
+  const clearError = (field: keyof ValidationErrors) => {
+    if (attemptedSubmit && errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: undefined }));
+    }
+  };
+
+  // Handle CPF changes with validation and password sync
+  const handleCpfChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const maskedCpf = e.target.value;
+    updatePersonalInfo('cpf', maskedCpf);
+    
+    // Set password to numeric-only CPF value
+    const numericCpf = getNumericValue(maskedCpf);
+    setPassword(numericCpf);
+    
+    // Validate CPF format on change if user has already tried to submit
+    if (attemptedSubmit) {
+      if (!numericCpf) {
+        setErrors(prev => ({ ...prev, cpf: "CPF é obrigatório" }));
+      } else if (numericCpf.length !== 11) {
+        setErrors(prev => ({ ...prev, cpf: "CPF deve conter 11 dígitos" }));
+      } else {
+        clearError('cpf');
+      }
+    }
+  };
+
+  // Handle CEP changes with validation
+  const handleCepChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const maskedCep = e.target.value;
+    updateAddress('cep', maskedCep);
+    
+    // Validate CEP format on change if user has already tried to submit
+    if (attemptedSubmit) {
+      const numericCep = getNumericValue(maskedCep);
+      if (!numericCep) {
+        setErrors(prev => ({ ...prev, cep: "CEP é obrigatório" }));
+      } else if (numericCep.length !== 8) {
+        setErrors(prev => ({ ...prev, cep: "CEP deve conter 8 dígitos" }));
+      } else {
+        clearError('cep');
+      }
+    }
+  };
+
+  // Form validation logic
   const validateForm = (): ValidationErrors => {
     const newErrors: ValidationErrors = {};
+    const { name, email, cpf } = personalInfo;
+    const { street, number, cep } = address;
     
+    // Required field validations
     if (!name.trim()) newErrors.name = "Nome é obrigatório";
-    if (!getNumericValue(cpf)) newErrors.cpf = "CPF é obrigatório";
     if (!email.trim()) newErrors.email = "Email é obrigatório";
-    if (!address.trim()) newErrors.address = "Endereço é obrigatório";
+    if (!getNumericValue(cpf)) newErrors.cpf = "CPF é obrigatório";
+    if (!street.trim()) newErrors.address = "Endereço é obrigatório";
+    if (!number.trim()) newErrors.numberAdress = "Número é obrigatório";
     if (!getNumericValue(cep)) newErrors.cep = "CEP é obrigatório";
-    if (!numberAdress.trim()) newErrors.numberAdress = "Número é obrigatório";
     
-    // Email format validation
+    // Format validations
     if (email && !/\S+@\S+\.\S+/.test(email)) {
       newErrors.email = "Email em formato inválido";
     }
     
     // CPF length validation
-    if (getNumericValue(cpf) && getNumericValue(cpf).length !== 11) {
+    const numericCpf = getNumericValue(cpf);
+    if (numericCpf && numericCpf.length !== 11) {
       newErrors.cpf = "CPF deve conter 11 dígitos";
     }
     
     // CEP length validation
-    if (getNumericValue(cep) && getNumericValue(cep).length !== 8) {
+    const numericCep = getNumericValue(cep);
+    if (numericCep && numericCep.length !== 8) {
       newErrors.cep = "CEP deve conter 8 dígitos";
     }
     
     return newErrors;
   };
 
-  /**
-   * Updates both CPF and password fields when CPF changes
-   * CPF is stored with mask, but password gets numeric value only
-   */
-  const handleCpfChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const maskedCpf = e.target.value; 
-    setCpf(maskedCpf);
-    
-    // Set password to numeric-only CPF value
-    const numericCpf = getNumericValue(maskedCpf);
-    setPassword(numericCpf); 
-    
-    // Clear error if field is filled
-    if (attemptedSubmit && getNumericValue(maskedCpf).trim()) {
-      setErrors(prev => ({ ...prev, cpf: undefined }));
+// Form submission handler
+const handleSubmit = async (e: FormEvent) => {
+  e.preventDefault();
+  setAttemptedSubmit(true);
+  
+  const validationErrors = validateForm();
+  setErrors(validationErrors);
+  
+  // Stop submission if validation fails
+  if (Object.keys(validationErrors).length > 0) {
+    const firstErrorElement = document.querySelector('.border-red-500');
+    if (firstErrorElement) {
+      firstErrorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
-  };
+    return;
+  }
+  
+  setError('');
 
-  /**
-   * Handles form submission with validation
-   */
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setAttemptedSubmit(true);
+  try {
+    const numericCpf = getNumericValue(personalInfo.cpf);
+    const numericCep = getNumericValue(address.cep);
     
-    const validationErrors = validateForm();
-    setErrors(validationErrors);
+    // Tratamento alinhado com a estrutura SQL (TIMESTAMP e VARCHAR)
+    // VARCHAR(20) - Se vazio, enviar null explicitamente
+    const registrationNumber = 
+      professionalInfo.registrationNumber && professionalInfo.registrationNumber.trim() !== '' 
+        ? professionalInfo.registrationNumber.trim() 
+        : null;
     
-    // If there are validation errors, stop submission
-    if (Object.keys(validationErrors).length > 0) {
-      // Scroll to the first error if needed
-      const firstErrorElement = document.querySelector('.border-red-500');
-      if (firstErrorElement) {
-        firstErrorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-      return;
+    // VARCHAR(100) - Se vazio, enviar null explicitamente
+    const specialization = 
+      professionalInfo.specialization && professionalInfo.specialization.trim() !== '' 
+        ? professionalInfo.specialization.trim() 
+        : null;
+    
+    // TIMESTAMP(3) - Formato esperado pelo PostgreSQL
+    let birthDate = null;
+    if (personalInfo.birthDate && personalInfo.birthDate.trim() !== '') {
+      // Formato ISO é compatível com TIMESTAMP do PostgreSQL
+      birthDate = new Date(personalInfo.birthDate).toISOString();
     }
     
-    setError('');
+    // TIMESTAMP(3) - Formato esperado pelo PostgreSQL
+    let hireDate = null;
+    if (professionalInfo.hireDate && professionalInfo.hireDate.trim() !== '') {
+      // Formato ISO é compatível com TIMESTAMP do PostgreSQL
+      hireDate = new Date(professionalInfo.hireDate).toISOString();
+    }
+    
+    // Log detalhado para debug
+    console.log('Valores enviados para API (compatíveis com SQL):', {
+      registrationNumber, // VARCHAR(20)
+      specialization,    // VARCHAR(100)
+      birthDate,         // TIMESTAMP(3)
+      hireDate           // TIMESTAMP(3)
+    });
+    
+    const requestBody = {
+      name: personalInfo.name,
+      cpf: numericCpf,
+      email: personalInfo.email,
+      password: numericCpf, 
+      role: 'PROFESSOR',
+      address: address.street,
+      cep: numericCep,
+      numberAdress: address.number,
+      organizationId,
+      isActive: professionalInfo.isActive,
+      // Campos opcionais com tratamento adequado
+      registrationNumber,
+      specialization,
+      birthDate,
+      hireDate
+    };
+    
+    console.log('Objeto completo a ser enviado:', JSON.stringify(requestBody, null, 2));
+    
+    const response = await fetch('http://localhost:4000/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(requestBody),
+    });
 
-    try {
-      // Extract numeric values for submission
-      const numericCpf = getNumericValue(cpf);
-      const numericCep = getNumericValue(cep);
+    if (!response.ok) {
+      const errorText = await response.text();
+      let errorMessage = 'Registro de professor falhou, tente novamente';
       
-      const response = await fetch('http://localhost:4000/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name,
-          cpf: numericCpf,         // Send numeric value only
-          email,
-          password: numericCpf,    // Password is same as numeric CPF
-          role: 'PROFESSOR',
-          address,
-          cep: numericCep,         // Send numeric value only
-          numberAdress,
-          organizationId,
-          isActive,
-          registrationNumber,
-          birthDate,
-          specialization,
-          hireDate,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Registro de professor falhou, tente novamente');
+      try {
+        const errorData = JSON.parse(errorText);
+        errorMessage = errorData.message || errorMessage;
+      } catch (e) {
+        console.error('Resposta de erro não é JSON:', errorText);
       }
-
-      router.push('/users/teachers/');
-    } catch (err: any) {
-      setError(err.message);
+      
+      throw new Error(errorMessage);
     }
-  };
+
+    // Evitar dupla leitura do corpo da resposta
+    const responseText = await response.text();
+    let responseData = {};
+    
+    try {
+      if (responseText) {
+        responseData = JSON.parse(responseText);
+        console.log('Resposta da API (sucesso):', responseData);
+      }
+    } catch (e) {
+      console.error('Erro ao processar resposta:', e);
+    }
+
+    router.push('/users/teachers/');
+  } catch (err: any) {
+    setError(err.message);
+    console.error('Erro durante o registro:', err);
+  }
+};
 
   return (
     <Wrapper>
@@ -200,11 +348,11 @@ const TeacherRegister = () => {
                       <div className="col-span-6 sm:col-span-2 md:col-span-3 lg:col-span-2">
                         <FormInput
                           label="Nome"
-                          value={name}
+                          value={personalInfo.name}
                           onChange={(e) => {
-                            setName(e.target.value);
+                            updatePersonalInfo('name', e.target.value);
                             if (attemptedSubmit && e.target.value.trim()) {
-                              setErrors(prev => ({ ...prev, name: undefined }));
+                              clearError('name');
                             }
                           }}
                           placeholder="Digite o Nome"
@@ -217,11 +365,11 @@ const TeacherRegister = () => {
                       <div className="col-span-6 sm:col-span-3 md:col-span-2 lg:col-span-2">
                         <FormInput
                           label="Email"
-                          value={email}
+                          value={personalInfo.email}
                           onChange={(e) => {
-                            setEmail(e.target.value);
+                            updatePersonalInfo('email', e.target.value);
                             if (attemptedSubmit && e.target.value.trim()) {
-                              setErrors(prev => ({ ...prev, email: undefined }));
+                              clearError('email');
                             }
                           }}
                           type="email"
@@ -235,56 +383,51 @@ const TeacherRegister = () => {
                       <div className="col-span-6 sm:col-span-3 lg:col-span-1">
                         <FormInput
                           label="CPF"
-                          value={cpf}
+                          value={personalInfo.cpf}
                           onChange={handleCpfChange}
                           placeholder="Digite o CPF"
                           required
                           error={errors.cpf}
                           attemptedSubmit={attemptedSubmit}
                           mask={formatCPF}
-                          maxLength={14} // 14 characters with mask: 999.999.999-99
+                          maxLength={14}
                         />
                       </div>
 
                       <div className="col-span-6 md:col-span-2 lg:col-span-1">
                         <FormInput
                           label="Data de Nascimento"
-                          value={birthDate}
-                          onChange={(e) => setBirthDate(e.target.value)}
+                          value={personalInfo.birthDate}
+                          onChange={(e) => updatePersonalInfo('birthDate', e.target.value)}
                           type="date"
                         />
                       </div>
                     </div>
 
-                    {/* Address and Contact Section */}
+                    {/* Address Section */}
                     <div className="grid grid-cols-6 gap-6 mb-6">
                       <div className="col-span-6 sm:col-span-2 lg:col-span-1">
                         <FormInput
                           label="CEP"
-                          value={cep}
-                          onChange={(e) => {
-                            setCep(e.target.value);
-                            if (attemptedSubmit && getNumericValue(e.target.value).trim()) {
-                              setErrors(prev => ({ ...prev, cep: undefined }));
-                            }
-                          }}
+                          value={address.cep}
+                          onChange={handleCepChange}
                           placeholder="Digite o CEP"
                           required
                           error={errors.cep}
                           attemptedSubmit={attemptedSubmit}
                           mask={formatCEP}
-                          maxLength={9} // 9 characters with mask: 99999-999
+                          maxLength={9}
                         />
                       </div>
                     
                       <div className="col-span-6 sm:col-span-2 lg:col-span-2">
                         <FormInput
                           label="Endereço"
-                          value={address}
+                          value={address.street}
                           onChange={(e) => {
-                            setAddress(e.target.value);
+                            updateAddress('street', e.target.value);
                             if (attemptedSubmit && e.target.value.trim()) {
-                              setErrors(prev => ({ ...prev, address: undefined }));
+                              clearError('address');
                             }
                           }}
                           placeholder="Digite o Endereço"
@@ -297,11 +440,11 @@ const TeacherRegister = () => {
                       <div className="col-span-6 sm:col-span-2 lg:col-span-1">
                         <FormInput
                           label="Número"
-                          value={numberAdress}
+                          value={address.number}
                           onChange={(e) => {
-                            setNumberAdress(e.target.value);
+                            updateAddress('number', e.target.value);
                             if (attemptedSubmit && e.target.value.trim()) {
-                              setErrors(prev => ({ ...prev, numberAdress: undefined }));
+                              clearError('numberAdress');
                             }
                           }}
                           placeholder="Digite o Número"
@@ -312,13 +455,13 @@ const TeacherRegister = () => {
                       </div>
                     </div>
 
-                    {/* Teacher-specific Information Section */}
+                    {/* Professional Information Section */}
                     <div className="grid grid-cols-6 gap-6 mb-6">
                       <div className="col-span-6 sm:col-span-2 lg:col-span-1">
                         <FormInput
                           label="Matrícula"
-                          value={registrationNumber}
-                          onChange={(e) => setRegistrationNumber(e.target.value)}
+                          value={professionalInfo.registrationNumber}
+                          onChange={(e) => updateProfessionalInfo('registrationNumber', e.target.value)}
                           placeholder="Digite a Matrícula"
                         />
                       </div>
@@ -326,8 +469,8 @@ const TeacherRegister = () => {
                       <div className="col-span-6 sm:col-span-3 lg:col-span-1">
                         <FormInput
                           label="Especialização"
-                          value={specialization}
-                          onChange={(e) => setSpecialization(e.target.value)}
+                          value={professionalInfo.specialization}
+                          onChange={(e) => updateProfessionalInfo('specialization', e.target.value)}
                           placeholder="Ex: Matemática, Física"
                           maxLength={100}
                         />
@@ -336,8 +479,8 @@ const TeacherRegister = () => {
                       <div className="col-span-6 sm:col-span-2 lg:col-span-1">
                         <FormInput
                           label="Data de Contratação"
-                          value={hireDate}
-                          onChange={(e) => setHireDate(e.target.value)}
+                          value={professionalInfo.hireDate}
+                          onChange={(e) => updateProfessionalInfo('hireDate', e.target.value)}
                           type="date"
                         />
                       </div>
@@ -345,23 +488,23 @@ const TeacherRegister = () => {
                       <div className="col-span-6 sm:col-span-1 lg:col-span-1 flex items-end">
                         <ToggleSwitch
                           label="Ativo"
-                          checked={isActive}
-                          onChange={() => setIsActive(!isActive)}
+                          checked={professionalInfo.isActive}
+                          onChange={() => updateProfessionalInfo('isActive', !professionalInfo.isActive)}
                         />
                       </div>
                     </div>
 
                     {/* Submit Button Section */}
                     <div className="grid grid-cols-1 mt-6">
-                      <div className='flex justify-center mt-10'>
-                      <button
-                        type="submit"
-                        className="py-2 px-8 inline-block font-semibold tracking-wide border align-middle duration-500 text-base text-center bg-blue-600 hover:bg-blue-700 border-blue-600 hover:border-blue-700 text-white rounded-md"
-                      >
-                        Cadastrar
-                      </button>
+                      <div className="flex justify-center mt-10">
+                        <button
+                          type="submit"
+                          className="py-2 px-8 inline-block font-semibold tracking-wide border align-middle duration-500 text-base text-center bg-blue-600 hover:bg-blue-700 border-blue-600 hover:border-blue-700 text-white rounded-md"
+                        >
+                          Cadastrar
+                        </button>
                       </div>
-                      {error && <p className="mt-2 text-red-500">{error}</p>}
+                      {error && <p className="mt-2 text-red-500 text-center">{error}</p>}
                     </div>
                   </form>
                 </div>
@@ -374,5 +517,4 @@ const TeacherRegister = () => {
   );
 };
 
-export default TeacherRegister
-//export default withAuth(TeacherRegister, ['SECRETARIO', 'COORDENADOR', 'DIRETOR']);
+export default withAuth(TeacherRegister, ['SECRETARIO', 'COORDENADOR', 'DIRETOR']);

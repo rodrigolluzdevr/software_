@@ -4,8 +4,8 @@ import { IoMdLogOut } from "react-icons/io";
 import { AiOutlineSetting } from "react-icons/ai";
 import router from "next/router";
 import { BiSolidUser, BiSolidUserCircle } from "react-icons/bi";
-import { BsLightningChargeFill } from "react-icons/bs";
 import { fetchUser } from "@/services/authService";
+import { CgEricsson } from "react-icons/cg";
 
 interface HeaderProps {
   setToggle: React.Dispatch<React.SetStateAction<boolean>>;
@@ -66,7 +66,7 @@ const Header: React.FC<HeaderProps> = ({ setToggle, toggle }) => {
             className="size-8 inline-flex items-center justify-center tracking-wide align-middle duration-500 text-[20px] text-center bg-white border border-white text-slate-900 rounded-full"
             onClick={toggleSidebar}
           >
-            <BsLightningChargeFill className="size-6 hover:text-blue-500" />
+            <CgEricsson className="size-6 hover:text-blue-500" />
           </button>
         </div>
 

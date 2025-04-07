@@ -1,4 +1,3 @@
-
 import TeachersList from "@/components/users/teachers";
 import Wrapper from "@/components/wrapper/Wrapper";
 import withAuth from "@/pages/utils/withAuth";
