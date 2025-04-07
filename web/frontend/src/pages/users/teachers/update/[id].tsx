@@ -74,7 +74,6 @@ const formatDateForInput = (dateString: string | undefined): string => {
   }
 };
 
-
 const TeacherUpdate = () => {
   const router = useRouter();
   const { id } = router.query;
@@ -146,11 +145,24 @@ const TeacherUpdate = () => {
         });
         
         if (!response.ok) {
-          // ... código de tratamento de erro existente ...
+          const errorText = await response.text();
+          console.error(`API error (${response.status}):`, errorText);
+          
+          // Tratamento específico para diferentes códigos de erro
+          if (response.status === 401) {
+            setError('Sessão expirada ou usuário sem permissão. Faça login novamente.');
+          } else if (response.status === 404) {
+            setError('Professor não encontrado');
+          } else {
+            setError(`Erro ao carregar dados (${response.status})`);
+          }
+          
+          throw new Error(`Falha ao buscar dados do professor (${response.status})`);
         }
         
         const data: TeacherData = await response.json();
         console.log("Teacher data received:", data);
+        console.log("Teacher isActive status:", data.isActive);
         setDebugInfo(`Data loaded successfully for teacher: ${data.name}`);
         
         // Map API data to our form structure, com formatação adequada das datas
@@ -170,20 +182,24 @@ const TeacherUpdate = () => {
             registrationNumber: data.registrationNumber || '',
             specialization: data.specialization || '',
             hireDate: formatDateForInput(data.hireDate), // Formata a data
-            isActive: data.isActive || true,
+            isActive: typeof data.isActive === 'boolean' ? data.isActive : true, // Garantir que seja booleano
           },
         });
         
         setOrganizationId(data.organizationId);
       } catch (error) {
-        // ... código de tratamento de erro existente ...
+        console.error('Error fetching teacher data:', error);
+        setDebugInfo(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        if (!(error instanceof Error && error.message.includes('401'))) {
+          setError('Erro ao carregar dados do professor');
+        }
       } finally {
         setLoading(false);
       }
     };
     
     fetchTeacherData();
-  }, [router.isReady, id]); // Add router.isReady to dependencies
+  }, [router.isReady, id]);
   
   // Load organization ID from token if not set from teacher data
   useEffect(() => {
@@ -231,12 +247,37 @@ const TeacherUpdate = () => {
   };
 
   const updateProfessionalInfo = (field: string, value: string | boolean) => {
+    console.log(`Atualizando campo ${field} para:`, value);
     setFormData({
       ...formData,
       professionalInfo: {
         ...professionalInfo,
         [field]: value,
       },
+    });
+  };
+
+  // Função específica para controlar a mudança de status ativo
+  const handleActiveStatusChange = (newValue: boolean) => {
+    // Capture o valor atual antes da mudança
+    const currentStatus = professionalInfo.isActive;
+    
+    console.log('Status Ativo alterando de:', currentStatus, 'para:', newValue);
+    
+    // Use setState com callback para garantir que o valor foi atualizado
+    setFormData(prevState => {
+      const updatedData = {
+        ...prevState,
+        professionalInfo: {
+          ...prevState.professionalInfo,
+          isActive: newValue,
+        },
+      };
+      
+      // Log após atualização
+      console.log('Novo estado de isActive após atualização:', updatedData.professionalInfo.isActive);
+      
+      return updatedData;
     });
   };
 
@@ -317,140 +358,146 @@ const TeacherUpdate = () => {
     return newErrors;
   };
 
-// Form submission handler for updating teacher
-const handleSubmit = async (e: FormEvent) => {
-  e.preventDefault();
-  setAttemptedSubmit(true);
-  
-  const validationErrors = validateForm();
-  setErrors(validationErrors);
-  
-  // Stop submission if validation fails
-  if (Object.keys(validationErrors).length > 0) {
-    const firstErrorElement = document.querySelector('.border-red-500');
-    if (firstErrorElement) {
-      firstErrorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-    return;
-  }
-  
-  setError('');
-  setLoading(true);
-  setDebugInfo(`Submitting update for teacher ID: ${id}...`);
-
-  try {
-    const numericCpf = getNumericValue(personalInfo.cpf);
-    const numericCep = getNumericValue(address.cep);
+  // Form submission handler for updating teacher
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setAttemptedSubmit(true);
     
-    // Preparação dos dados exatamente como enviados pelo Postman
-    // Formatando corretamente as datas para o backend
-    let birthDate = null;
-    if (personalInfo.birthDate && personalInfo.birthDate.trim() !== '') {
-      birthDate = new Date(personalInfo.birthDate).toISOString();
-    }
+    const validationErrors = validateForm();
+    setErrors(validationErrors);
     
-    let hireDate = null;
-    if (professionalInfo.hireDate && professionalInfo.hireDate.trim() !== '') {
-      hireDate = new Date(professionalInfo.hireDate).toISOString();
-    }
-    
-    // Tratamento dos campos de texto para garantir valores não nulos
-    const registrationNumber = professionalInfo.registrationNumber && 
-      professionalInfo.registrationNumber.trim() !== '' ? 
-      professionalInfo.registrationNumber.trim() : null;
-      
-    const specialization = professionalInfo.specialization && 
-      professionalInfo.specialization.trim() !== '' ? 
-      professionalInfo.specialization.trim() : null;
-    
-    // Objeto de dados a ser enviado, no mesmo formato que o POST
-    const requestBody = {
-      name: personalInfo.name,
-      cpf: numericCpf,
-      email: personalInfo.email,
-      role: 'PROFESSOR',
-      address: address.street,
-      cep: numericCep,
-      numberAdress: address.number,
-      organizationId,
-      isActive: professionalInfo.isActive,
-      registrationNumber,
-      birthDate,
-      specialization,
-      hireDate
-    };
-    
-    console.log('Enviando dados para atualização:', JSON.stringify(requestBody, null, 2));
-    
-    // Obter o token de autenticação
-    const token = sessionStorage.getItem('token');
-    if (!token) {
-      setError('Usuário não está autenticado');
+    // Stop submission if validation fails
+    if (Object.keys(validationErrors).length > 0) {
+      const firstErrorElement = document.querySelector('.border-red-500');
+      if (firstErrorElement) {
+        firstErrorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
       return;
     }
     
-    // Usando PATCH como solicitado
-    const response = await fetch(`http://localhost:4000/users/${id}`, {
-      method: 'PATCH', // Usando PATCH em vez de PUT
-      headers: { 
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify(requestBody),
-    });
+    setError('');
+    setLoading(true);
+    setDebugInfo(`Submitting update for teacher ID: ${id}...`);
 
-    const responseStatus = response.status;
-    console.log('Status da resposta:', responseStatus);
-    console.log('Headers da resposta:', Object.fromEntries([...response.headers]));
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error(`API update error (${response.status}):`, errorText);
-      
-      let errorMessage = 'Atualização de professor falhou, tente novamente';
-      try {
-        const errorData = JSON.parse(errorText);
-        errorMessage = errorData.message || errorMessage;
-      } catch (e) {
-        console.error('Resposta de erro não é JSON:', errorText);
-      }
-      
-      if (response.status === 401) {
-        setError('Sessão expirada ou usuário sem permissão. Faça login novamente.');
-      } else if (response.status === 403) {
-        setError('Sem permissão para atualizar este professor');
-      } else if (response.status === 404) {
-        setError('Professor não encontrado');
-      } else {
-        setError(errorMessage);
-      }
-      
-      throw new Error(errorMessage);
-    }
-
-    // Processando a resposta de sucesso
-    const responseText = await response.text();
-    let responseData = {};
-    
     try {
-      if (responseText) {
-        responseData = JSON.parse(responseText);
-        console.log('Resposta da API (sucesso):', responseData);
+      const numericCpf = getNumericValue(personalInfo.cpf);
+      const numericCep = getNumericValue(address.cep);
+      
+      // Log do status ativo antes de criar o payload
+      console.log('Valor isActive antes de preparar payload:', professionalInfo.isActive);
+      
+      // Preparação dos dados exatamente como enviados pelo Postman
+      // Formatando corretamente as datas para o backend
+      let birthDate = null;
+      if (personalInfo.birthDate && personalInfo.birthDate.trim() !== '') {
+        birthDate = new Date(personalInfo.birthDate).toISOString();
       }
-    } catch (e) {
-      console.error('Erro ao processar resposta:', e);
-    }
+      
+      let hireDate = null;
+      if (professionalInfo.hireDate && professionalInfo.hireDate.trim() !== '') {
+        hireDate = new Date(professionalInfo.hireDate).toISOString();
+      }
+      
+      // Tratamento dos campos de texto para garantir valores não nulos
+      const registrationNumber = professionalInfo.registrationNumber && 
+        professionalInfo.registrationNumber.trim() !== '' ? 
+        professionalInfo.registrationNumber.trim() : null;
+        
+      const specialization = professionalInfo.specialization && 
+        professionalInfo.specialization.trim() !== '' ? 
+        professionalInfo.specialization.trim() : null;
+      
+      // Objeto de dados a ser enviado, garantindo que isActive seja booleano
+      const requestBody = {
+        name: personalInfo.name,
+        cpf: numericCpf,
+        email: personalInfo.email,
+        role: 'PROFESSOR',
+        address: address.street,
+        cep: numericCep,
+        numberAdress: address.number,
+        organizationId,
+        isActive: Boolean(professionalInfo.isActive), // Garante que seja um boolean
+        registrationNumber,
+        birthDate,
+        specialization,
+        hireDate
+      };
+      
+      // Log do valor booleano no payload
+      console.log('Valor isActive no payload:', requestBody.isActive);
+      
+      console.log('Enviando dados para atualização:', JSON.stringify(requestBody, null, 2));
+      
+      // Obter o token de autenticação
+      const token = sessionStorage.getItem('token');
+      if (!token) {
+        setError('Usuário não está autenticado');
+        return;
+      }
+      
+      // Usando PATCH como solicitado
+      const response = await fetch(`http://localhost:4000/users/${id}`, {
+        method: 'PATCH', // Usando PATCH em vez de PUT
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(requestBody),
+      });
 
-    setDebugInfo('Update successful, redirecting...');
-    router.push('/users/teachers/');
-  } catch (err: any) {
-    setError(err.message);
-    setDebugInfo(`Error during update: ${err.message}`);
-  } finally {
-    setLoading(false);
-  }
-};
+      const responseStatus = response.status;
+      console.log('Status da resposta:', responseStatus);
+      console.log('Headers da resposta:', Object.fromEntries([...response.headers]));
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`API update error (${response.status}):`, errorText);
+        
+        let errorMessage = 'Atualização de professor falhou, tente novamente';
+        try {
+          const errorData = JSON.parse(errorText);
+          errorMessage = errorData.message || errorMessage;
+        } catch (e) {
+          console.error('Resposta de erro não é JSON:', errorText);
+        }
+        
+        if (response.status === 401) {
+          setError('Sessão expirada ou usuário sem permissão. Faça login novamente.');
+        } else if (response.status === 403) {
+          setError('Sem permissão para atualizar este professor');
+        } else if (response.status === 404) {
+          setError('Professor não encontrado');
+        } else {
+          setError(errorMessage);
+        }
+        
+        throw new Error(errorMessage);
+      }
+
+      // Processando a resposta de sucesso
+      const responseText = await response.text();
+      let responseData = {};
+      
+      try {
+        if (responseText) {
+          responseData = JSON.parse(responseText);
+          console.log('Resposta da API (sucesso):', responseData);
+        }
+      } catch (e) {
+        console.error('Erro ao processar resposta:', e);
+      }
+
+      setDebugInfo('Update successful, redirecting...');
+      router.push('/users/teachers/');
+    } catch (err: any) {
+      setError(err.message);
+      setDebugInfo(`Error during update: ${err.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Wrapper>
@@ -627,13 +674,19 @@ const handleSubmit = async (e: FormEvent) => {
                         </div>
 
                         <div className="col-span-6 sm:col-span-1 lg:col-span-1 flex items-end">
-                        <ToggleSwitch
-  label="Ativo"
-  checked={professionalInfo.isActive}
-  onChange={(newValue) => {
-    updateProfessionalInfo('isActive', newValue);
-  }}
-/>
+                          <div className="flex items-center">
+                            <ToggleSwitch
+                              label="Status"
+                              checked={professionalInfo.isActive}
+                              onChange={handleActiveStatusChange}
+                            />
+                            {/* Indicador visual do estado atual */}
+                            {process.env.NODE_ENV !== 'production' && (
+                              <span className="ml-2 text-xs text-gray-500">
+                                {professionalInfo.isActive ? 'Ativo' : 'Inativo'}
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
 
