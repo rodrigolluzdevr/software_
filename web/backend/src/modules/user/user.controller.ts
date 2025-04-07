@@ -401,16 +401,16 @@ export class UserController {
         break;
         
       case 'PROFESSOR':
-        // Secretários, coordenadores e diretores podem deletar professores
-        if (userRole !== 'SECRETARIO' && userRole !== 'COORDENADOR' && userRole !== 'DIRETOR') {
+        // apenas secretários, coordenadores podem deletar professores
+        if (userRole !== 'SECRETARIO' && userRole !== 'COORDENADOR') {
           throw new ForbiddenException(
             'Apenas secretários, coordenadores e diretores podem deletar professores'
           );
         }
         break;
         
-      case 'USER': // Alunos
-        // Apenas diretores podem deletar alunos
+      case 'USER': // alunos
+        // apenas diretores podem deletar alunos
         if (userRole !== 'DIRETOR') {
           throw new ForbiddenException(
             'Apenas diretores podem deletar alunos'

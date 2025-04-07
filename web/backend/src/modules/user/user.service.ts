@@ -159,50 +159,42 @@ export class UserService {
     return count > 0;
   }
 
-
-
-
-
-
-
-  // Verificar se uma escola pertence a determinadas regiões
-async isSchoolInRegions(schoolId: number, regionIds: number[]): Promise<boolean> {
-  const count = await this.prisma.school.count({
-    where: {
-      id: schoolId,
-      regionId: {
-        in: regionIds
-      }
-    }
-  });
-  return count > 0;
-}
-
-// Verificar se uma turma pertence a determinadas regiões (via escola)
-async isClassInRegions(classId: number, regionIds: number[]): Promise<boolean> {
-  const count = await this.prisma.class.count({
-    where: {
-      id: classId,
-      school: {
+  // delete
+  async isSchoolInRegions(schoolId: number, regionIds: number[]): Promise<boolean> {
+    const count = await this.prisma.school.count({
+      where: {
+        id: schoolId,
         regionId: {
           in: regionIds
         }
       }
-    }
-  });
-  return count > 0;
-}
+    });
+    return count > 0;
+  }
 
-// Verificar se uma turma pertence a determinadas escolas
-async isClassInSchools(classId: number, schoolIds: number[]): Promise<boolean> {
-  const count = await this.prisma.class.count({
-    where: {
-      id: classId,
-      schoolId: {
-        in: schoolIds
+  async isClassInRegions(classId: number, regionIds: number[]): Promise<boolean> {
+    const count = await this.prisma.class.count({
+      where: {
+        id: classId,
+        school: {
+          regionId: {
+            in: regionIds
+          }
+        }
       }
-    }
-  });
-  return count > 0;
-}
+    });
+    return count > 0;
+  }
+
+  async isClassInSchools(classId: number, schoolIds: number[]): Promise<boolean> {
+    const count = await this.prisma.class.count({
+      where: {
+        id: classId,
+        schoolId: {
+          in: schoolIds
+        }
+      }
+    });
+    return count > 0;
+  }
 }
