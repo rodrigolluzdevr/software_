@@ -40,7 +40,7 @@ export class UserService {
 
 
 
-  //Get All Users
+  // get all users
   async getAllUsersByOrganization(organizationId: number): Promise<User[]> {
     return this.prisma.user.findMany({
       where: { organizationId },
@@ -109,7 +109,7 @@ export class UserService {
     });
   }
 
-  //Get ['id']
+  // get ['id']
 
   async isUserInRegions(userId: number, regionIds: number[]): Promise<boolean> {
     const count = await this.prisma.user.count({
@@ -158,4 +158,51 @@ export class UserService {
     });
     return count > 0;
   }
+
+
+
+
+
+
+
+  // Verificar se uma escola pertence a determinadas regiões
+async isSchoolInRegions(schoolId: number, regionIds: number[]): Promise<boolean> {
+  const count = await this.prisma.school.count({
+    where: {
+      id: schoolId,
+      regionId: {
+        in: regionIds
+      }
+    }
+  });
+  return count > 0;
+}
+
+// Verificar se uma turma pertence a determinadas regiões (via escola)
+async isClassInRegions(classId: number, regionIds: number[]): Promise<boolean> {
+  const count = await this.prisma.class.count({
+    where: {
+      id: classId,
+      school: {
+        regionId: {
+          in: regionIds
+        }
+      }
+    }
+  });
+  return count > 0;
+}
+
+// Verificar se uma turma pertence a determinadas escolas
+async isClassInSchools(classId: number, schoolIds: number[]): Promise<boolean> {
+  const count = await this.prisma.class.count({
+    where: {
+      id: classId,
+      schoolId: {
+        in: schoolIds
+      }
+    }
+  });
+  return count > 0;
+}
 }
