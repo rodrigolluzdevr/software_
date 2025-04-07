@@ -41,6 +41,11 @@ export class UserController {
       cep: string;
       numberAdress: string;
       organizationId: number;
+      registrationNumber?: string;
+      birthDate?: string | Date;
+      specialization?: string;
+      hireDate?: string | Date;
+      isActive?: boolean;
     },
     @Req() req: Request,
   ) {
@@ -79,6 +84,11 @@ export class UserController {
       cep?: string;
       numberAdress?: string;
       organizationId?: number;
+      registrationNumber?: string;
+      birthDate?: string | Date;
+      specialization?: string;
+      hireDate?: string | Date;
+      isActive?: boolean;
     },
     @Req() req: Request,
   ) {

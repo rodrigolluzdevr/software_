@@ -234,66 +234,47 @@ const handleSubmit = async (e: FormEvent) => {
     const numericCpf = getNumericValue(personalInfo.cpf);
     const numericCep = getNumericValue(address.cep);
     
-    // Tratamento alinhado com a estrutura SQL (TIMESTAMP e VARCHAR)
-    // VARCHAR(20) - Se vazio, enviar null explicitamente
-    const registrationNumber = 
-      professionalInfo.registrationNumber && professionalInfo.registrationNumber.trim() !== '' 
-        ? professionalInfo.registrationNumber.trim() 
-        : null;
+    // Preparação dos dados exatamente como enviados pelo Postman
+    const birthDate = personalInfo.birthDate ? 
+      new Date(personalInfo.birthDate).toISOString() : 
+      null;
     
-    // VARCHAR(100) - Se vazio, enviar null explicitamente
-    const specialization = 
-      professionalInfo.specialization && professionalInfo.specialization.trim() !== '' 
-        ? professionalInfo.specialization.trim() 
-        : null;
+    const hireDate = professionalInfo.hireDate ? 
+      new Date(professionalInfo.hireDate).toISOString() : 
+      null;
     
-    // TIMESTAMP(3) - Formato esperado pelo PostgreSQL
-    let birthDate = null;
-    if (personalInfo.birthDate && personalInfo.birthDate.trim() !== '') {
-      // Formato ISO é compatível com TIMESTAMP do PostgreSQL
-      birthDate = new Date(personalInfo.birthDate).toISOString();
-    }
-    
-    // TIMESTAMP(3) - Formato esperado pelo PostgreSQL
-    let hireDate = null;
-    if (professionalInfo.hireDate && professionalInfo.hireDate.trim() !== '') {
-      // Formato ISO é compatível com TIMESTAMP do PostgreSQL
-      hireDate = new Date(professionalInfo.hireDate).toISOString();
-    }
-    
-    // Log detalhado para debug
-    console.log('Valores enviados para API (compatíveis com SQL):', {
-      registrationNumber, // VARCHAR(20)
-      specialization,    // VARCHAR(100)
-      birthDate,         // TIMESTAMP(3)
-      hireDate           // TIMESTAMP(3)
-    });
-    
+    // Dados no formato exato do Postman
     const requestBody = {
       name: personalInfo.name,
       cpf: numericCpf,
       email: personalInfo.email,
-      password: numericCpf, 
+      password: numericCpf, // Password is same as numeric CPF
       role: 'PROFESSOR',
       address: address.street,
       cep: numericCep,
       numberAdress: address.number,
       organizationId,
       isActive: professionalInfo.isActive,
-      // Campos opcionais com tratamento adequado
-      registrationNumber,
-      specialization,
+      registrationNumber: professionalInfo.registrationNumber || null,
       birthDate,
+      specialization: professionalInfo.specialization || null,
       hireDate
     };
     
-    console.log('Objeto completo a ser enviado:', JSON.stringify(requestBody, null, 2));
+    console.log('Enviando dados para API:', JSON.stringify(requestBody, null, 2));
     
-    const response = await fetch('http://localhost:4000/auth/register', {
+    // Usando o mesmo endpoint que funciona no Postman
+    const response = await fetch('http://localhost:4000/users', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${sessionStorage.getItem('token')}` // Adicionando token se necessário
+      },
       body: JSON.stringify(requestBody),
     });
+
+    const responseStatus = response.status;
+    console.log('Status da resposta:', responseStatus);
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -309,7 +290,7 @@ const handleSubmit = async (e: FormEvent) => {
       throw new Error(errorMessage);
     }
 
-    // Evitar dupla leitura do corpo da resposta
+    // Processando a resposta de sucesso
     const responseText = await response.text();
     let responseData = {};
     
