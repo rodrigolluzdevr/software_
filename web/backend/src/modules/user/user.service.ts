@@ -38,9 +38,124 @@ export class UserService {
     });
   }
 
+
+
+  //Get All Users
   async getAllUsersByOrganization(organizationId: number): Promise<User[]> {
     return this.prisma.user.findMany({
       where: { organizationId },
     });
+  }
+  
+  async getAllUsersByRegionIds(regionIds: number[]): Promise<User[]> {
+    return this.prisma.user.findMany({
+      where: {
+        regions: {
+          some: {
+            id: {
+              in: regionIds,
+            },
+          },
+        },
+      },
+    });
+  }
+
+  async getUsersBySchoolIds(schoolIds: number[]): Promise<User[]> {
+    return this.prisma.user.findMany({
+      where: {
+        schools: {
+          some: {
+            id: {
+              in: schoolIds
+            }
+          }
+        }
+      }
+    });
+  }
+
+  async getAllUsersByClassIds(classIds: number[]): Promise<User[]> {
+    return this.prisma.user.findMany({
+      where: {
+        class: {
+          some: {
+            id: {
+              in: classIds,
+            },
+          },
+        },
+      },
+    });
+  }
+
+  async getSchoolsByRegionIds(regionIds: number[]): Promise<any[]> {
+    return this.prisma.school.findMany({
+      where: {
+        regionId: {
+          in: regionIds
+        }
+      }
+    });
+  }
+
+  async getClassesBySchoolIds(schoolIds: number[]): Promise<any[]> {
+    return this.prisma.class.findMany({
+      where: {
+        schoolId: {
+          in: schoolIds,
+        },
+      },
+    });
+  }
+
+  //Get ['id']
+
+  async isUserInRegions(userId: number, regionIds: number[]): Promise<boolean> {
+    const count = await this.prisma.user.count({
+      where: {
+        id: userId,
+        regions: {
+          some: {
+            id: {
+              in: regionIds
+            }
+          }
+        }
+      }
+    });
+    return count > 0;
+  }
+  
+  async isUserInSchools(userId: number, schoolIds: number[]): Promise<boolean> {
+    const count = await this.prisma.user.count({
+      where: {
+        id: userId,
+        schools: {
+          some: {
+            id: {
+              in: schoolIds
+            }
+          }
+        }
+      }
+    });
+    return count > 0;
+  }
+  
+  async isUserInClasses(userId: number, classIds: number[]): Promise<boolean> {
+    const count = await this.prisma.user.count({
+      where: {
+        id: userId,
+        class: {
+          some: {
+            id: {
+              in: classIds
+            }
+          }
+        }
+      }
+    });
+    return count > 0;
   }
 }
