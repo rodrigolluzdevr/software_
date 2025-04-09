@@ -6,6 +6,7 @@ import FormInput from '@/components/forms/FormInput';
 import ToggleSwitch from '@/components/forms/ToggleSwitch';
 import { formatCPF, formatCEP, getNumericValue } from '../../../utils/maskUtils';
 import { jwtDecode } from 'jwt-decode';
+import { Breadcrumb } from '@/components/common/Breadcrumb';
 
 // types
 interface JwtPayload {
@@ -483,6 +484,13 @@ const TeacherUpdate = () => {
     }
   };
 
+  // Breadcrumb items
+  const breadcrumbItems = [
+    { label: 'Dashboard', href: '/dashboard' },
+    { label: 'Professores', href: '/users/teachers' },
+    { label: 'Editar', active: true },
+  ];
+
   return (
     <Wrapper>
       <div className="w-full relative px-2 sm:px-3 md:px-4 lg:px-6">
@@ -492,16 +500,16 @@ const TeacherUpdate = () => {
               <div className="shadow-sm rounded bg-white">
                 <div className="p-5">
                   <h5 className="text-lg font-semibold">
-                    teacher update {id ? `#${id}` : ''}
+                    Editar Professor
                   </h5>
-                  {process.env.NODE_ENV !== 'production' && debugInfo && (
-                    <p className="text-xs text-gray-500 mt-1">{debugInfo}</p>
-                  )}
                 </div>
                 <div className="p-5 border-t border-gray-100">
+                  {/* Breadcrumbs */}
+                  <Breadcrumb items={breadcrumbItems} />
+
                   {loading && !error ? (
                     <div className="text-center py-8">
-                      <p>loading teacher data...</p>
+                      <p>carregando professor...</p>
                     </div>
                   ) : error ? (
                     <div className="text-center py-8 text-red-500">
@@ -510,7 +518,7 @@ const TeacherUpdate = () => {
                         className="mt-4 py-2 px-4 bg-gray-200 hover:bg-gray-300 rounded text-sm"
                         onClick={() => router.back()}
                       >
-                        back
+                        voltar
                       </button>
                     </div>
                   ) : (

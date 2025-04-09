@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+/* Elementos gerais */
 .page-wrapper {
   height: 100vh;
 }
@@ -14,144 +15,136 @@
   @media (max-width: 425px) {
     @apply w-[260px];
   }
+}
 
-  ul {
-    @apply list-none p-0 m-0;
-  }
+.sidebar-wrapper ul {
+  @apply list-none p-0 m-0;
+}
 
-  a {
-    @apply decoration-0;
-  }
+.sidebar-wrapper a {
+  @apply decoration-0;
+}
 
-  .sidebar-content {
-    @apply relative overflow-y-auto h-full max-h-full;
+.sidebar-content {
+  @apply relative overflow-y-auto h-full max-h-full;
+}
 
-    &.desktop {
-      @apply overflow-y-hidden;
-    }
-  }
+.sidebar-content.desktop {
+  @apply overflow-y-hidden;
+}
 
-  .sidebar-brand {
-    @apply flex items-center h-[70px] py-2.5 px-5;
+.sidebar-brand {
+  @apply flex items-center h-[70px] py-2.5 px-5;
+}
 
-    > a {
-      @apply uppercase font-bold flex-grow duration-500;
+.sidebar-brand > a {
+  @apply uppercase font-bold flex-grow duration-500;
+}
 
-      &:focus {
-        outline: none !important;
-      }
-    }
+.sidebar-brand > a:focus {
+  outline: none !important;
+}
 
-    #close-sidebar {
-      @apply cursor-pointer text-2xl duration-500;
-    }
-  }
+#close-sidebar {
+  @apply cursor-pointer text-2xl duration-500;
+}
 
-  .sidebar-menu {
-    @apply py-4 px-0;
+.sidebar-menu {
+  @apply py-4 px-0;
+}
 
-    .header-menu {
-      span {
-        @apply text-xs pt-[15px] pb-[5px] px-5 inline-block;
-      }
-    }
+.header-menu span {
+  @apply text-xs pt-[15px] pb-[5px] px-5 inline-block;
+}
 
-    li {
-      a {
-        @apply relative flex items-center w-full decoration-0 py-4 pe-6 ps-5 duration-500;
+/* Links de menu */
+.sidebar-menu li a {
+  @apply relative flex items-center w-full py-4 pe-6 ps-5 duration-500;
+}
 
-        &:focus {
-          outline: none !important;
-        }
-
-        @media (max-width: 1024px) {
-          @apply py-2 px-6;
-        }
-
-        @media screen and (max-width: 425px) {
-          @apply py-2 pe-6 ps-3;
-        }
-
-        &:hover > i::before {
-          @apply inline-block;
-        }
-
-        i {
-          @apply !size-8 !bg-gray-100 !flex !items-center !justify-center !text-base !text-center !rounded-full !duration-500;
-        }
-      }
-
-      &:hover,
-      &.active {
-        i {
-          @apply bg-gray-100;
-        }
-      }
-    }
-
-    .sidebar-dropdown {
-      @apply ms-0;
-
-      > a {
-        @apply after:absolute after:top-[17px] after:end-[15px] after:duration-500 after:text-slate-900 after:text-sm;
-      }
-
-      &.active {
-        > a {
-          @apply after:rotate-90 after:end-[17px];
-        }
-      }
-
-      &:hover,
-      &.active {
-        > a:after {
-          @apply text-indigo-600;
-        }
-      }
-
-      .sidebar-submenu {
-        @apply hidden;
-
-        ul {
-          @apply py-[5px] px-0;
-
-          li {
-            @apply ps-[25px] text-sm ms-0;
-
-            a {
-              @apply before:text-indigo-600 before:me-1 before:text-base before:duration-500;
-
-              .badge,
-              .label {
-                @apply float-right mt-0;
-              }
-            }
-          }
-        }
-
-        &.block {
-          @apply !block;
-        }
-      }
-    }
-
-    ul {
-      li {
-        a {
-          span {
-            &.label,
-            &.badge {
-              float: right;
-              margin-top: 8px;
-              margin-left: 5px;
-            }
-          }
-        }
-      }
-    }
+@media (max-width: 1024px) {
+  .sidebar-menu li a {
+    @apply py-2 px-6;
   }
 }
 
+@media (max-width: 425px) {
+  .sidebar-menu li a {
+    @apply py-2 pe-6 ps-3;
+  }
+}
+
+.sidebar-menu li a:focus {
+  outline: none !important;
+}
+
+.sidebar-menu li a:hover > i::before {
+  @apply inline-block;
+}
+
+.sidebar-menu li a i {
+  @apply !size-8 !bg-gray-100 !flex !items-center !justify-center !text-base !text-center !rounded-full !duration-500;
+}
+
+/* Efeito hover/active */
+.sidebar-menu li:hover i,
+.sidebar-menu li.active i {
+  @apply bg-gray-100;
+}
+
+/* Dropdown */
+.sidebar-dropdown {
+  @apply ms-0;
+}
+
+.sidebar-dropdown > a {
+  @apply after:absolute after:top-[7px] after:end-[5px] after:duration-500 after:text-slate-900 after:text-sm;
+}
+
+.sidebar-dropdown.active > a {
+  @apply after:rotate-90 after:end-[7px];
+}
+
+.sidebar-dropdown:hover > a:after,
+.sidebar-dropdown.active > a:after {
+  @apply text-indigo-600;
+}
+
+/* Submenu */
+.sidebar-submenu {
+  @apply hidden;
+}
+
+.sidebar-submenu ul {
+  @apply py-[5px] px-0;
+}
+
+.sidebar-submenu ul li {
+  @apply ps-[25px] text-sm ms-0;
+}
+
+.sidebar-submenu ul li a {
+  @apply before:text-indigo-600 before:me-1 before:text-base before:duration-500;
+}
+
+.sidebar-submenu ul li a .badge,
+.sidebar-submenu ul li a .label {
+  @apply float-right mt-0;
+}
+
+.sidebar-submenu.block {
+  @apply !block;
+}
+
+/* Itens aninhados em <ul> sem dropdown */
+.sidebar-menu ul li a span.label,
+.sidebar-menu ul li a span.badge {
+  float: right;
+  margin-top: 8px;
+  margin-left: 5px;
+}
+
+/* Footer */
 .sidebar-footer {
   @apply absolute w-full bottom-0 start-0 end-0 py-3 ps-6 pe-5 shadow-sm h-[51px];
 
@@ -160,62 +153,30 @@
   }
 }
 
-[dir="rtl"] {
-  .page-wrapper {
-    .sidebar-wrapper {
-      .sidebar-menu {
-        .sidebar-dropdown {
-          > a:after {
-            transform: rotate(-180deg);
-          }
-
-          &.active {
-            > a:after {
-              transform: rotate(-90deg);
-            }
-          }
-
-          .sidebar-submenu {
-            ul {
-              li {
-                a {
-                  &:before {
-                    transform: rotate(180deg);
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
+/* Estilos RTL */
+[dir="rtl"] .page-wrapper .sidebar-wrapper .sidebar-menu .sidebar-dropdown > a:after {
+  transform: rotate(-180deg);
 }
 
-.sidebar-nav {
-  > .navbar-item {
-    &:hover,
-    &.active {
-      .navbar-link {
-        @apply text-indigo-600;
-      }
-    }
-  }
+[dir="rtl"] .page-wrapper .sidebar-wrapper .sidebar-menu .sidebar-dropdown.active > a:after {
+  transform: rotate(-90deg);
+}
 
-  li {
-    &.active {
-      a {
-        @apply text-indigo-600;
-      }
-    }
+[dir="rtl"] .page-wrapper .sidebar-wrapper .sidebar-menu .sidebar-dropdown .sidebar-submenu ul li a:before {
+  transform: rotate(180deg);
+}
 
-    &.account-menu {
-      &.active,
-      &:hover {
-        .navbar-link {
-          @apply !text-indigo-600;
-        }
-      }
-    }
-  }
+/* Barra de navegação extra */
+.sidebar-nav > .navbar-item:hover .navbar-link,
+.sidebar-nav > .navbar-item.active .navbar-link {
+  @apply text-indigo-600;
+}
+
+.sidebar-nav li.active a {
+  @apply text-indigo-600;
+}
+
+.sidebar-nav li.account-menu:hover .navbar-link,
+.sidebar-nav li.account-menu.active .navbar-link {
+  @apply !text-indigo-600;
 }

@@ -46,7 +46,6 @@ const Sidebar: React.FC = () => {
 
   // Menu data definitions
   const adminPanelItems: LinkItem[] = [
-    { path: '/dashboard', label: 'Dashboard Do Usuário' },
     {
       path: '/regions',
       label: 'Regiões',
@@ -70,6 +69,7 @@ const Sidebar: React.FC = () => {
   ];
 
   const userPanelItems: LinkItem[] = [
+    { path: '/dashboard', label: 'Dashboard' },
     {
       path: '/users/coordinators',
       label: 'Coordenadores',
@@ -143,31 +143,22 @@ const Sidebar: React.FC = () => {
   );
 
   // Active state helpers
-  const isAdminPanelActive = ['', '/dashboard', '/regions', '/schools', '/school-classes'].includes(activeMenu);
+  const isAdminPanelActive = ['', '/regions', '/schools', '/school-classes'].includes(activeMenu);
   const isUserPanelActive = [
-    '/users/coordinators',
-    '/users/directors',
-    '/users/teachers',
+    '', 
+    '/dashboard', 
+    '/users/coordinators', 
+    '/users/directors', 
+    '/users/teachers', 
     '/users/students',
   ].includes(activeMenu);
 
   return (
     <nav className="sidebar-wrapper">
       <div className="sidebar-content">
-        <div className="sidebar-brand">LOGO SIGedu</div>
+        <div className="sidebar-brand">LOGO</div>
         <SimpleBarReact style={{ height: 'calc(100% - 70px)' }}>
           <ul className="sidebar-menu">
-            {/* Admin Panel Menu */}
-            {hasAccessToAnyItem(adminPanelItems) && (
-              <li className={`sidebar-dropdown text-black hover:text-blue-500 ${isAdminPanelActive ? 'active' : ''}`}>
-                <Link href="#" onClick={() => handleMenuClick(SUBMENU_IDS.DASHBOARD)}>
-                  <PiAirplayFill className="icon mr-4" />
-                  Painel Administrativo
-                </Link>
-                {renderSubMenu(SUBMENU_IDS.DASHBOARD, adminPanelItems)}
-              </li>
-            )}
-            
             {/* Users Panel Menu */}
             {hasAccessToAnyItem(userPanelItems) && (
               <li className={`sidebar-dropdown text-black hover:text-blue-500 ${isUserPanelActive ? 'active' : ''}`}>
@@ -176,6 +167,17 @@ const Sidebar: React.FC = () => {
                   Painel de Usuários
                 </Link>
                 {renderSubMenu(SUBMENU_IDS.USERS, userPanelItems)}
+              </li>
+            )}
+
+            {/* Admin Panel Menu */}
+            {hasAccessToAnyItem(adminPanelItems) && (
+              <li className={`sidebar-dropdown text-black hover:text-blue-500 ${isAdminPanelActive ? 'active' : ''}`}>
+                <Link href="#" onClick={() => handleMenuClick(SUBMENU_IDS.DASHBOARD)}>
+                  <PiAirplayFill className="icon mr-4" />
+                  Painel Administrativo
+                </Link>
+                {renderSubMenu(SUBMENU_IDS.DASHBOARD, adminPanelItems)}
               </li>
             )}
           </ul>

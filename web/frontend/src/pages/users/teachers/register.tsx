@@ -6,6 +6,7 @@ import FormInput from '@/components/forms/FormInput';
 import ToggleSwitch from '@/components/forms/ToggleSwitch';
 import { formatCPF, formatCEP, getNumericValue } from '../../utils/maskUtils';
 import { jwtDecode } from 'jwt-decode';
+import { Breadcrumb } from '@/components/common/Breadcrumb';
 
 // types
 interface JwtPayload {
@@ -46,7 +47,7 @@ interface TeacherFormData {
 
 const TeacherRegister = () => {
   const router = useRouter();
-  
+
   // form state with structured data model
   const [formData, setFormData] = useState<TeacherFormData>({
     personalInfo: {
@@ -77,17 +78,17 @@ const TeacherRegister = () => {
 
   // extract values for easier access
   const { personalInfo, address, professionalInfo } = formData;
-  
+
   // load organization id from token on component mount
   useEffect(() => {
     const fetchOrganizationId = () => {
       const token = sessionStorage.getItem('token');
-      
+
       if (!token) {
         setError('usuário não está autenticado');
         return;
       }
-      
+
       try {
         const decoded = jwtDecode<JwtPayload>(token);
         setOrganizationId(decoded.organizationId);
@@ -96,7 +97,7 @@ const TeacherRegister = () => {
         setError('erro ao obter informações do usuário logado');
       }
     };
-    
+
     fetchOrganizationId();
   }, []);
 
@@ -134,7 +135,7 @@ const TeacherRegister = () => {
   // clear error for a field
   const clearError = (field: keyof ValidationErrors) => {
     if (attemptedSubmit && errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: undefined }));
+      setErrors((prev) => ({ ...prev, [field]: undefined }));
     }
   };
 
@@ -142,17 +143,17 @@ const TeacherRegister = () => {
   const handleCpfChange = (e: ChangeEvent<HTMLInputElement>) => {
     const maskedCpf = e.target.value;
     updatePersonalInfo('cpf', maskedCpf);
-    
+
     // set password to numeric-only cpf value
     const numericCpf = getNumericValue(maskedCpf);
     setPassword(numericCpf);
-    
+
     // validate cpf format if user has already tried to submit
     if (attemptedSubmit) {
       if (!numericCpf) {
-        setErrors(prev => ({ ...prev, cpf: 'cpf é obrigatório' }));
+        setErrors((prev) => ({ ...prev, cpf: 'cpf é obrigatório' }));
       } else if (numericCpf.length !== 11) {
-        setErrors(prev => ({ ...prev, cpf: 'cpf deve conter 11 dígitos' }));
+        setErrors((prev) => ({ ...prev, cpf: 'cpf deve conter 11 dígitos' }));
       } else {
         clearError('cpf');
       }
@@ -163,14 +164,14 @@ const TeacherRegister = () => {
   const handleCepChange = (e: ChangeEvent<HTMLInputElement>) => {
     const maskedCep = e.target.value;
     updateAddress('cep', maskedCep);
-    
+
     // validate cep format if user has already tried to submit
     if (attemptedSubmit) {
       const numericCep = getNumericValue(maskedCep);
       if (!numericCep) {
-        setErrors(prev => ({ ...prev, cep: 'cep é obrigatório' }));
+        setErrors((prev) => ({ ...prev, cep: 'cep é obrigatório' }));
       } else if (numericCep.length !== 8) {
-        setErrors(prev => ({ ...prev, cep: 'cep deve conter 8 dígitos' }));
+        setErrors((prev) => ({ ...prev, cep: 'cep deve conter 8 dígitos' }));
       } else {
         clearError('cep');
       }
@@ -182,7 +183,7 @@ const TeacherRegister = () => {
     const newErrors: ValidationErrors = {};
     const { name, email, cpf } = personalInfo;
     const { street, number, cep } = address;
-    
+
     // required field validations
     if (!name.trim()) newErrors.name = 'nome é obrigatório';
     if (!email.trim()) newErrors.email = 'email é obrigatório';
@@ -190,24 +191,24 @@ const TeacherRegister = () => {
     if (!street.trim()) newErrors.address = 'endereço é obrigatório';
     if (!number.trim()) newErrors.numberAdress = 'número é obrigatório';
     if (!getNumericValue(cep)) newErrors.cep = 'cep é obrigatório';
-    
+
     // format validations
     if (email && !/\S+@\S+\.\S+/.test(email)) {
       newErrors.email = 'email em formato inválido';
     }
-    
+
     // cpf length validation
     const numericCpf = getNumericValue(cpf);
     if (numericCpf && numericCpf.length !== 11) {
       newErrors.cpf = 'cpf deve conter 11 dígitos';
     }
-    
+
     // cep length validation
     const numericCep = getNumericValue(cep);
     if (numericCep && numericCep.length !== 8) {
       newErrors.cep = 'cep deve conter 8 dígitos';
     }
-    
+
     return newErrors;
   };
 
@@ -215,34 +216,37 @@ const TeacherRegister = () => {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setAttemptedSubmit(true);
-    
+
     const validationErrors = validateForm();
     setErrors(validationErrors);
-    
+
     // stop submission if validation fails
     if (Object.keys(validationErrors).length > 0) {
       const firstErrorElement = document.querySelector('.border-red-500');
       if (firstErrorElement) {
-        firstErrorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        firstErrorElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        });
       }
       return;
     }
-    
+
     setError('');
 
     try {
       const numericCpf = getNumericValue(personalInfo.cpf);
       const numericCep = getNumericValue(address.cep);
-      
+
       // preparing data exactly as posted by postman
-      const birthDate = personalInfo.birthDate 
-        ? new Date(personalInfo.birthDate).toISOString() 
+      const birthDate = personalInfo.birthDate
+        ? new Date(personalInfo.birthDate).toISOString()
         : null;
-      
-      const hireDate = professionalInfo.hireDate 
-        ? new Date(professionalInfo.hireDate).toISOString() 
+
+      const hireDate = professionalInfo.hireDate
+        ? new Date(professionalInfo.hireDate).toISOString()
         : null;
-      
+
       // data object as posted by postman
       const requestBody = {
         name: personalInfo.name,
@@ -258,17 +262,17 @@ const TeacherRegister = () => {
         registrationNumber: professionalInfo.registrationNumber || null,
         birthDate,
         specialization: professionalInfo.specialization || null,
-        hireDate
+        hireDate,
       };
-      
+
       console.log('sending data to api:', JSON.stringify(requestBody, null, 2));
-      
+
       // using the same endpoint that works in postman
       const response = await fetch('http://localhost:4000/users', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+          Authorization: `Bearer ${sessionStorage.getItem('token')}`,
         },
         body: JSON.stringify(requestBody),
       });
@@ -279,21 +283,21 @@ const TeacherRegister = () => {
       if (!response.ok) {
         const errorText = await response.text();
         let errorMessage = 'registro de professor falhou, tente novamente';
-        
+
         try {
           const errorData = JSON.parse(errorText);
           errorMessage = errorData.message || errorMessage;
         } catch (e) {
           console.error('error response is not json:', errorText);
         }
-        
+
         throw new Error(errorMessage);
       }
 
       // processing success response
       const responseText = await response.text();
       let responseData = {};
-      
+
       try {
         if (responseText) {
           responseData = JSON.parse(responseText);
@@ -310,6 +314,13 @@ const TeacherRegister = () => {
     }
   };
 
+  // Breadcrumb items
+  const breadcrumbItems = [
+    { label: 'Dashboard', href: '/dashboard' },
+    { label: 'Professores', href: '/users/teachers' },
+    { label: 'Cadastrar', active: true },
+  ];
+
   return (
     <Wrapper>
       <div className="w-full relative px-2 sm:px-3 md:px-4 lg:px-6">
@@ -318,11 +329,11 @@ const TeacherRegister = () => {
             <div className="py-4">
               <div className="shadow-sm rounded bg-white">
                 <div className="p-5">
-                  <h5 className="text-lg font-semibold">
-                    cadastro de professor
-                  </h5>
+                  <h5 className="text-lg font-semibold">Cadastrar Professor</h5>
                 </div>
                 <div className="p-5 border-t border-gray-100">
+                  {/* Breadcrumbs */}
+                  <Breadcrumb items={breadcrumbItems} />
                   <form onSubmit={handleSubmit}>
                     {/* personal information section */}
                     <div className="grid grid-cols-6 gap-6 mb-6">
@@ -379,7 +390,9 @@ const TeacherRegister = () => {
                         <FormInput
                           label="Data de Nascimento"
                           value={personalInfo.birthDate}
-                          onChange={(e) => updatePersonalInfo('birthDate', e.target.value)}
+                          onChange={(e) =>
+                            updatePersonalInfo('birthDate', e.target.value)
+                          }
                           type="date"
                         />
                       </div>
@@ -400,7 +413,7 @@ const TeacherRegister = () => {
                           maxLength={9}
                         />
                       </div>
-                    
+
                       <div className="col-span-6 sm:col-span-2 lg:col-span-2">
                         <FormInput
                           label="Endereço"
@@ -442,7 +455,12 @@ const TeacherRegister = () => {
                         <FormInput
                           label="Matrícula"
                           value={professionalInfo.registrationNumber}
-                          onChange={(e) => updateProfessionalInfo('registrationNumber', e.target.value)}
+                          onChange={(e) =>
+                            updateProfessionalInfo(
+                              'registrationNumber',
+                              e.target.value,
+                            )
+                          }
                           placeholder="Digite a Matrícula"
                         />
                       </div>
@@ -451,7 +469,12 @@ const TeacherRegister = () => {
                         <FormInput
                           label="Especialização"
                           value={professionalInfo.specialization}
-                          onChange={(e) => updateProfessionalInfo('specialization', e.target.value)}
+                          onChange={(e) =>
+                            updateProfessionalInfo(
+                              'specialization',
+                              e.target.value,
+                            )
+                          }
                           placeholder="Ex: Matemática, Física"
                           maxLength={100}
                         />
@@ -461,7 +484,9 @@ const TeacherRegister = () => {
                         <FormInput
                           label="Data de Contratação"
                           value={professionalInfo.hireDate}
-                          onChange={(e) => updateProfessionalInfo('hireDate', e.target.value)}
+                          onChange={(e) =>
+                            updateProfessionalInfo('hireDate', e.target.value)
+                          }
                           type="date"
                         />
                       </div>
@@ -470,7 +495,12 @@ const TeacherRegister = () => {
                         <ToggleSwitch
                           label="Ativo"
                           checked={professionalInfo.isActive}
-                          onChange={() => updateProfessionalInfo('isActive', !professionalInfo.isActive)}
+                          onChange={() =>
+                            updateProfessionalInfo(
+                              'isActive',
+                              !professionalInfo.isActive,
+                            )
+                          }
                         />
                       </div>
                     </div>
@@ -485,7 +515,9 @@ const TeacherRegister = () => {
                           Cadastrar
                         </button>
                       </div>
-                      {error && <p className="mt-2 text-red-500 text-center">{error}</p>}
+                      {error && (
+                        <p className="mt-2 text-red-500 text-center">{error}</p>
+                      )}
                     </div>
                   </form>
                 </div>
@@ -498,4 +530,8 @@ const TeacherRegister = () => {
   );
 };
 
-export default withAuth(TeacherRegister, ['SECRETARIO', 'COORDENADOR', 'DIRETOR']);
+export default withAuth(TeacherRegister, [
+  'SECRETARIO',
+  'COORDENADOR',
+  'DIRETOR',
+]);
