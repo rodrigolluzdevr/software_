@@ -7,7 +7,7 @@ import ToggleSwitch from '@/components/forms/ToggleSwitch';
 import { formatCPF, formatCEP, getNumericValue } from '../../utils/maskUtils';
 import { jwtDecode } from 'jwt-decode';
 
-// Types
+// types
 interface JwtPayload {
   sub: number;
   cpf: string;
@@ -47,7 +47,7 @@ interface TeacherFormData {
 const TeacherRegister = () => {
   const router = useRouter();
   
-  // Form state with structured data model
+  // form state with structured data model
   const [formData, setFormData] = useState<TeacherFormData>({
     personalInfo: {
       name: '',
@@ -68,23 +68,23 @@ const TeacherRegister = () => {
     },
   });
 
-  // Additional state
+  // additional state
   const [password, setPassword] = useState<string>('');
   const [organizationId, setOrganizationId] = useState<number>(0);
   const [error, setError] = useState<string>('');
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [attemptedSubmit, setAttemptedSubmit] = useState<boolean>(false);
 
-  // Extract values for easier access in the component
+  // extract values for easier access
   const { personalInfo, address, professionalInfo } = formData;
   
-  // Load organization ID from token on component mount
+  // load organization id from token on component mount
   useEffect(() => {
     const fetchOrganizationId = () => {
       const token = sessionStorage.getItem('token');
       
       if (!token) {
-        setError('Usuário não está autenticado');
+        setError('usuário não está autenticado');
         return;
       }
       
@@ -92,15 +92,15 @@ const TeacherRegister = () => {
         const decoded = jwtDecode<JwtPayload>(token);
         setOrganizationId(decoded.organizationId);
       } catch (error) {
-        console.error('Failed to decode token:', error);
-        setError('Erro ao obter informações do usuário logado');
+        console.error('failed to decode token:', error);
+        setError('erro ao obter informações do usuário logado');
       }
     };
     
     fetchOrganizationId();
   }, []);
 
-  // Field update functions
+  // field update functions
   const updatePersonalInfo = (field: string, value: string) => {
     setFormData({
       ...formData,
@@ -131,184 +131,184 @@ const TeacherRegister = () => {
     });
   };
 
-  // Clear error for a field
+  // clear error for a field
   const clearError = (field: keyof ValidationErrors) => {
     if (attemptedSubmit && errors[field]) {
       setErrors(prev => ({ ...prev, [field]: undefined }));
     }
   };
 
-  // Handle CPF changes with validation and password sync
+  // handle cpf changes with validation and password sync
   const handleCpfChange = (e: ChangeEvent<HTMLInputElement>) => {
     const maskedCpf = e.target.value;
     updatePersonalInfo('cpf', maskedCpf);
     
-    // Set password to numeric-only CPF value
+    // set password to numeric-only cpf value
     const numericCpf = getNumericValue(maskedCpf);
     setPassword(numericCpf);
     
-    // Validate CPF format on change if user has already tried to submit
+    // validate cpf format if user has already tried to submit
     if (attemptedSubmit) {
       if (!numericCpf) {
-        setErrors(prev => ({ ...prev, cpf: "CPF é obrigatório" }));
+        setErrors(prev => ({ ...prev, cpf: 'cpf é obrigatório' }));
       } else if (numericCpf.length !== 11) {
-        setErrors(prev => ({ ...prev, cpf: "CPF deve conter 11 dígitos" }));
+        setErrors(prev => ({ ...prev, cpf: 'cpf deve conter 11 dígitos' }));
       } else {
         clearError('cpf');
       }
     }
   };
 
-  // Handle CEP changes with validation
+  // handle cep changes with validation
   const handleCepChange = (e: ChangeEvent<HTMLInputElement>) => {
     const maskedCep = e.target.value;
     updateAddress('cep', maskedCep);
     
-    // Validate CEP format on change if user has already tried to submit
+    // validate cep format if user has already tried to submit
     if (attemptedSubmit) {
       const numericCep = getNumericValue(maskedCep);
       if (!numericCep) {
-        setErrors(prev => ({ ...prev, cep: "CEP é obrigatório" }));
+        setErrors(prev => ({ ...prev, cep: 'cep é obrigatório' }));
       } else if (numericCep.length !== 8) {
-        setErrors(prev => ({ ...prev, cep: "CEP deve conter 8 dígitos" }));
+        setErrors(prev => ({ ...prev, cep: 'cep deve conter 8 dígitos' }));
       } else {
         clearError('cep');
       }
     }
   };
 
-  // Form validation logic
+  // form validation logic
   const validateForm = (): ValidationErrors => {
     const newErrors: ValidationErrors = {};
     const { name, email, cpf } = personalInfo;
     const { street, number, cep } = address;
     
-    // Required field validations
-    if (!name.trim()) newErrors.name = "Nome é obrigatório";
-    if (!email.trim()) newErrors.email = "Email é obrigatório";
-    if (!getNumericValue(cpf)) newErrors.cpf = "CPF é obrigatório";
-    if (!street.trim()) newErrors.address = "Endereço é obrigatório";
-    if (!number.trim()) newErrors.numberAdress = "Número é obrigatório";
-    if (!getNumericValue(cep)) newErrors.cep = "CEP é obrigatório";
+    // required field validations
+    if (!name.trim()) newErrors.name = 'nome é obrigatório';
+    if (!email.trim()) newErrors.email = 'email é obrigatório';
+    if (!getNumericValue(cpf)) newErrors.cpf = 'cpf é obrigatório';
+    if (!street.trim()) newErrors.address = 'endereço é obrigatório';
+    if (!number.trim()) newErrors.numberAdress = 'número é obrigatório';
+    if (!getNumericValue(cep)) newErrors.cep = 'cep é obrigatório';
     
-    // Format validations
+    // format validations
     if (email && !/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = "Email em formato inválido";
+      newErrors.email = 'email em formato inválido';
     }
     
-    // CPF length validation
+    // cpf length validation
     const numericCpf = getNumericValue(cpf);
     if (numericCpf && numericCpf.length !== 11) {
-      newErrors.cpf = "CPF deve conter 11 dígitos";
+      newErrors.cpf = 'cpf deve conter 11 dígitos';
     }
     
-    // CEP length validation
+    // cep length validation
     const numericCep = getNumericValue(cep);
     if (numericCep && numericCep.length !== 8) {
-      newErrors.cep = "CEP deve conter 8 dígitos";
+      newErrors.cep = 'cep deve conter 8 dígitos';
     }
     
     return newErrors;
   };
 
-// Form submission handler
-const handleSubmit = async (e: FormEvent) => {
-  e.preventDefault();
-  setAttemptedSubmit(true);
-  
-  const validationErrors = validateForm();
-  setErrors(validationErrors);
-  
-  // Stop submission if validation fails
-  if (Object.keys(validationErrors).length > 0) {
-    const firstErrorElement = document.querySelector('.border-red-500');
-    if (firstErrorElement) {
-      firstErrorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  // form submission handler
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setAttemptedSubmit(true);
+    
+    const validationErrors = validateForm();
+    setErrors(validationErrors);
+    
+    // stop submission if validation fails
+    if (Object.keys(validationErrors).length > 0) {
+      const firstErrorElement = document.querySelector('.border-red-500');
+      if (firstErrorElement) {
+        firstErrorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      return;
     }
-    return;
-  }
-  
-  setError('');
+    
+    setError('');
 
-  try {
-    const numericCpf = getNumericValue(personalInfo.cpf);
-    const numericCep = getNumericValue(address.cep);
-    
-    // Preparação dos dados exatamente como enviados pelo Postman
-    const birthDate = personalInfo.birthDate ? 
-      new Date(personalInfo.birthDate).toISOString() : 
-      null;
-    
-    const hireDate = professionalInfo.hireDate ? 
-      new Date(professionalInfo.hireDate).toISOString() : 
-      null;
-    
-    // Dados no formato exato do Postman
-    const requestBody = {
-      name: personalInfo.name,
-      cpf: numericCpf,
-      email: personalInfo.email,
-      password: numericCpf, // Password is same as numeric CPF
-      role: 'PROFESSOR',
-      address: address.street,
-      cep: numericCep,
-      numberAdress: address.number,
-      organizationId,
-      isActive: professionalInfo.isActive,
-      registrationNumber: professionalInfo.registrationNumber || null,
-      birthDate,
-      specialization: professionalInfo.specialization || null,
-      hireDate
-    };
-    
-    console.log('Enviando dados para API:', JSON.stringify(requestBody, null, 2));
-    
-    // Usando o mesmo endpoint que funciona no Postman
-    const response = await fetch('http://localhost:4000/users', {
-      method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${sessionStorage.getItem('token')}` // Adicionando token se necessário
-      },
-      body: JSON.stringify(requestBody),
-    });
+    try {
+      const numericCpf = getNumericValue(personalInfo.cpf);
+      const numericCep = getNumericValue(address.cep);
+      
+      // preparing data exactly as posted by postman
+      const birthDate = personalInfo.birthDate 
+        ? new Date(personalInfo.birthDate).toISOString() 
+        : null;
+      
+      const hireDate = professionalInfo.hireDate 
+        ? new Date(professionalInfo.hireDate).toISOString() 
+        : null;
+      
+      // data object as posted by postman
+      const requestBody = {
+        name: personalInfo.name,
+        cpf: numericCpf,
+        email: personalInfo.email,
+        password: numericCpf, // password is same as numeric cpf
+        role: 'PROFESSOR',
+        address: address.street,
+        cep: numericCep,
+        numberAdress: address.number,
+        organizationId,
+        isActive: professionalInfo.isActive,
+        registrationNumber: professionalInfo.registrationNumber || null,
+        birthDate,
+        specialization: professionalInfo.specialization || null,
+        hireDate
+      };
+      
+      console.log('sending data to api:', JSON.stringify(requestBody, null, 2));
+      
+      // using the same endpoint that works in postman
+      const response = await fetch('http://localhost:4000/users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+        },
+        body: JSON.stringify(requestBody),
+      });
 
-    const responseStatus = response.status;
-    console.log('Status da resposta:', responseStatus);
+      const responseStatus = response.status;
+      console.log('response status:', responseStatus);
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      let errorMessage = 'Registro de professor falhou, tente novamente';
+      if (!response.ok) {
+        const errorText = await response.text();
+        let errorMessage = 'registro de professor falhou, tente novamente';
+        
+        try {
+          const errorData = JSON.parse(errorText);
+          errorMessage = errorData.message || errorMessage;
+        } catch (e) {
+          console.error('error response is not json:', errorText);
+        }
+        
+        throw new Error(errorMessage);
+      }
+
+      // processing success response
+      const responseText = await response.text();
+      let responseData = {};
       
       try {
-        const errorData = JSON.parse(errorText);
-        errorMessage = errorData.message || errorMessage;
+        if (responseText) {
+          responseData = JSON.parse(responseText);
+          console.log('api response (success):', responseData);
+        }
       } catch (e) {
-        console.error('Resposta de erro não é JSON:', errorText);
+        console.error('error processing response:', e);
       }
-      
-      throw new Error(errorMessage);
-    }
 
-    // Processando a resposta de sucesso
-    const responseText = await response.text();
-    let responseData = {};
-    
-    try {
-      if (responseText) {
-        responseData = JSON.parse(responseText);
-        console.log('Resposta da API (sucesso):', responseData);
-      }
-    } catch (e) {
-      console.error('Erro ao processar resposta:', e);
+      router.push('/users/teachers/');
+    } catch (err: any) {
+      setError(err.message);
+      console.error('error during registration:', err);
     }
-
-    router.push('/users/teachers/');
-  } catch (err: any) {
-    setError(err.message);
-    console.error('Erro durante o registro:', err);
-  }
-};
+  };
 
   return (
     <Wrapper>
@@ -319,12 +319,12 @@ const handleSubmit = async (e: FormEvent) => {
               <div className="shadow-sm rounded bg-white">
                 <div className="p-5">
                   <h5 className="text-lg font-semibold">
-                    Cadastro de Professor
+                    cadastro de professor
                   </h5>
                 </div>
                 <div className="p-5 border-t border-gray-100">
                   <form onSubmit={handleSubmit}>
-                    {/* Personal Information Section */}
+                    {/* personal information section */}
                     <div className="grid grid-cols-6 gap-6 mb-6">
                       <div className="col-span-6 sm:col-span-2 md:col-span-3 lg:col-span-2">
                         <FormInput
@@ -385,7 +385,7 @@ const handleSubmit = async (e: FormEvent) => {
                       </div>
                     </div>
 
-                    {/* Address Section */}
+                    {/* address section */}
                     <div className="grid grid-cols-6 gap-6 mb-6">
                       <div className="col-span-6 sm:col-span-2 lg:col-span-1">
                         <FormInput
@@ -436,7 +436,7 @@ const handleSubmit = async (e: FormEvent) => {
                       </div>
                     </div>
 
-                    {/* Professional Information Section */}
+                    {/* professional information section */}
                     <div className="grid grid-cols-6 gap-6 mb-6">
                       <div className="col-span-6 sm:col-span-2 lg:col-span-1">
                         <FormInput
@@ -475,7 +475,7 @@ const handleSubmit = async (e: FormEvent) => {
                       </div>
                     </div>
 
-                    {/* Submit Button Section */}
+                    {/* submit button section */}
                     <div className="grid grid-cols-1 mt-6">
                       <div className="flex justify-center mt-10">
                         <button

@@ -7,7 +7,7 @@ import ToggleSwitch from '@/components/forms/ToggleSwitch';
 import { formatCPF, formatCEP, getNumericValue } from '../../../utils/maskUtils';
 import { jwtDecode } from 'jwt-decode';
 
-// Types
+// types
 interface JwtPayload {
   sub: number;
   cpf: string;
@@ -44,7 +44,7 @@ interface TeacherFormData {
   };
 }
 
-// User data interface from API
+// user data interface from api
 interface TeacherData {
   id: number;
   name: string;
@@ -62,14 +62,14 @@ interface TeacherData {
   role: string;
 }
 
+// converts the iso string to a Date object and extracts only the yyyy-mm-dd part
 const formatDateForInput = (dateString: string | undefined): string => {
   if (!dateString) return '';
   try {
-    // Converte a string ISO para objeto Date e extrai apenas a parte YYYY-MM-DD
     const date = new Date(dateString);
     return date.toISOString().split('T')[0];
   } catch (e) {
-    console.error('Error formatting date:', e);
+    console.error('error formatting date:', e);
     return '';
   }
 };
@@ -78,7 +78,7 @@ const TeacherUpdate = () => {
   const router = useRouter();
   const { id } = router.query;
   
-  // Form state with structured data model
+  // form state with structured data model
   const [formData, setFormData] = useState<TeacherFormData>({
     personalInfo: {
       name: '',
@@ -99,44 +99,44 @@ const TeacherUpdate = () => {
     },
   });
 
-  // Additional state
+  // additional state
   const [organizationId, setOrganizationId] = useState<number>(0);
   const [error, setError] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [attemptedSubmit, setAttemptedSubmit] = useState<boolean>(false);
 
-  // Extract values for easier access in the component
+  // extract values for easier access in the component
   const { personalInfo, address, professionalInfo } = formData;
   
-  // Debug state to help track issues
+  // debug state to help track issues
   const [debugInfo, setDebugInfo] = useState<string>('');
   
-  // Load teacher data when component mounts and ID is available
+  // load teacher data when component mounts and id is available
   useEffect(() => {
-    // Wait for router to be ready and have the ID parameter
+    // wait for router to be ready and have the id parameter
     if (!router.isReady) return;
     
     if (!id) {
-      setDebugInfo('No ID parameter found in URL');
+      setDebugInfo('no id parameter found in url');
       return;
     }
     
-    setDebugInfo(`Found ID: ${id}, fetching data...`);
+    setDebugInfo(`found id: ${id}, fetching data...`);
     
     const fetchTeacherData = async () => {
       setLoading(true);
       try {
-        console.log(`Fetching data for teacher ID: ${id}`);
+        console.log(`fetching data for teacher id: ${id}`);
         
-        // Obter o token de autenticação
+        // get the authentication token
         const token = sessionStorage.getItem('token');
         
         if (!token) {
-          throw new Error('Usuário não está autenticado');
+          throw new Error('user is not authenticated');
         }
         
-        // Incluir o token no cabeçalho Authorization
+        // include the token in the authorization header
         const response = await fetch(`http://localhost:4000/users/${id}`, {
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -146,32 +146,32 @@ const TeacherUpdate = () => {
         
         if (!response.ok) {
           const errorText = await response.text();
-          console.error(`API error (${response.status}):`, errorText);
+          console.error(`api error (${response.status}):`, errorText);
           
-          // Tratamento específico para diferentes códigos de erro
+          // specific handling for different error codes
           if (response.status === 401) {
-            setError('Sessão expirada ou usuário sem permissão. Faça login novamente.');
+            setError('session expired or user without permission. please log in again.');
           } else if (response.status === 404) {
-            setError('Professor não encontrado');
+            setError('teacher not found');
           } else {
-            setError(`Erro ao carregar dados (${response.status})`);
+            setError(`error loading data (${response.status})`);
           }
           
-          throw new Error(`Falha ao buscar dados do professor (${response.status})`);
+          throw new Error(`failed to fetch teacher data (${response.status})`);
         }
         
         const data: TeacherData = await response.json();
-        console.log("Teacher data received:", data);
-        console.log("Teacher isActive status:", data.isActive);
-        setDebugInfo(`Data loaded successfully for teacher: ${data.name}`);
+        console.log('teacher data received:', data);
+        console.log('teacher isActive status:', data.isActive);
+        setDebugInfo(`data loaded successfully for teacher: ${data.name}`);
         
-        // Map API data to our form structure, com formatação adequada das datas
+        // map api data to our form structure, including date formatting
         setFormData({
           personalInfo: {
             name: data.name || '',
             email: data.email || '',
             cpf: formatCPF(data.cpf) || '',
-            birthDate: formatDateForInput(data.birthDate), // Formata a data
+            birthDate: formatDateForInput(data.birthDate),
           },
           address: {
             cep: formatCEP(data.cep) || '',
@@ -181,17 +181,17 @@ const TeacherUpdate = () => {
           professionalInfo: {
             registrationNumber: data.registrationNumber || '',
             specialization: data.specialization || '',
-            hireDate: formatDateForInput(data.hireDate), // Formata a data
-            isActive: typeof data.isActive === 'boolean' ? data.isActive : true, // Garantir que seja booleano
+            hireDate: formatDateForInput(data.hireDate),
+            isActive: typeof data.isActive === 'boolean' ? data.isActive : true,
           },
         });
         
         setOrganizationId(data.organizationId);
       } catch (error) {
-        console.error('Error fetching teacher data:', error);
-        setDebugInfo(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        console.error('error fetching teacher data:', error);
+        setDebugInfo(`error: ${error instanceof Error ? error.message : 'unknown error'}`);
         if (!(error instanceof Error && error.message.includes('401'))) {
-          setError('Erro ao carregar dados do professor');
+          setError('error loading teacher data');
         }
       } finally {
         setLoading(false);
@@ -201,7 +201,7 @@ const TeacherUpdate = () => {
     fetchTeacherData();
   }, [router.isReady, id]);
   
-  // Load organization ID from token if not set from teacher data
+  // load organization id from token if not set from teacher data
   useEffect(() => {
     if (organizationId !== 0) return;
     
@@ -209,7 +209,7 @@ const TeacherUpdate = () => {
       const token = sessionStorage.getItem('token');
       
       if (!token) {
-        setError('Usuário não está autenticado');
+        setError('user is not authenticated');
         return;
       }
       
@@ -217,15 +217,15 @@ const TeacherUpdate = () => {
         const decoded = jwtDecode<JwtPayload>(token);
         setOrganizationId(decoded.organizationId);
       } catch (error) {
-        console.error('Failed to decode token:', error);
-        setError('Erro ao obter informações do usuário logado');
+        console.error('failed to decode token:', error);
+        setError('error getting logged user info');
       }
     };
     
     fetchOrganizationId();
   }, [organizationId]);
 
-  // Field update functions
+  // field update functions
   const updatePersonalInfo = (field: string, value: string) => {
     setFormData({
       ...formData,
@@ -247,7 +247,7 @@ const TeacherUpdate = () => {
   };
 
   const updateProfessionalInfo = (field: string, value: string | boolean) => {
-    console.log(`Atualizando campo ${field} para:`, value);
+    console.log(`updating field ${field} to:`, value);
     setFormData({
       ...formData,
       professionalInfo: {
@@ -257,14 +257,11 @@ const TeacherUpdate = () => {
     });
   };
 
-  // Função específica para controlar a mudança de status ativo
+  // function to control the active status change
   const handleActiveStatusChange = (newValue: boolean) => {
-    // Capture o valor atual antes da mudança
     const currentStatus = professionalInfo.isActive;
+    console.log('changing active status from:', currentStatus, 'to:', newValue);
     
-    console.log('Status Ativo alterando de:', currentStatus, 'para:', newValue);
-    
-    // Use setState com callback para garantir que o valor foi atualizado
     setFormData(prevState => {
       const updatedData = {
         ...prevState,
@@ -274,91 +271,88 @@ const TeacherUpdate = () => {
         },
       };
       
-      // Log após atualização
-      console.log('Novo estado de isActive após atualização:', updatedData.professionalInfo.isActive);
+      console.log('new isActive state after update:', updatedData.professionalInfo.isActive);
       
       return updatedData;
     });
   };
 
-  // Clear error for a field
+  // clear error for a field
   const clearError = (field: keyof ValidationErrors) => {
     if (attemptedSubmit && errors[field]) {
       setErrors(prev => ({ ...prev, [field]: undefined }));
     }
   };
 
-  // Handle CPF changes with validation
+  // handle cpf changes with validation
   const handleCpfChange = (e: ChangeEvent<HTMLInputElement>) => {
     const maskedCpf = e.target.value;
     updatePersonalInfo('cpf', maskedCpf);
     
-    // Validate CPF format on change if user has already tried to submit
     if (attemptedSubmit) {
       const numericCpf = getNumericValue(maskedCpf);
       if (!numericCpf) {
-        setErrors(prev => ({ ...prev, cpf: "CPF é obrigatório" }));
+        setErrors(prev => ({ ...prev, cpf: 'cpf is required' }));
       } else if (numericCpf.length !== 11) {
-        setErrors(prev => ({ ...prev, cpf: "CPF deve conter 11 dígitos" }));
+        setErrors(prev => ({ ...prev, cpf: 'cpf must have 11 digits' }));
       } else {
         clearError('cpf');
       }
     }
   };
 
-  // Handle CEP changes with validation
+  // handle cep changes with validation
   const handleCepChange = (e: ChangeEvent<HTMLInputElement>) => {
     const maskedCep = e.target.value;
     updateAddress('cep', maskedCep);
     
-    // Validate CEP format on change if user has already tried to submit
     if (attemptedSubmit) {
       const numericCep = getNumericValue(maskedCep);
       if (!numericCep) {
-        setErrors(prev => ({ ...prev, cep: "CEP é obrigatório" }));
+        setErrors(prev => ({ ...prev, cep: 'cep is required' }));
       } else if (numericCep.length !== 8) {
-        setErrors(prev => ({ ...prev, cep: "CEP deve conter 8 dígitos" }));
+        setErrors(prev => ({ ...prev, cep: 'cep must have 8 digits' }));
       } else {
         clearError('cep');
       }
     }
   };
 
-  // Form validation logic
+  // form validation logic
   const validateForm = (): ValidationErrors => {
     const newErrors: ValidationErrors = {};
     const { name, email, cpf } = personalInfo;
     const { street, number, cep } = address;
     
-    // Required field validations
-    if (!name.trim()) newErrors.name = "Nome é obrigatório";
-    if (!email.trim()) newErrors.email = "Email é obrigatório";
-    if (!getNumericValue(cpf)) newErrors.cpf = "CPF é obrigatório";
-    if (!street.trim()) newErrors.address = "Endereço é obrigatório";
-    if (!number.trim()) newErrors.numberAdress = "Número é obrigatório";
-    if (!getNumericValue(cep)) newErrors.cep = "CEP é obrigatório";
+    // required field validations
+    if (!name.trim()) newErrors.name = 'name is required';
+    if (!email.trim()) newErrors.email = 'email is required';
+    if (!getNumericValue(cpf)) newErrors.cpf = 'cpf is required';
+    if (!street.trim()) newErrors.address = 'address is required';
+    if (!number.trim()) newErrors.numberAdress = 'number is required';
+    if (!getNumericValue(cep)) newErrors.cep = 'cep is required';
     
-    // Format validations
+    // format validations
     if (email && !/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = "Email em formato inválido";
+      newErrors.email = 'invalid email format';
     }
     
-    // CPF length validation
+    // cpf length validation
     const numericCpf = getNumericValue(cpf);
     if (numericCpf && numericCpf.length !== 11) {
-      newErrors.cpf = "CPF deve conter 11 dígitos";
+      newErrors.cpf = 'cpf must have 11 digits';
     }
     
-    // CEP length validation
+    // cep length validation
     const numericCep = getNumericValue(cep);
     if (numericCep && numericCep.length !== 8) {
-      newErrors.cep = "CEP deve conter 8 dígitos";
+      newErrors.cep = 'cep must have 8 digits';
     }
     
     return newErrors;
   };
 
-  // Form submission handler for updating teacher
+  // form submission handler for updating teacher
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setAttemptedSubmit(true);
@@ -366,7 +360,7 @@ const TeacherUpdate = () => {
     const validationErrors = validateForm();
     setErrors(validationErrors);
     
-    // Stop submission if validation fails
+    // stop submission if validation fails
     if (Object.keys(validationErrors).length > 0) {
       const firstErrorElement = document.querySelector('.border-red-500');
       if (firstErrorElement) {
@@ -377,17 +371,15 @@ const TeacherUpdate = () => {
     
     setError('');
     setLoading(true);
-    setDebugInfo(`Submitting update for teacher ID: ${id}...`);
+    setDebugInfo(`submitting update for teacher id: ${id}...`);
 
     try {
       const numericCpf = getNumericValue(personalInfo.cpf);
       const numericCep = getNumericValue(address.cep);
       
-      // Log do status ativo antes de criar o payload
-      console.log('Valor isActive antes de preparar payload:', professionalInfo.isActive);
+      console.log('isActive value before building payload:', professionalInfo.isActive);
       
-      // Preparação dos dados exatamente como enviados pelo Postman
-      // Formatando corretamente as datas para o backend
+      // preparing the data as sent by postman, formatting dates for the backend
       let birthDate = null;
       if (personalInfo.birthDate && personalInfo.birthDate.trim() !== '') {
         birthDate = new Date(personalInfo.birthDate).toISOString();
@@ -398,16 +390,18 @@ const TeacherUpdate = () => {
         hireDate = new Date(professionalInfo.hireDate).toISOString();
       }
       
-      // Tratamento dos campos de texto para garantir valores não nulos
-      const registrationNumber = professionalInfo.registrationNumber && 
-        professionalInfo.registrationNumber.trim() !== '' ? 
-        professionalInfo.registrationNumber.trim() : null;
-        
-      const specialization = professionalInfo.specialization && 
-        professionalInfo.specialization.trim() !== '' ? 
-        professionalInfo.specialization.trim() : null;
+      // handle text fields to ensure non-null values
+      const registrationNumber =
+        professionalInfo.registrationNumber && professionalInfo.registrationNumber.trim() !== ''
+          ? professionalInfo.registrationNumber.trim()
+          : null;
       
-      // Objeto de dados a ser enviado, garantindo que isActive seja booleano
+      const specialization =
+        professionalInfo.specialization && professionalInfo.specialization.trim() !== ''
+          ? professionalInfo.specialization.trim()
+          : null;
+      
+      // data object to send, ensuring isActive is boolean
       const requestBody = {
         name: personalInfo.name,
         cpf: numericCpf,
@@ -417,28 +411,23 @@ const TeacherUpdate = () => {
         cep: numericCep,
         numberAdress: address.number,
         organizationId,
-        isActive: Boolean(professionalInfo.isActive), // Garante que seja um boolean
+        isActive: Boolean(professionalInfo.isActive),
         registrationNumber,
         birthDate,
         specialization,
         hireDate
       };
       
-      // Log do valor booleano no payload
-      console.log('Valor isActive no payload:', requestBody.isActive);
-      
-      console.log('Enviando dados para atualização:', JSON.stringify(requestBody, null, 2));
-      
-      // Obter o token de autenticação
+      // get the authentication token
       const token = sessionStorage.getItem('token');
       if (!token) {
-        setError('Usuário não está autenticado');
+        setError('user is not authenticated');
         return;
       }
       
-      // Usando PATCH como solicitado
+      // using patch here
       const response = await fetch(`http://localhost:4000/users/${id}`, {
-        method: 'PATCH', // Usando PATCH em vez de PUT
+        method: 'PATCH',
         headers: { 
           'Content-Type': 'application/json',
           'Accept': 'application/json',
@@ -447,28 +436,24 @@ const TeacherUpdate = () => {
         body: JSON.stringify(requestBody),
       });
 
-      const responseStatus = response.status;
-      console.log('Status da resposta:', responseStatus);
-      console.log('Headers da resposta:', Object.fromEntries([...response.headers]));
-
       if (!response.ok) {
         const errorText = await response.text();
-        console.error(`API update error (${response.status}):`, errorText);
+        console.error(`api update error (${response.status}):`, errorText);
         
-        let errorMessage = 'Atualização de professor falhou, tente novamente';
+        let errorMessage = 'teacher update failed, please try again';
         try {
           const errorData = JSON.parse(errorText);
           errorMessage = errorData.message || errorMessage;
         } catch (e) {
-          console.error('Resposta de erro não é JSON:', errorText);
+          console.error('error response is not json:', errorText);
         }
         
         if (response.status === 401) {
-          setError('Sessão expirada ou usuário sem permissão. Faça login novamente.');
+          setError('session expired or user without permission. please log in again.');
         } else if (response.status === 403) {
-          setError('Sem permissão para atualizar este professor');
+          setError('you do not have permission to update this teacher');
         } else if (response.status === 404) {
-          setError('Professor não encontrado');
+          setError('teacher not found');
         } else {
           setError(errorMessage);
         }
@@ -476,24 +461,23 @@ const TeacherUpdate = () => {
         throw new Error(errorMessage);
       }
 
-      // Processando a resposta de sucesso
       const responseText = await response.text();
       let responseData = {};
       
       try {
         if (responseText) {
           responseData = JSON.parse(responseText);
-          console.log('Resposta da API (sucesso):', responseData);
+          console.log('api response (success):', responseData);
         }
       } catch (e) {
-        console.error('Erro ao processar resposta:', e);
+        console.error('error processing response:', e);
       }
 
-      setDebugInfo('Update successful, redirecting...');
+      setDebugInfo('update successful, redirecting...');
       router.push('/users/teachers/');
     } catch (err: any) {
       setError(err.message);
-      setDebugInfo(`Error during update: ${err.message}`);
+      setDebugInfo(`error during update: ${err.message}`);
     } finally {
       setLoading(false);
     }
@@ -508,7 +492,7 @@ const TeacherUpdate = () => {
               <div className="shadow-sm rounded bg-white">
                 <div className="p-5">
                   <h5 className="text-lg font-semibold">
-                    Atualização de Professor {id ? `#${id}` : ''}
+                    teacher update {id ? `#${id}` : ''}
                   </h5>
                   {process.env.NODE_ENV !== 'production' && debugInfo && (
                     <p className="text-xs text-gray-500 mt-1">{debugInfo}</p>
@@ -517,7 +501,7 @@ const TeacherUpdate = () => {
                 <div className="p-5 border-t border-gray-100">
                   {loading && !error ? (
                     <div className="text-center py-8">
-                      <p>Carregando dados do professor...</p>
+                      <p>loading teacher data...</p>
                     </div>
                   ) : error ? (
                     <div className="text-center py-8 text-red-500">
@@ -526,12 +510,12 @@ const TeacherUpdate = () => {
                         className="mt-4 py-2 px-4 bg-gray-200 hover:bg-gray-300 rounded text-sm"
                         onClick={() => router.back()}
                       >
-                        Voltar
+                        back
                       </button>
                     </div>
                   ) : (
                     <form onSubmit={handleSubmit}>
-                      {/* Personal Information Section */}
+                      {/* personal information section */}
                       <div className="grid grid-cols-6 gap-6 mb-6">
                         <div className="col-span-6 sm:col-span-2 md:col-span-3 lg:col-span-2">
                           <FormInput
@@ -592,7 +576,7 @@ const TeacherUpdate = () => {
                         </div>
                       </div>
 
-                      {/* Address Section */}
+                      {/* address section */}
                       <div className="grid grid-cols-6 gap-6 mb-6">
                         <div className="col-span-6 sm:col-span-2 lg:col-span-1">
                           <FormInput
@@ -643,7 +627,7 @@ const TeacherUpdate = () => {
                         </div>
                       </div>
 
-                      {/* Professional Information Section */}
+                      {/* professional information section */}
                       <div className="grid grid-cols-6 gap-6 mb-6">
                         <div className="col-span-6 sm:col-span-2 lg:col-span-1">
                           <FormInput
@@ -680,7 +664,6 @@ const TeacherUpdate = () => {
                               checked={professionalInfo.isActive}
                               onChange={handleActiveStatusChange}
                             />
-                            {/* Indicador visual do estado atual */}
                             {process.env.NODE_ENV !== 'production' && (
                               <span className="ml-2 text-xs text-gray-500">
                                 {professionalInfo.isActive ? 'Ativo' : 'Inativo'}
@@ -690,7 +673,7 @@ const TeacherUpdate = () => {
                         </div>
                       </div>
 
-                      {/* Submit Button Section */}
+                      {/* submit button section */}
                       <div className="grid grid-cols-1 mt-6">
                         <div className="flex justify-center gap-4 mt-10">
                           <button
