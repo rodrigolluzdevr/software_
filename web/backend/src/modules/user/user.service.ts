@@ -16,11 +16,27 @@ export class UserService {
     });
   }
 
-  async createUser(userData: Prisma.UserUncheckedCreateInput): Promise<User> {
-    return this.prisma.user.create({
-      data: userData,
-    });
+// Modifique o método createUser
+
+async createUser(userData: any): Promise<User> {
+  // Extrair organizationId se existir
+  const { organizationId, ...otherData } = userData;
+  
+  // Preparar o objeto de dados para o Prisma
+  const data: any = { ...otherData };
+  
+  // Se organizationId foi fornecido, criar a estrutura de relacionamento
+  if (organizationId) {
+    data.organization = {
+      connect: { id: Number(organizationId) }
+    };
   }
+
+  // Criar o usuário com a estrutura de dados correta
+  return this.prisma.user.create({
+    data
+  });
+}
 
   async updateUser(
     id: number,
