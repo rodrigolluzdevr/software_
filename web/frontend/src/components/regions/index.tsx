@@ -95,7 +95,7 @@ export default function RegionsList() {
 
   // Breadcrumb items
   const breadcrumbItems = [
-    { label: 'Início', href: '/' },
+    { label: 'Dashboard', href: '/dashboard' },
     { label: 'Regiões', active: true },
   ];
 

@@ -96,7 +96,7 @@ export default function DirectorsList() {
     
       // Breadcrumb items
       const breadcrumbItems = [
-        { label: 'Início', href: '/' },
+        { label: 'Dashboard', href: '/dashboard' },
         { label: 'Diretores', active: true },
       ];
     

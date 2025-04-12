@@ -95,7 +95,7 @@ export default function CoordinatorsList() {
 
   // Breadcrumb items
   const breadcrumbItems = [
-    { label: 'Início', href: '/' },
+    { label: 'Dashboard', href: '/dashboard' },
     { label: 'Coordenadores', active: true },
   ];
 

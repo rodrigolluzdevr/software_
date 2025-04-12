@@ -90,7 +90,7 @@ export default function TeacherPanel({ router }: TeacherDashboardProps) {
           <div className="py-4">
             {/* Cabeçalho com título e filtro de classe */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
-              <h5 className="text-lg font-semibold">Dashboard Do Usuário</h5>
+              <h5 className="text-lg font-semibold">Dashboard</h5>
               {/* Filtro de classe */}
               {userClasses.length > 0 && (
                 <div className="mt-2 sm:mt-0">
@@ -115,10 +115,6 @@ export default function TeacherPanel({ router }: TeacherDashboardProps) {
             {/* Breadcrumb */}
             <div className="mb-6">
               <ul className="flex items-center text-[14px] font-bold">
-                <li className="hover:text-blue-500 transition-colors">
-                  <Link href="/">Início</Link>
-                </li>
-                <li className="mx-2">/</li>
                 <li className="text-blue-500">Dashboard</li>
               </ul>
             </div>

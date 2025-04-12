@@ -96,7 +96,7 @@ export default function TeachersList() {
     
       // Breadcrumb items
       const breadcrumbItems = [
-        { label: 'Início', href: '/' },
+        { label: 'Dashboard', href: '/dashboard' },
         { label: 'Professores', active: true },
       ];
     

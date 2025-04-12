@@ -96,8 +96,8 @@ export default function StudentsList() {
     
       // Breadcrumb items
       const breadcrumbItems = [
-        { label: 'Início', href: '/' },
-        { label: 'Estudantes', active: true },
+        { label: 'Dashboard', href: '/dashboard' },
+        { label: 'Alunos', active: true },
       ];
     
       return (
@@ -105,7 +105,7 @@ export default function StudentsList() {
           <div className="layout-specing">
             {/* Header */}
             <PageHeader
-              title="Estudantes"
+              title="Alunos"
               buttonLabel="Cadastrar"
               onButtonClick={handleRegisterClick}
             />
@@ -116,7 +116,7 @@ export default function StudentsList() {
             {/* Loading State */}
             {isLoading && (
               <div className="text-center py-4" aria-live="polite">
-                <p>Carregando estudantes...</p>
+                <p>Carregando alunos...</p>
               </div>
             )}
     
@@ -131,7 +131,7 @@ export default function StudentsList() {
             {!isLoading && !error && (
               <>
                 <SearchBar
-                  placeholder="Pesquisar estudantes..."
+                  placeholder="Pesquisar alunos..."
                   value={searchTerm}
                   onChange={handleSearchChange}
                 />

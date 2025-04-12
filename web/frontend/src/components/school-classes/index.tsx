@@ -95,7 +95,7 @@ export default function ClassesList() {
 
   // Breadcrumb items
   const breadcrumbItems = [
-    { label: 'Início', href: '/' },
+    { label: 'Dashboard', href: '/dashboard' },
     { label: 'Turmas', href: '/school-classes' },
   ];
 

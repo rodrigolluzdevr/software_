@@ -92,7 +92,7 @@ export const StudentsTable: React.FC<StudentsTableProps> = ({
             {students.length === 0 ? (
               <tr className="bg-white">
                 <td colSpan={isDirector ? 5 : 4} className="text-center p-4">
-                  Nenhum estudante encontrado
+                  Nenhum aluno encontrado
                 </td>
               </tr>
             ) : (

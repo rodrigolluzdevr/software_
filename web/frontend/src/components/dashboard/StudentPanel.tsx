@@ -60,16 +60,12 @@ const StudentDashboard = ({ router }: StudentDashboardProps) => {
           <div className="py-4">
             {/* Cabeçalho com título */}
             <div className="flex flex-row justify-between items-center mb-4">
-              <h5 className="text-lg font-semibold">Dashboard Do Usuário</h5>
+              <h5 className="text-lg font-semibold">Dashboard</h5>
             </div>
 
             {/* Breadcrumb simplificado */}
             <div className="mb-6">
               <ul className="flex items-center text-[14px] font-bold">
-                <li className="hover:text-blue-500 transition-colors">
-                  <Link href="/">Início</Link>
-                </li>
-                <li className="mx-2">/</li>
                 <li className="text-blue-500">Dashboard</li>
               </ul>
             </div>

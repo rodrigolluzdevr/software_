@@ -8,7 +8,6 @@ import { formatCPF, formatCEP, getNumericValue } from '../../utils/maskUtils';
 import { jwtDecode } from 'jwt-decode';
 import { Breadcrumb } from '@/components/common/Breadcrumb';
 
-// types
 interface JwtPayload {
   sub: number;
   cpf: string;
@@ -38,8 +37,7 @@ interface StudentFormData {
     number: string;
   };
   academicInfo: {
-    enrollmentNumber: string;
-    enrollmentDate: string;
+    registrationNumber: string;
     isActive: boolean;
   };
 }
@@ -47,96 +45,49 @@ interface StudentFormData {
 const StudentRegister = () => {
   const router = useRouter();
 
-  // form state with structured data model
   const [formData, setFormData] = useState<StudentFormData>({
-    personalInfo: {
-      name: '',
-      email: '',
-      cpf: '',
-      birthDate: '',
-    },
-    address: {
-      cep: '',
-      street: '',
-      number: '',
-    },
-    academicInfo: {
-      enrollmentNumber: '',
-      enrollmentDate: '',
-      isActive: true,
-    },
+    personalInfo: { name: '', email: '', cpf: '', birthDate: '' },
+    address: { cep: '', street: '', number: '' },
+    academicInfo: { registrationNumber: '', isActive: true },
   });
 
-  // additional state
   const [password, setPassword] = useState<string>('');
   const [organizationId, setOrganizationId] = useState<number>(0);
   const [error, setError] = useState<string>('');
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [attemptedSubmit, setAttemptedSubmit] = useState<boolean>(false);
 
-  // extract values for easier access
   const { personalInfo, address, academicInfo } = formData;
 
-  // Dentro do useEffect para obter o organizationId
-
   useEffect(() => {
-    const fetchOrganizationId = () => {
-      const token = sessionStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
+    if (!token) {
+      setError('Usuário não está autenticado');
+      return;
+    }
 
-      if (!token) {
-        setError('Usuário não está autenticado');
-        router.push('/login');
-        return;
-      }
+    try {
+      const decoded = jwtDecode<JwtPayload>(token);
+      setOrganizationId(decoded.organizationId);
+    } catch (error) {
+      console.error('failed to decode token:', error);
+      setError('erro ao obter informações do usuário logado');
+    }
+  }, []);
 
-      try {
-        const decoded = jwtDecode<JwtPayload>(token);
-        console.log('Token decodificado:', decoded); // Verificar o token completo
-
-        if (!decoded.organizationId) {
-          setError('Não foi possível obter a organização do usuário');
-          return;
-        }
-
-        setOrganizationId(decoded.organizationId);
-        console.log('ID da organização definido:', decoded.organizationId);
-      } catch (error) {
-        console.error('Falha ao decodificar o token:', error);
-        setError('Erro ao obter informações do usuário logado');
-      }
-    };
-
-    fetchOrganizationId();
-  }, [router]);
-
-  // field update functions
+  // helper to update form data
   const updatePersonalInfo = (field: string, value: string) => {
-    setFormData({
-      ...formData,
-      personalInfo: {
-        ...personalInfo,
-        [field]: value,
-      },
-    });
+    setFormData({ ...formData, personalInfo: { ...personalInfo, [field]: value } });
   };
 
   const updateAddress = (field: string, value: string) => {
-    setFormData({
-      ...formData,
-      address: {
-        ...address,
-        [field]: value,
-      },
-    });
+    setFormData({ ...formData, address: { ...address, [field]: value } });
   };
 
   const updateAcademicInfo = (field: string, value: string | boolean) => {
     setFormData({
       ...formData,
-      academicInfo: {
-        ...academicInfo,
-        [field]: value,
-      },
+      academicInfo: { ...academicInfo, [field]: value },
     });
   };
 
@@ -147,16 +98,13 @@ const StudentRegister = () => {
     }
   };
 
-  // handle cpf changes with validation and password sync
+  // handle CPF changes
   const handleCpfChange = (e: ChangeEvent<HTMLInputElement>) => {
     const maskedCpf = e.target.value;
     updatePersonalInfo('cpf', maskedCpf);
-
-    // set password to numeric-only cpf value
     const numericCpf = getNumericValue(maskedCpf);
     setPassword(numericCpf);
 
-    // validate cpf format if user has already tried to submit
     if (attemptedSubmit) {
       if (!numericCpf) {
         setErrors((prev) => ({ ...prev, cpf: 'cpf é obrigatório' }));
@@ -168,12 +116,11 @@ const StudentRegister = () => {
     }
   };
 
-  // handle cep changes with validation
+  // handle CEP changes
   const handleCepChange = (e: ChangeEvent<HTMLInputElement>) => {
     const maskedCep = e.target.value;
     updateAddress('cep', maskedCep);
 
-    // validate cep format if user has already tried to submit
     if (attemptedSubmit) {
       const numericCep = getNumericValue(maskedCep);
       if (!numericCep) {
@@ -186,13 +133,12 @@ const StudentRegister = () => {
     }
   };
 
-  // form validation logic
+  // validate form
   const validateForm = (): ValidationErrors => {
     const newErrors: ValidationErrors = {};
     const { name, email, cpf } = personalInfo;
     const { street, number, cep } = address;
 
-    // required field validations
     if (!name.trim()) newErrors.name = 'nome é obrigatório';
     if (!email.trim()) newErrors.email = 'email é obrigatório';
     if (!getNumericValue(cpf)) newErrors.cpf = 'cpf é obrigatório';
@@ -200,18 +146,15 @@ const StudentRegister = () => {
     if (!number.trim()) newErrors.numberAdress = 'número é obrigatório';
     if (!getNumericValue(cep)) newErrors.cep = 'cep é obrigatório';
 
-    // format validations
     if (email && !/\S+@\S+\.\S+/.test(email)) {
       newErrors.email = 'email em formato inválido';
     }
 
-    // cpf length validation
     const numericCpf = getNumericValue(cpf);
     if (numericCpf && numericCpf.length !== 11) {
       newErrors.cpf = 'cpf deve conter 11 dígitos';
     }
 
-    // cep length validation
     const numericCep = getNumericValue(cep);
     if (numericCep && numericCep.length !== 8) {
       newErrors.cep = 'cep deve conter 8 dígitos';
@@ -220,25 +163,14 @@ const StudentRegister = () => {
     return newErrors;
   };
 
-  // form submission handler
+  // handle submit
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setAttemptedSubmit(true);
 
     const validationErrors = validateForm();
     setErrors(validationErrors);
-
-    // stop submission if validation fails
-    if (Object.keys(validationErrors).length > 0) {
-      const firstErrorElement = document.querySelector('.border-red-500');
-      if (firstErrorElement) {
-        firstErrorElement.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center',
-        });
-      }
-      return;
-    }
+    if (Object.keys(validationErrors).length > 0) return;
 
     setError('');
 
@@ -246,24 +178,9 @@ const StudentRegister = () => {
       const numericCpf = getNumericValue(personalInfo.cpf);
       const numericCep = getNumericValue(address.cep);
 
-      // preparing data exactly as needed for the API
       const birthDate = personalInfo.birthDate
         ? new Date(personalInfo.birthDate).toISOString()
         : null;
-
-      const enrollmentDate = academicInfo.enrollmentDate
-        ? new Date(academicInfo.enrollmentDate).toISOString()
-        : null;
-
-      // Adicionando verificações de consistência
-      if (!organizationId || organizationId <= 0) {
-        setError('ID da organização inválido. Faça login novamente.');
-        console.error('organizationId inválido:', organizationId);
-        return;
-      }
-
-      // Converta explicitamente para número para garantir formato consistente
-      const orgId = Number(organizationId);
 
       const requestBody = {
         name: personalInfo.name,
@@ -274,17 +191,12 @@ const StudentRegister = () => {
         address: address.street,
         cep: numericCep,
         numberAdress: address.number,
-        organizationId: orgId,
+        organizationId,
         isActive: academicInfo.isActive,
-        enrollmentNumber: academicInfo.enrollmentNumber || null,
+        registrationNumber: academicInfo.registrationNumber || null,
         birthDate,
-        enrollmentDate,
       };
-      
-      console.log('sending data to api:', JSON.stringify(requestBody, null, 2));
-      console.log('organizationId type:', typeof orgId);
 
-      // API request to create student
       const response = await fetch('http://localhost:4000/users', {
         method: 'POST',
         headers: {
@@ -294,9 +206,6 @@ const StudentRegister = () => {
         body: JSON.stringify(requestBody),
       });
 
-      const responseStatus = response.status;
-      console.log('response status:', responseStatus);
-
       if (!response.ok) {
         const errorText = await response.text();
         let errorMessage = 'registro de estudante falhou, tente novamente';
@@ -304,24 +213,10 @@ const StudentRegister = () => {
         try {
           const errorData = JSON.parse(errorText);
           errorMessage = errorData.message || errorMessage;
-        } catch (e) {
+        } catch (error) {
           console.error('error response is not json:', errorText);
         }
-
         throw new Error(errorMessage);
-      }
-
-      // processing success response
-      const responseText = await response.text();
-      let responseData = {};
-
-      try {
-        if (responseText) {
-          responseData = JSON.parse(responseText);
-          console.log('api response (success):', responseData);
-        }
-      } catch (e) {
-        console.error('error processing response:', e);
       }
 
       router.push('/users/students/');
@@ -331,7 +226,6 @@ const StudentRegister = () => {
     }
   };
 
-  // Breadcrumb items
   const breadcrumbItems = [
     { label: 'Dashboard', href: '/dashboard' },
     { label: 'Estudantes', href: '/users/students' },
@@ -349,10 +243,9 @@ const StudentRegister = () => {
                   <h5 className="text-lg font-semibold">Cadastrar Estudante</h5>
                 </div>
                 <div className="p-5 border-t border-gray-100">
-                  {/* Breadcrumbs */}
                   <Breadcrumb items={breadcrumbItems} />
                   <form onSubmit={handleSubmit}>
-                    {/* personal information section */}
+                    {/* Personal Info */}
                     <div className="grid grid-cols-6 gap-6 mb-6">
                       <div className="col-span-6 sm:col-span-2 md:col-span-3 lg:col-span-2">
                         <FormInput
@@ -360,9 +253,7 @@ const StudentRegister = () => {
                           value={personalInfo.name}
                           onChange={(e) => {
                             updatePersonalInfo('name', e.target.value);
-                            if (attemptedSubmit && e.target.value.trim()) {
-                              clearError('name');
-                            }
+                            clearError('name');
                           }}
                           placeholder="Digite o Nome"
                           required
@@ -370,25 +261,21 @@ const StudentRegister = () => {
                           attemptedSubmit={attemptedSubmit}
                         />
                       </div>
-
                       <div className="col-span-6 sm:col-span-3 md:col-span-2 lg:col-span-2">
                         <FormInput
                           label="Email"
+                          type="email"
                           value={personalInfo.email}
                           onChange={(e) => {
                             updatePersonalInfo('email', e.target.value);
-                            if (attemptedSubmit && e.target.value.trim()) {
-                              clearError('email');
-                            }
+                            clearError('email');
                           }}
-                          type="email"
                           placeholder="Digite o Email"
                           required
                           error={errors.email}
                           attemptedSubmit={attemptedSubmit}
                         />
                       </div>
-
                       <div className="col-span-6 sm:col-span-3 lg:col-span-1">
                         <FormInput
                           label="CPF"
@@ -402,20 +289,18 @@ const StudentRegister = () => {
                           maxLength={14}
                         />
                       </div>
-
                       <div className="col-span-6 md:col-span-2 lg:col-span-1">
                         <FormInput
                           label="Data de Nascimento"
+                          type="date"
                           value={personalInfo.birthDate}
                           onChange={(e) =>
                             updatePersonalInfo('birthDate', e.target.value)
                           }
-                          type="date"
                         />
                       </div>
                     </div>
-
-                    {/* address section */}
+                    {/* Address */}
                     <div className="grid grid-cols-6 gap-6 mb-6">
                       <div className="col-span-6 sm:col-span-2 lg:col-span-1">
                         <FormInput
@@ -430,16 +315,13 @@ const StudentRegister = () => {
                           maxLength={9}
                         />
                       </div>
-
                       <div className="col-span-6 sm:col-span-2 lg:col-span-2">
                         <FormInput
                           label="Endereço"
                           value={address.street}
                           onChange={(e) => {
                             updateAddress('street', e.target.value);
-                            if (attemptedSubmit && e.target.value.trim()) {
-                              clearError('address');
-                            }
+                            clearError('address');
                           }}
                           placeholder="Digite o Endereço"
                           required
@@ -447,16 +329,13 @@ const StudentRegister = () => {
                           attemptedSubmit={attemptedSubmit}
                         />
                       </div>
-
                       <div className="col-span-6 sm:col-span-2 lg:col-span-1">
                         <FormInput
                           label="Número"
                           value={address.number}
                           onChange={(e) => {
                             updateAddress('number', e.target.value);
-                            if (attemptedSubmit && e.target.value.trim()) {
-                              clearError('numberAdress');
-                            }
+                            clearError('numberAdress');
                           }}
                           placeholder="Digite o Número"
                           required
@@ -465,49 +344,28 @@ const StudentRegister = () => {
                         />
                       </div>
                     </div>
-
-                    {/* academic information section */}
+                    {/* Academic Info */}
                     <div className="grid grid-cols-6 gap-6 mb-6">
                       <div className="col-span-6 sm:col-span-2 lg:col-span-1">
                         <FormInput
                           label="Matrícula"
-                          value={academicInfo.enrollmentNumber}
+                          value={academicInfo.registrationNumber}
                           onChange={(e) =>
-                            updateAcademicInfo(
-                              'enrollmentNumber',
-                              e.target.value,
-                            )
+                            updateAcademicInfo('registrationNumber', e.target.value)
                           }
                           placeholder="Digite a Matrícula"
                         />
                       </div>
-
-                      <div className="col-span-6 sm:col-span-2 lg:col-span-1">
-                        <FormInput
-                          label="Data de Matrícula"
-                          value={academicInfo.enrollmentDate}
-                          onChange={(e) =>
-                            updateAcademicInfo('enrollmentDate', e.target.value)
-                          }
-                          type="date"
-                        />
-                      </div>
-
                       <div className="col-span-6 sm:col-span-1 lg:col-span-1 flex items-end">
                         <ToggleSwitch
                           label="Ativo"
                           checked={academicInfo.isActive}
                           onChange={() =>
-                            updateAcademicInfo(
-                              'isActive',
-                              !academicInfo.isActive,
-                            )
+                            updateAcademicInfo('isActive', !academicInfo.isActive)
                           }
                         />
                       </div>
                     </div>
-
-                    {/* submit button section */}
                     <div className="grid grid-cols-1 mt-6">
                       <div className="flex justify-center mt-10">
                         <button
