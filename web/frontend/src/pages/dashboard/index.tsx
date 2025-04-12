@@ -30,7 +30,7 @@ const Dashboard = () => {
       <div className={styles.dashboardContainer}>
         {role === 'ADMIN' && <AdminPanel />}
         {role === 'PROFESSOR' && <TeacherPanel router={router} />}
-        {role === 'SECRETARIO' && <SecretaryPanel router={router} />}
+        {(role === 'SECRETARIO' || null) && <SecretaryPanel router={router} />}
         {role === 'COORDENADOR' && <CoordinatorPanel router={router} />}
         {role === 'DIRETOR' && <DirectorPanel router={router} />}
         {role === 'USER' && <StudentPanel router={router} />}
@@ -39,4 +39,5 @@ const Dashboard = () => {
   );
 };
 
-export default withAuth(Dashboard);
+//export default withAuth(Dashboard);
+export default Dashboard;

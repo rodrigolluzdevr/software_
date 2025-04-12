@@ -7,7 +7,7 @@ export default function Wrapper(props: any) {
   let [toggle, setToggle] = useState(true);
   return (
     <div className={`page-wrapper  ${toggle ? "toggled" : ""}`}>
-      <Sidebar />
+      <Sidebar children={undefined} />
       <main className="page-content bg-gray-50">
         <Header toggle={toggle} setToggle={setToggle} />
         {props.children}

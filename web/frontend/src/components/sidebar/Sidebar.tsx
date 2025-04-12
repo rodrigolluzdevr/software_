@@ -230,7 +230,7 @@ const Sidebar: React.FC<SidebarProps> = ({ children }) => {
       <aside 
         className="sidebar-wrapper fixed top-0 left-0 z-50 h-screen bg-white shadow-lg border-r border-gray-200 duration-300 w-64 overflow-hidden"
       >
-        <div className="sidebar-content h-full overflow-hidden">
+        <div className="h-full overflow-hidden">
           {/* Logo e botão de fechar */}
           <div className="sidebar-brand flex items-center justify-between h-16 px-4 border-b border-gray-200">
             <Link href="/" className="flex items-center space-x-2">
