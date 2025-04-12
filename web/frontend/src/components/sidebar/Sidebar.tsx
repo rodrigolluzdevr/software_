@@ -58,6 +58,7 @@ const Sidebar: React.FC<SidebarProps> = ({ children }) => {
 
   // Menu data definitions
   const adminPanelItems: LinkItem[] = [
+    { path: '/dashboard', label: 'Dashboard' }, // Moved Dashboard to admin panel
     {
       path: '/regions',
       label: 'Regiões',
@@ -76,7 +77,6 @@ const Sidebar: React.FC<SidebarProps> = ({ children }) => {
   ];
 
   const userPanelItems: LinkItem[] = [
-    { path: '/dashboard', label: 'Dashboard' },
     {
       path: '/users/coordinators',
       label: 'Coordenadores',
@@ -99,20 +99,49 @@ const Sidebar: React.FC<SidebarProps> = ({ children }) => {
     },
   ];
 
+  // Load submenu states from localStorage on initial render
+  useEffect(() => {
+    const savedSubMenus = localStorage.getItem('sidebarSubMenus');
+    if (savedSubMenus) {
+      try {
+        setSubMenus(JSON.parse(savedSubMenus));
+      } catch (e) {
+        console.error('Error parsing saved submenu state', e);
+      }
+    }
+  }, []);
+
   // Update active menu on path change
   useEffect(() => {
     setActiveMenu(currentPath);
     window.scrollTo(0, 0);
     
-    // Auto-open submenu when a child page is active
-    if (currentPath?.startsWith('/users') || currentPath === '/dashboard') {
-      setSubMenus(prev => ({ ...prev, [SUBMENU_IDS.USERS]: true }));
+    // Only open menus related to current path if they're not already open
+    // Never close menus automatically - let user control that
+    
+    let shouldUpdate = false;
+    const updatedSubMenus = {...subMenus};
+    
+    // Auto-open Users submenu when on a users page
+    if (currentPath?.startsWith('/users') && !updatedSubMenus[SUBMENU_IDS.USERS]) {
+      updatedSubMenus[SUBMENU_IDS.USERS] = true;
+      shouldUpdate = true;
     }
     
-    if (currentPath?.startsWith('/regions') || 
+    // Auto-open Dashboard submenu when on related pages
+    if ((currentPath?.startsWith('/regions') || 
         currentPath?.startsWith('/schools') || 
-        currentPath?.startsWith('/school-classes')) {
-      setSubMenus(prev => ({ ...prev, [SUBMENU_IDS.DASHBOARD]: true }));
+        currentPath?.startsWith('/school-classes') ||
+        currentPath === '/dashboard') && 
+        !updatedSubMenus[SUBMENU_IDS.DASHBOARD]) {
+      updatedSubMenus[SUBMENU_IDS.DASHBOARD] = true;
+      shouldUpdate = true;
+    }
+
+    // Only update if we've opened a panel that was closed
+    if (shouldUpdate) {
+      setSubMenus(updatedSubMenus);
+      localStorage.setItem('sidebarSubMenus', JSON.stringify(updatedSubMenus));
     }
   }, [currentPath]);
 
@@ -126,7 +155,12 @@ const Sidebar: React.FC<SidebarProps> = ({ children }) => {
 
   // Utility functions
   const handleMenuClick = (menuName: string) => {
-    setSubMenus((prev) => ({ ...prev, [menuName]: !prev[menuName] }));
+    const newSubMenus = {
+      ...subMenus,
+      [menuName]: !subMenus[menuName]
+    };
+    setSubMenus(newSubMenus);
+    localStorage.setItem('sidebarSubMenus', JSON.stringify(newSubMenus));
   };
 
   const isActive = (path: string) => activeMenu === path;
@@ -194,9 +228,9 @@ const Sidebar: React.FC<SidebarProps> = ({ children }) => {
       
       {/* Sidebar */}
       <aside 
-        className="sidebar-wrapper fixed top-0 left-0 z-50 h-screen bg-white shadow-lg border-r border-gray-200 duration-300 w-64"
+        className="sidebar-wrapper fixed top-0 left-0 z-50 h-screen bg-white shadow-lg border-r border-gray-200 duration-300 w-64 overflow-hidden"
       >
-        <div className="sidebar-content h-full">
+        <div className="sidebar-content h-full overflow-hidden">
           {/* Logo e botão de fechar */}
           <div className="sidebar-brand flex items-center justify-between h-16 px-4 border-b border-gray-200">
             <Link href="/" className="flex items-center space-x-2">
@@ -216,28 +250,36 @@ const Sidebar: React.FC<SidebarProps> = ({ children }) => {
           </div>
 
           {/* Menu de navegação */}
-          <SimpleBarReact style={{ height: 'calc(100% - 64px)' }} className="p-4">
+          <SimpleBarReact 
+            style={{ height: 'calc(100% - 64px)' }} 
+            className="p-4"
+            autoHide={true}
+            forceVisible={false}
+            scrollbarMinSize={0}
+          >
             <ul className="sidebar-menu space-y-2">
-              {/* Users Panel Menu */}
-              {hasAccessToAnyItem(userPanelItems) && (
-                <li className={`sidebar-dropdown relative ${subMenus[SUBMENU_IDS.USERS] ? 'active' : ''}`}>
+              {/* Admin Panel Menu */}
+              {hasAccessToAnyItem(adminPanelItems) && (
+                <li className={`sidebar-dropdown relative ${subMenus[SUBMENU_IDS.DASHBOARD] ? 'active' : ''}`}>
                   <button
-                    onClick={() => handleMenuClick(SUBMENU_IDS.USERS)}
+                    onClick={() => handleMenuClick(SUBMENU_IDS.DASHBOARD)}
                     className="flex items-center justify-between w-full px-3 py-3 text-left rounded-md transition-all duration-200 text-gray-700 hover:bg-gray-50 hover:text-blue-500"
                   >
                     <div className="flex items-center">
-                      <BiSolidUserAccount className="text-xl mr-3" />
-                      <span className="font-medium">Painel de Usuários</span>
+                      <PiAirplayFill className="text-xl mr-3" />
+                      <span className="font-medium">Painel Administrativo</span>
                     </div>
                     <BiChevronDown
                       className={`transition-transform duration-200 ${
-                        subMenus[SUBMENU_IDS.USERS] ? 'transform rotate-180' : ''
+                        subMenus[SUBMENU_IDS.DASHBOARD]
+                          ? 'transform rotate-180'
+                          : ''
                       }`}
                     />
                   </button>
-                  <div className={`sidebar-submenu ${subMenus[SUBMENU_IDS.USERS] ? 'block' : ''}`}>
+                  <div className={`sidebar-submenu ${subMenus[SUBMENU_IDS.DASHBOARD] ? 'block' : ''}`}>
                     <ul className="pl-8 space-y-2 pt-1">
-                      {userPanelItems
+                      {adminPanelItems
                         .filter(
                           (link) =>
                             !link.roles ||
@@ -264,28 +306,26 @@ const Sidebar: React.FC<SidebarProps> = ({ children }) => {
                 </li>
               )}
 
-              {/* Admin Panel Menu */}
-              {hasAccessToAnyItem(adminPanelItems) && (
-                <li className={`sidebar-dropdown relative ${subMenus[SUBMENU_IDS.DASHBOARD] ? 'active' : ''}`}>
+              {/* Users Panel Menu */}
+              {hasAccessToAnyItem(userPanelItems) && (
+                <li className={`sidebar-dropdown relative ${subMenus[SUBMENU_IDS.USERS] ? 'active' : ''}`}>
                   <button
-                    onClick={() => handleMenuClick(SUBMENU_IDS.DASHBOARD)}
+                    onClick={() => handleMenuClick(SUBMENU_IDS.USERS)}
                     className="flex items-center justify-between w-full px-3 py-3 text-left rounded-md transition-all duration-200 text-gray-700 hover:bg-gray-50 hover:text-blue-500"
                   >
                     <div className="flex items-center">
-                      <PiAirplayFill className="text-xl mr-3" />
-                      <span className="font-medium">Painel Administrativo</span>
+                      <BiSolidUserAccount className="text-xl mr-3" />
+                      <span className="font-medium">Painel de Usuários</span>
                     </div>
                     <BiChevronDown
                       className={`transition-transform duration-200 ${
-                        subMenus[SUBMENU_IDS.DASHBOARD]
-                          ? 'transform rotate-180'
-                          : ''
+                        subMenus[SUBMENU_IDS.USERS] ? 'transform rotate-180' : ''
                       }`}
                     />
                   </button>
-                  <div className={`sidebar-submenu ${subMenus[SUBMENU_IDS.DASHBOARD] ? 'block' : ''}`}>
+                  <div className={`sidebar-submenu ${subMenus[SUBMENU_IDS.USERS] ? 'block' : ''}`}>
                     <ul className="pl-8 space-y-2 pt-1">
-                      {adminPanelItems
+                      {userPanelItems
                         .filter(
                           (link) =>
                             !link.roles ||
@@ -347,6 +387,11 @@ const Sidebar: React.FC<SidebarProps> = ({ children }) => {
             </div>
           </div>
         </div>
+
+        {/* Main content */}
+        <main className="content-wrapper">
+          {children}
+        </main>
       </div>
     </div>
   );
