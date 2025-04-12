@@ -96,7 +96,7 @@ export default function ClassesList() {
   // Breadcrumb items
   const breadcrumbItems = [
     { label: 'Dashboard', href: '/dashboard' },
-    { label: 'Turmas', href: '/school-classes' },
+    { label: 'Turmas', active: true },
   ];
 
   return (

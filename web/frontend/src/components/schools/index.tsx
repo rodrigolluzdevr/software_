@@ -96,7 +96,7 @@ export default function SchoolsList() {
   // Breadcrumb items
   const breadcrumbItems = [
     { label: 'Dashboard', href: '/dashboard' },
-    { label: 'Escolas', href: '/schools' },
+    { label: 'Escolas', active: true },
   ];
 
   return (
