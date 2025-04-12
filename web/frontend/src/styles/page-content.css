@@ -1,50 +1,78 @@
 @import "tailwindcss";
 
 .page-content {
-  @apply inline-block w-full ps-0 overflow-x-hidden duration-500;
+  display: inline-block;
+  width: 100%;
+  padding-left: 0;
+  overflow-x: hidden;
+  transition-duration: 500ms;
+}
 
-  .top-header {
-    @apply fixed top-0 inset-x-0 z-999 max-h-[70px] duration-500;
+.page-content .top-header {
+  position: fixed;
+  top: 0;
+  inset-inline: 0;
+  z-index: 999;
+  max-height: 70px;
+  transition-duration: 500ms;
+}
 
-    .header-bar {
-      @apply relative justify-between items-center p-6 bg-white h-[70px] shadow-sm;
+.page-content .top-header .header-bar {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  background-color: white;
+  height: 70px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
 
-      @media (max-width: 425px) {
-        @apply py-6 px-3;
-      }
-    }
-  }
-
-  .layout-specing {
-    min-height: calc(100vh - 66px) !important;
-    @apply !relative !pt-[94px] !px-3 !pb-6;
-
-    @media (max-width: 425px) {
-      @apply !px-0;
-    }
+@media (max-width: 425px) {
+  .page-content .top-header .header-bar {
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
   }
 }
 
-.page-wrapper.toggled {
-  @media screen and (min-width: 1025px) {
-    .page-content {
-      @apply ps-[300px];
-    }
+.page-content .layout-specing {
+  min-height: calc(100vh - 66px) !important;
+  position: relative !important;
+  padding-top: 94px !important;
+  padding-inline: 0.75rem !important;
+  padding-bottom: 1.5rem !important;
+}
+
+@media (max-width: 425px) {
+  .page-content .layout-specing {
+    padding-inline: 0 !important;
   }
+}
 
-  .top-header {
-    @apply start-[281px];
-
-    @media (max-width: 1024px) {
-      @apply start-0;
-    }
+@media screen and (min-width: 1025px) {
+  .page-wrapper.toggled .page-content {
+    padding-left: 300px;
   }
+}
 
-  .sidebar-wrapper {
-    @apply start-0;
+.page-wrapper.toggled .top-header {
+  inset-inline-start: 281px;
+}
 
-    @media (max-width: 1024px) {
-      @apply -start-[300px];
-    }
+@media (max-width: 1024px) {
+  .page-wrapper.toggled .top-header {
+    inset-inline-start: 0;
+  }
+}
+
+.page-wrapper.toggled .sidebar-wrapper {
+  inset-inline-start: 0;
+}
+
+@media (max-width: 1024px) {
+  .page-wrapper.toggled .sidebar-wrapper {
+    inset-inline-start: -300px;
   }
 }
