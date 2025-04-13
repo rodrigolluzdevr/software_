@@ -73,7 +73,7 @@ export default function SchoolsList() {
   }
 
   function handleEditRegion(schoolId: number) {
-    router.push(`/schools/update?schoolId=${schoolId}`);
+    router.push(`/schools/update/${schoolId}`);
   }
 
   function handleSort(field: string) {

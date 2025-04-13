@@ -73,7 +73,7 @@ export default function ClassesList() {
   }
 
   function handleEditRegion(classId: number) {
-    router.push(`/school-classes/update?classId=${classId}`);
+    router.push(`/school-classes/update/${classId}`);
   }
 
   function handleSort(field: string) {
