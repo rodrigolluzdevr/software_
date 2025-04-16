@@ -38,8 +38,8 @@ const SecretaryDashboard = ({ router }: SecretaryDashboardProps) => {
   const [loading, setLoading] = useState<boolean>(true);
 
   // Funções de navegação
-  const navigateToRegions = () => router.push('/users/regions/register');
-  const navigateToSchools = () => router.push('/users/schools/register');
+  const navigateToRegions = () => router.push('/regions/register');
+  const navigateToSchools = () => router.push('/schools/register');
   const navigateToCoordinators = () => router.push('/users/coordinators/register');
   const navigateToDirectors = () => router.push('/users/directors/register');
 
